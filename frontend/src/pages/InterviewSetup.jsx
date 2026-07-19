@@ -1,9 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-
+import { useInterview } from "../context/InterviewContext";
 function InterviewSetup() {
   const navigate = useNavigate();
-
+  const { setInterviewData } = useInterview();
   const [formData, setFormData] = useState({
     role: "",
     experience: "",
@@ -19,14 +19,16 @@ function InterviewSetup() {
     });
   };
 
-  const handleStart = (e) => {
-    e.preventDefault();
+const handleStart = (e) => {
+  e.preventDefault();
 
-    console.log("Interview Configuration:", formData);
+  setInterviewData((prev) => ({
+    ...prev,
+    ...formData,
+  }));
 
-    // Navigate to Interview Page
-    navigate("/interview");
-  };
+  navigate("/interview");
+};
 
   return (
     <div className="min-h-screen bg-slate-100 flex justify-center items-center px-4">

@@ -26,17 +26,21 @@
 
 
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import Results from "./pages/Results";
 import Home from "./pages/Home";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import Dashboard from "./pages/Dashboard";
 import InterviewSetup from "./pages/InterviewSetup";
 import Interview from "./pages/Interview";
+import Results from "./pages/Results";
+
+
 function App() {
   return (
     <BrowserRouter>
       <Routes>
+        <Route path="/results" element={<Results />} />
         <Route path="/" element={<Home />} />
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
