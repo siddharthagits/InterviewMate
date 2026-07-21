@@ -1,107 +1,52 @@
 import { useForm } from "react-hook-form";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+
+const S = {
+  wrap: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px" },
+  card: { width:"100%", maxWidth:440, background:"var(--card)", border:"1px solid var(--glass-border)", borderRadius:20, overflow:"hidden" },
+  header: { padding:"32px 36px 24px", borderBottom:"1px solid var(--glass-border)" },
+  body: { padding:"28px 36px 36px" },
+  field: { marginBottom:20 },
+  label: { display:"block", fontSize:12, fontWeight:600, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.06em", marginBottom:8 },
+  err: { color:"var(--red)", fontSize:12, marginTop:5 },
+};
 
 function Login() {
-  const {
-    register,
-    handleSubmit,
-    formState: { errors },
-  } = useForm();
-
-  const onSubmit = (data) => {
-    console.log("Login Data:", data);
-    // Later: Call FastAPI login API here
-  };
+  const navigate = useNavigate();
+  const { register, handleSubmit, formState:{ errors } } = useForm();
+  const onSubmit = () => navigate("/dashboard");
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-slate-900 px-4">
-      <div className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8">
-
-        <h1 className="text-3xl font-bold text-center text-slate-800">
-          Welcome Back
-        </h1>
-
-        <p className="text-center text-gray-500 mt-2">
-          Login to InterviewMate
-        </p>
-
-        <form
-          onSubmit={handleSubmit(onSubmit)}
-          className="mt-8 space-y-5"
-        >
-          {/* Email */}
-          <div>
-            <label className="block mb-2 font-medium">
-              Email
-            </label>
-
-            <input
-              type="email"
-              placeholder="Enter your email"
-              {...register("email", {
-                required: "Email is required",
-                pattern: {
-                  value: /^\S+@\S+$/i,
-                  message: "Enter a valid email",
-                },
-              })}
-              className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-
-            {errors.email && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.email.message}
-              </p>
-            )}
-          </div>
-
-          {/* Password */}
-          <div>
-            <label className="block mb-2 font-medium">
-              Password
-            </label>
-
-            <input
-              type="password"
-              placeholder="Enter your password"
-              {...register("password", {
-                required: "Password is required",
-                minLength: {
-                  value: 6,
-                  message: "Minimum 6 characters",
-                },
-              })}
-              className="w-full border rounded-lg p-3 focus:ring-2 focus:ring-blue-500 outline-none"
-            />
-
-            {errors.password && (
-              <p className="text-red-500 text-sm mt-1">
-                {errors.password.message}
-              </p>
-            )}
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-          >
-            Login
-          </button>
-        </form>
-
-        <p className="text-center mt-6 text-gray-600">
-          Don't have an account?{" "}
-          <Link
-            to="/register"
-            className="text-blue-600 font-semibold"
-          >
-            Register
-          </Link>
-        </p>
-
+    <div style={S.wrap}>
+      <div style={S.card}>
+        <div style={S.header}>
+          <Link to="/" className="grad-text" style={{ fontSize:18, fontWeight:800, textDecoration:"none", display:"inline-block" }}>InterviewMate</Link>
+          <h1 style={{ fontSize:26, fontWeight:800, marginTop:8 }}>Welcome back</h1>
+          <p style={{ color:"var(--text-muted)", fontSize:14, marginTop:4 }}>Sign in to your account</p>
+        </div>
+        <div style={S.body}>
+          <form onSubmit={handleSubmit(onSubmit)}>
+            <div style={S.field}>
+              <label style={S.label}>Email</label>
+              <input type="email" className="input" placeholder="you@example.com"
+                {...register("email",{ required:"Email is required" })} />
+              {errors.email && <p style={S.err}>{errors.email.message}</p>}
+            </div>
+            <div style={S.field}>
+              <label style={S.label}>Password</label>
+              <input type="password" className="input" placeholder="••••••••"
+                {...register("password",{ required:"Password required", minLength:{ value:6, message:"Min 6 characters" } })} />
+              {errors.password && <p style={S.err}>{errors.password.message}</p>}
+            </div>
+            <button type="submit" className="btn btn-primary" style={{ width:"100%", marginTop:8 }}>Sign In</button>
+          </form>
+          <p style={{ textAlign:"center", marginTop:20, fontSize:14, color:"var(--text-muted)" }}>
+            No account?{" "}
+            <Link to="/register" style={{ color:"var(--primary-light)", fontWeight:600 }}>Register</Link>
+          </p>
+        </div>
       </div>
     </div>
   );
 }
-
 export default Login;

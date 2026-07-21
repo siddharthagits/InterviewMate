@@ -2,29 +2,19 @@ import { Link } from "react-router-dom";
 
 function Navbar() {
   return (
-    <nav className="flex justify-between items-center px-10 py-5 bg-slate-950 text-white shadow-lg">
-      <h1 className="text-2xl font-bold text-blue-400">
-        InterviewMate
-      </h1>
-
-      <div className="space-x-6">
-        <Link to="/" className="hover:text-blue-400">
-          Home
-        </Link>
-
-        <Link to="/login" className="hover:text-blue-400">
-          Login
-        </Link>
-
-        <Link
-          to="/register"
-          className="bg-blue-600 px-4 py-2 rounded-lg hover:bg-blue-700"
-        >
-          Register
-        </Link>
+    <nav style={{
+      display:"flex", justifyContent:"space-between", alignItems:"center",
+      padding:"18px 48px",
+      background:"transparent", backdropFilter:"none",
+      borderBottom:"none",
+      position:"absolute", top:0, zIndex:100, width:"100%"
+    }}>
+      <Link to="/" className="grad-text" style={{ fontSize:22, fontWeight:800, textDecoration:"none" }}>InterviewMate</Link>
+      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
+        <Link to="/login" className="btn btn-outline" style={{ padding:"8px 18px", fontSize:14 }}>Login</Link>
+        <Link to="/register" className="btn btn-primary" style={{ padding:"8px 18px", fontSize:14 }}>Get Started</Link>
       </div>
     </nav>
   );
 }
-
 export default Navbar;

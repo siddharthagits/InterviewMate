@@ -1,142 +1,66 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
+
+const S = {
+  wrap: { minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", padding: "40px 20px" },
+  card: { width: "100%", maxWidth: "520px" },
+  header: {
+    background: "linear-gradient(135deg, var(--primary), var(--primary-dark))",
+    borderRadius: "16px 16px 0 0", padding: "32px",
+    boxShadow: "0 8px 32px var(--primary-glow)",
+  },
+  body: { background: "var(--card)", border: "1px solid var(--glass-border)", borderTop: "none", borderRadius: "0 0 16px 16px", padding: "32px" },
+  field: { marginBottom: "20px" },
+  label: { display: "block", fontSize: "13px", fontWeight: 600, color: "var(--text-dim)", marginBottom: "8px", textTransform: "uppercase", letterSpacing: "0.05em" },
+};
+
+const fields = [
+  { name: "role", label: "Job Role", options: ["Software Engineer","Frontend Developer","Backend Developer","Full Stack Developer","Data Analyst"] },
+  { name: "experience", label: "Experience Level", options: ["Fresher","1-2 Years","3-5 Years","5+ Years"] },
+  { name: "language", label: "Programming Language", options: ["JavaScript","Python","Java","C++"] },
+  { name: "difficulty", label: "Difficulty", options: ["Easy","Medium","Hard"] },
+  { name: "duration", label: "Duration", options: ["15 Minutes","30 Minutes","45 Minutes"] },
+];
+
 function InterviewSetup() {
   const navigate = useNavigate();
   const { setInterviewData } = useInterview();
-  const [formData, setFormData] = useState({
-    role: "",
-    experience: "",
-    language: "",
-    difficulty: "",
-    duration: "",
-  });
+  const [form, setForm] = useState({ role:"",experience:"",language:"",difficulty:"",duration:"" });
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value,
-    });
+  const handle = (e) => setForm(p => ({ ...p, [e.target.name]: e.target.value }));
+
+  const start = (e) => {
+    e.preventDefault();
+    setInterviewData(p => ({ ...p, ...form }));
+    navigate("/interview");
   };
 
-const handleStart = (e) => {
-  e.preventDefault();
-
-  setInterviewData((prev) => ({
-    ...prev,
-    ...formData,
-  }));
-
-  navigate("/interview");
-};
-
   return (
-    <div className="min-h-screen bg-slate-100 flex justify-center items-center px-4">
-      <div className="bg-white shadow-xl rounded-2xl w-full max-w-xl p-8">
+    <div style={S.wrap}>
+      <div style={S.card}>
+        <div style={S.header}>
+          <p style={{ fontSize: "12px", fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: "8px" }}>AI Powered</p>
+          <h1 style={{ fontSize: "28px", fontWeight: 800, color: "#fff" }}>Configure Interview</h1>
+          <p style={{ color: "rgba(255,255,255,0.65)", marginTop: "6px", fontSize: "14px" }}>35 questions: MCQs, text answers & code snippets</p>
+        </div>
 
-        <h1 className="text-3xl font-bold text-center text-slate-800">
-          Start AI Interview
-        </h1>
-
-        <p className="text-center text-gray-500 mt-2">
-          Configure your interview
-        </p>
-
-        <form onSubmit={handleStart} className="space-y-5 mt-8">
-
-          <div>
-            <label className="font-medium">Job Role</label>
-            <select
-              name="role"
-              value={formData.role}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3 mt-1"
-              required
-            >
-              <option value="">Select Role</option>
-              <option>Software Engineer</option>
-              <option>Frontend Developer</option>
-              <option>Backend Developer</option>
-              <option>Full Stack Developer</option>
-              <option>Data Analyst</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="font-medium">Experience</label>
-            <select
-              name="experience"
-              value={formData.experience}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3 mt-1"
-              required
-            >
-              <option value="">Select Experience</option>
-              <option>Fresher</option>
-              <option>1-2 Years</option>
-              <option>3-5 Years</option>
-              <option>5+ Years</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="font-medium">Programming Language</label>
-            <select
-              name="language"
-              value={formData.language}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3 mt-1"
-              required
-            >
-              <option value="">Select Language</option>
-              <option>Java</option>
-              <option>Python</option>
-              <option>C++</option>
-              <option>JavaScript</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="font-medium">Difficulty</label>
-            <select
-              name="difficulty"
-              value={formData.difficulty}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3 mt-1"
-              required
-            >
-              <option value="">Select Difficulty</option>
-              <option>Easy</option>
-              <option>Medium</option>
-              <option>Hard</option>
-            </select>
-          </div>
-
-          <div>
-            <label className="font-medium">Duration</label>
-            <select
-              name="duration"
-              value={formData.duration}
-              onChange={handleChange}
-              className="w-full border rounded-lg p-3 mt-1"
-              required
-            >
-              <option value="">Select Duration</option>
-              <option>10 Minutes</option>
-              <option>15 Minutes</option>
-              <option>30 Minutes</option>
-            </select>
-          </div>
-
-          <button
-            type="submit"
-            className="w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700 transition"
-          >
-            Start Interview
-          </button>
-
-        </form>
-
+        <div style={S.body}>
+          <form onSubmit={start}>
+            {fields.map(({ name, label, options }) => (
+              <div key={name} style={S.field}>
+                <label style={S.label}>{label}</label>
+                <select name={name} value={form[name]} onChange={handle} required className="select-field">
+                  <option value="">Select {label}</option>
+                  {options.map(o => <option key={o}>{o}</option>)}
+                </select>
+              </div>
+            ))}
+            <button type="submit" className="btn btn-primary" style={{ width: "100%", marginTop: "8px" }}>
+              Start Interview ▶
+            </button>
+          </form>
+        </div>
       </div>
     </div>
   );

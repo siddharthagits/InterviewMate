@@ -1,52 +1,32 @@
-import { Link } from "react-router-dom";
+import { useLocation, Link } from "react-router-dom";
+
+const links = [
+  { to: "/",          icon: "🏠", label: "Home" },
+  { to: "/dashboard", icon: "⊞", label: "Dashboard" },
+  { to: "/setup",     icon: "▶", label: "Start Interview" },
+  { to: "/history",   icon: "◷", label: "History" },
+  { to: "/reports",   icon: "◈", label: "Reports" },
+  { to: "/profile",   icon: "◉", label: "Profile" },
+];
 
 function Sidebar() {
+  const { pathname } = useLocation();
+
   return (
-    <aside className="w-64 bg-slate-900 text-white min-h-screen p-6">
-
-      <h2 className="text-2xl font-bold text-blue-400 mb-10">
-        InterviewMate
-      </h2>
-
-      <nav className="flex flex-col gap-4">
-
-        <Link
-          to="/dashboard"
-          className="hover:bg-slate-800 p-3 rounded-lg"
-        >
-          Dashboard
-        </Link>
-
-        <Link
-          to="/setup"
-          className="hover:bg-slate-800 p-3 rounded-lg"
-        >
-          Start Interview
-        </Link>
-
-        <Link
-          to="/history"
-          className="hover:bg-slate-800 p-3 rounded-lg"
-        >
-          History
-        </Link>
-
-        <Link
-          to="/reports"
-          className="hover:bg-slate-800 p-3 rounded-lg"
-        >
-          Reports
-        </Link>
-
-        <Link
-          to="/profile"
-          className="hover:bg-slate-800 p-3 rounded-lg"
-        >
-          Profile
-        </Link>
-
+    <aside className="sidebar">
+      <Link to="/" className="sidebar-logo" style={{ textDecoration:"none" }}>InterviewMate</Link>
+      <nav style={{ display: "flex", flexDirection: "column", gap: "4px" }}>
+        {links.map(({ to, icon, label }) => (
+          <Link
+            key={to}
+            to={to}
+            className={`sidebar-link${pathname === to ? " active" : ""}`}
+          >
+            <span className="sidebar-icon">{icon}</span>
+            {label}
+          </Link>
+        ))}
       </nav>
-
     </aside>
   );
 }

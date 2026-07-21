@@ -2,14 +2,11 @@ import Sidebar from "./Sidebar";
 
 function DashboardLayout({ children }) {
   return (
-    <div className="flex">
-
+    <div style={{ display: "flex", minHeight: "100vh" }}>
       <Sidebar />
-
-      <main className="flex-1 bg-slate-100 min-h-screen p-8">
+      <main style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
         {children}
       </main>
-
     </div>
   );
 }

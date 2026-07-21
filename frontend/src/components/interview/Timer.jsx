@@ -1,38 +1,53 @@
-// import { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 
-// function Timer() {
-//   const [time, setTime] = useState(600); // 10 minutes
+// Parse "10 Minutes" → 600 seconds
+function parseDurationSeconds(duration) {
+  if (!duration) return 600;
+  const match = duration.match(/(\d+)/);
+  if (!match) return 600;
+  return parseInt(match[1], 10) * 60;
+}
 
-//   useEffect(() => {
-//     const timer = setInterval(() => {
-//       setTime((prev) => {
-//         if (prev === 0) {
-//           clearInterval(timer);
-//           return 0;
-//         }
-//         return prev - 1;
-//       });
-//     }, 1000);
+function Timer({ duration, onTimeUp }) {
+  const totalSeconds = parseDurationSeconds(duration);
+  const [time, setTime] = useState(totalSeconds);
 
-//     return () => clearInterval(timer);
-//   }, []);
+  useEffect(() => {
+    if (time <= 0) {
+      onTimeUp?.();
+      return;
+    }
 
-//   const minutes = Math.floor(time / 60);
-//   const seconds = time % 60;
+    const interval = setInterval(() => {
+      setTime((prev) => {
+        if (prev <= 1) {
+          clearInterval(interval);
+          onTimeUp?.();
+          return 0;
+        }
+        return prev - 1;
+      });
+    }, 1000);
 
-//   return (
-//     <h2 className="text-right text-xl font-bold">
-//       {minutes}:{seconds.toString().padStart(2, "0")}
-//     </h2>
-//   );
-// }
+    return () => clearInterval(interval);
+  }, []); // run once on mount
 
-// export default Timer;
+  const minutes = Math.floor(time / 60);
+  const seconds = time % 60;
+  const isWarning = time <= 60;
+  const isCritical = time <= 10;
 
-function Timer() {
   return (
-    <div className="bg-red-100 text-red-600 px-4 py-2 rounded-lg font-bold">
-      10:00
+    <div
+      className={`px-4 py-2 rounded-lg font-bold text-lg tabular-nums transition-colors ${
+        isCritical
+          ? "bg-red-600 text-white animate-pulse"
+          : isWarning
+          ? "bg-orange-100 text-orange-600"
+          : "bg-red-100 text-red-600"
+      }`}
+    >
+      ⏱ {minutes}:{seconds.toString().padStart(2, "0")}
     </div>
   );
 }
