@@ -12,7 +12,14 @@ dist
 dist-ssr
 *.local
 
-# Editor directories and files
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Vite / editor artifacts
+.vite/
 .vscode/*
 !.vscode/extensions.json
 .idea
