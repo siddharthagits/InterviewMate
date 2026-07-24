@@ -302,21 +302,50 @@ def _get_mcq_bank(language):
     if "c++" in lang or "cpp" in lang: return _MCQ_CPP
     return _MCQ_JS
 
+def _get_all_mcqs():
+    all_mcqs = []
+    for bank in (_MCQ_JS, _MCQ_PYTHON, _MCQ_JAVA, _MCQ_CPP):
+        for questions in bank.values():
+            all_mcqs.extend(questions)
+    return all_mcqs
+
+
+def _dedupe_mcqs(mcqs):
+    seen = set()
+    unique = []
+    for q in mcqs:
+        key = q["q"].strip().lower()
+        if key not in seen:
+            seen.add(key)
+            unique.append(q)
+    return unique
+
+
 def _build_fallback(data):
     mcq_bank = _get_mcq_bank(data.language)
     diff = data.difficulty if data.difficulty in mcq_bank else "Medium"
-    primary_mcqs = mcq_bank.get(diff, [])
+    primary_mcqs = mcq_bank.get(diff, [])[:]
     other_mcqs = []
     for k in mcq_bank:
         if k != diff:
             other_mcqs.extend(mcq_bank[k])
-            
+
     random.shuffle(primary_mcqs)
     random.shuffle(other_mcqs)
-    
-    available_mcqs = primary_mcqs + other_mcqs
-    
-    # Take up to 25 unique questions
+
+    available_mcqs = _dedupe_mcqs(primary_mcqs + other_mcqs)
+    if len(available_mcqs) < 25:
+        extra_mcqs = _dedupe_mcqs(_get_all_mcqs())
+        random.shuffle(extra_mcqs)
+        for q in extra_mcqs:
+            if len(available_mcqs) >= 25:
+                break
+            if q["q"].strip().lower() not in {x["q"].strip().lower() for x in available_mcqs}:
+                available_mcqs.append(q)
+
+    if len(available_mcqs) < 25:
+        available_mcqs = (available_mcqs + available_mcqs)[:25]
+
     mcqs = available_mcqs[:25]
     texts = random.sample(_TEXT[diff], min(5, len(_TEXT[diff])))
     codes = random.sample(_get_code_bank(data.language), min(5, len(_get_code_bank(data.language))))
@@ -376,8 +405,8 @@ Return ONLY valid JSON array, no markdown."""
                 text = text[start:end+1]
             
             parsed = json.loads(text)
-            if isinstance(parsed, list) and len(parsed) >= 30:
-                return parsed
+            if isinstance(parsed, list) and len(parsed) >= 35:
+                return parsed[:35]
         except Exception:
             continue
     return None

@@ -63,16 +63,21 @@ Return ONLY valid JSON:
 
 def evaluate_answers(interview_data, answers):
     """
-    answers: list of AnswerSubmission objects
+    answers: list of AnswerSubmission objects or list of text strings for fallback evaluation
     Returns full result dict with combined score.
     """
-    mcq_answers  = [a for a in answers if a.question_type == "mcq"]
-    code_answers = [a for a in answers if a.question_type == "code"]
-    text_answers = [a for a in answers if a.question_type == "text"]
+    if answers and isinstance(answers[0], str):
+        text_answers = answers
+        mcq_answers = []
+        code_answers = []
+    else:
+        mcq_answers  = [a for a in answers if getattr(a, "question_type", None) == "mcq"]
+        code_answers = [a for a in answers if getattr(a, "question_type", None) == "code"]
+        text_answers = [a for a in answers if getattr(a, "question_type", None) == "text"]
 
     # Auto-score MCQ
-    mcq_correct = sum(1 for a in mcq_answers  if a.selected is not None and a.correct is not None and a.selected == a.correct)
-    code_correct= sum(1 for a in code_answers if a.selected is not None and a.correct is not None and a.selected == a.correct)
+    mcq_correct = sum(1 for a in mcq_answers  if getattr(a, "selected", None) is not None and getattr(a, "correct", None) is not None and a.selected == a.correct)
+    code_correct= sum(1 for a in code_answers if getattr(a, "selected", None) is not None and getattr(a, "correct", None) is not None and a.selected == a.correct)
 
     total_mcq  = len(mcq_answers)  or 1
     total_code = len(code_answers) or 1
@@ -81,7 +86,10 @@ def evaluate_answers(interview_data, answers):
     code_pct = code_correct / total_code * 100
 
     # Evaluate text with Gemini / fallback
-    text_strings = [a.text or "" for a in text_answers]
+    if answers and isinstance(answers[0], str):
+        text_strings = text_answers
+    else:
+        text_strings = [getattr(a, "text", "") or "" for a in text_answers]
     combined_text = "".join(text_strings).strip()
 
     if not combined_text:
