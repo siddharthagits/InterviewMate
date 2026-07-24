@@ -1,0 +1,14 @@
+[build]
+  base = "frontend"
+  command = "npm run build"
+  publish = "dist"
+
+[dev]
+  command = "npm --prefix frontend run dev"
+  targetPort = 5173
+  framework = "#custom"
+
+[[redirects]]
+  from = "/*"
+  to = "/index.html"
+  status = 200
