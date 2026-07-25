@@ -4,8 +4,9 @@ import axios from "axios";
 import { useInterview } from "../context/InterviewContext";
 import MCQOptions from "../components/interview/MCQOptions";
 import CodeSnippet from "../components/interview/CodeSnippet";
+import { buildFallbackQuestions } from "../data/questionBank";
 
-const API = "http://127.0.0.1:8000";
+const API = import.meta.env.VITE_API_URL || "http://127.0.0.1:8000";
 
 function parseSecs(dur) {
   const m = (dur || "").match(/(\d+)/);
@@ -71,10 +72,12 @@ export default function Interview() {
         setQuestions(r.data.questions || []);
         setCtxQuestions(r.data.questions || []);
       } catch {
-        const fb = [
-          { id: 1, type: "text", question: "Tell me about yourself and your experience." },
-          { id: 2, type: "mcq", question: "What is a variable?", options: ["Container for data", "A loop", "A function", "A class"], correct: 0 },
-        ];
+        // Backend unreachable — generate a full 35-question interview locally
+        const fb = buildFallbackQuestions({
+          role: interviewData.role,
+          language: interviewData.language,
+          difficulty: interviewData.difficulty,
+        });
         setQuestions(fb);
         setCtxQuestions(fb);
       } finally { setLoadingQs(false); }
