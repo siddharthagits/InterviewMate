@@ -8,21 +8,38 @@ function Hero() {
         ✨ AI-Powered Interview Practice
       </div>
 
+<<<<<<< HEAD
       <h1 style={{ fontSize:"clamp(40px,6vw,72px)", fontWeight:900, lineHeight:1.1, maxWidth:800 }}>
         Ace Your Next{" "}
         <span className="grad-text">Interview</span>
         <br />with AI Coaching
+=======
+      <h1 style={{ fontSize:"clamp(28px,4vw,52px)", fontWeight:900, lineHeight:1.15, maxWidth:700 }}>
+        Ace Your Next{" "}
+        <span className="grad-text">Interview</span>
+>>>>>>> cb25cce (Initial commit)
       </h1>
 
       <p style={{ marginTop:24, maxWidth:560, color:"var(--text-muted)", fontSize:18, lineHeight:1.7 }}>
         Practice with 35 adaptive questions — MCQs, code output challenges, and in-depth answers — then get instant AI feedback on your performance.
       </p>
 
+<<<<<<< HEAD
       <div style={{ marginTop:40, display:"flex", gap:14, flexWrap:"wrap", justifyContent:"center" }}>
         <button className="btn btn-primary" style={{ fontSize:16, padding:"14px 36px" }} onClick={() => nav("/setup")}>
           Start Free Interview ▶
         </button>
         <button className="btn btn-outline" style={{ fontSize:16, padding:"14px 36px" }} onClick={() => nav("/dashboard")}>
+=======
+      <div style={{ marginTop:40, display:"flex", gap:12, flexWrap:"wrap", justifyContent:"center" }}>
+        <button className="btn btn-primary" style={{ fontSize:14, padding:"10px 26px" }} onClick={() => nav("/setup")}>
+          Start Free Interview ▶
+        </button>
+        <button className="btn btn-primary" style={{ fontSize:14, padding:"10px 26px" }} onClick={() => nav("/mock-tests")}>
+          🎯 Free Mock Tests
+        </button>
+        <button className="btn btn-outline" style={{ fontSize:14, padding:"10px 26px" }} onClick={() => nav("/dashboard")}>
+>>>>>>> cb25cce (Initial commit)
           View Dashboard
         </button>
       </div>
