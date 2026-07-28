@@ -317,8 +317,6 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 @keyframes pulse-glow {
   0%, 100% { box-shadow: 0 0 8px var(--primary-glow); }
   50%       { box-shadow: 0 0 24px var(--primary-glow); }
-<<<<<<< HEAD
-=======
 }
 
 /* ── Mock Test Cards ─────────────────────────────────────────────────────── */
@@ -339,5 +337,4 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 /* ── Mock Test Page ───────────────────────────────────────────────────────── */
 @media (max-width: 768px) {
   .mock-test-card { min-width: 100% !important; }
->>>>>>> cb25cce (Initial commit)
 }

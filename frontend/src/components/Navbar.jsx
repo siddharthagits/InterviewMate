@@ -10,9 +10,6 @@ function Navbar() {
       position:"absolute", top:0, zIndex:100, width:"100%"
     }}>
       <Link to="/" className="grad-text" style={{ fontSize:22, fontWeight:800, textDecoration:"none" }}>InterviewMate</Link>
-<<<<<<< HEAD
-      <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-=======
       <div style={{ display:"flex", alignItems:"center", gap:16 }}>
         <Link
           to="/mock-tests"
@@ -22,7 +19,6 @@ function Navbar() {
         >
           🎯 Mock Tests
         </Link>
->>>>>>> cb25cce (Initial commit)
         <Link to="/login" className="btn btn-outline" style={{ padding:"8px 18px", fontSize:14 }}>Login</Link>
         <Link to="/register" className="btn btn-primary" style={{ padding:"8px 18px", fontSize:14 }}>Get Started</Link>
       </div>

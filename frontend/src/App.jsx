@@ -9,11 +9,8 @@ import Results from "./pages/Results";
 import History from "./pages/History";
 import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
-<<<<<<< HEAD
-=======
 import MockTestPage from "./pages/MockTestPage";
 import MockTestList from "./pages/MockTestList";
->>>>>>> cb25cce (Initial commit)
 
 function App() {
   return (
@@ -28,11 +25,8 @@ function App() {
       <Route path="/history" element={<History />} />
       <Route path="/reports" element={<Reports />} />
       <Route path="/profile" element={<Profile />} />
-<<<<<<< HEAD
-=======
       <Route path="/mock-test/:category" element={<MockTestPage />} />
       <Route path="/mock-tests" element={<MockTestList />} />
->>>>>>> cb25cce (Initial commit)
     </Routes>
   );
 }
