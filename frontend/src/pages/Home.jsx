@@ -8,23 +8,28 @@ function Home() {
   return (
     <div style={{ position: "relative", minHeight: "100vh", background: "var(--bg)", overflow: "hidden" }}>
 
-      {/* Particle canvas — covers the whole page behind everything */}
+      {/* Particle canvas — fixed behind everything */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>
         <ParticleBackground />
       </div>
 
-      {/* Radial glow overlays on top of particles */}
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none",
-        background: `
-          radial-gradient(ellipse 70% 50% at 50% 0%,  rgba(99,102,241,0.12) 0%, transparent 65%),
-          radial-gradient(ellipse 50% 40% at 80% 60%, rgba(6,182,212,0.07)  0%, transparent 60%)
-        `,
-      }} />
+      {/* Multi-layer glow overlays */}
+      <div
+        style={{
+          position: "fixed", inset: 0, zIndex: 1, pointerEvents: "none",
+          background: `
+            radial-gradient(ellipse 70% 50% at 50% 0%,   rgba(124,58,237,0.1) 0%, transparent 65%),
+            radial-gradient(ellipse 50% 40% at 85% 60%,  rgba(6,182,212,0.06) 0%, transparent 60%),
+            radial-gradient(ellipse 40% 30% at 10% 80%,  rgba(245,158,11,0.04) 0%, transparent 55%)
+          `,
+        }}
+      />
 
-      {/* Page content */}
+      {/* Fixed Navbar */}
+      <Navbar />
+
+      {/* Scrollable page content — offset for fixed navbar */}
       <div style={{ position: "relative", zIndex: 2 }}>
-        <Navbar />
         <Hero />
         <Features />
         <Footer />

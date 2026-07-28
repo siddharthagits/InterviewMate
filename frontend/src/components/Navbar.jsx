@@ -1,28 +1,79 @@
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
+import { useState, useEffect } from "react";
 
 function Navbar() {
+  const location = useLocation();
+  const [scrolled, setScrolled] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  useEffect(() => {
+    const onScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener("scroll", onScroll);
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
   return (
-    <nav style={{
-      display:"flex", justifyContent:"space-between", alignItems:"center",
-      padding:"18px 48px",
-      background:"transparent", backdropFilter:"none",
-      borderBottom:"none",
-      position:"absolute", top:0, zIndex:100, width:"100%"
-    }}>
-      <Link to="/" className="grad-text" style={{ fontSize:22, fontWeight:800, textDecoration:"none" }}>InterviewMate</Link>
-      <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+    <nav
+      className="navbar"
+      style={{
+        background: scrolled
+          ? "rgba(4,8,15,0.92)"
+          : "rgba(4,8,15,0.5)",
+        borderBottomColor: scrolled
+          ? "rgba(124,58,237,0.12)"
+          : "rgba(255,255,255,0.04)",
+        boxShadow: scrolled ? "0 4px 40px rgba(0,0,0,0.4)" : "none",
+      }}
+    >
+      {/* Logo */}
+      <Link to="/" className="navbar-logo">
+        Interview<span style={{ color: "#fcd34d" }}>Mate</span>
+      </Link>
+
+      {/* Desktop Links */}
+      <div style={{ display: "flex", alignItems: "center", gap: 28 }}>
         <Link
           to="/mock-tests"
-          style={{ fontSize:14, color:"var(--text-muted)", textDecoration:"none", fontWeight:500, transition:"color 0.15s" }}
-          onMouseEnter={e => e.currentTarget.style.color = "#67e8f9"}
-          onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
+          className="nav-link"
+          style={{ color: location.pathname === "/mock-tests" ? "var(--violet-light)" : undefined }}
         >
-          🎯 Mock Tests
+          Mock Tests
         </Link>
-        <Link to="/login" className="btn btn-outline" style={{ padding:"8px 18px", fontSize:14 }}>Login</Link>
-        <Link to="/register" className="btn btn-primary" style={{ padding:"8px 18px", fontSize:14 }}>Get Started</Link>
+        <Link
+          to="/company-assessment"
+          className="nav-link"
+          style={{ color: location.pathname === "/company-assessment" ? "var(--gold-light)" : undefined }}
+        >
+          🏢 Companies
+        </Link>
+        <Link
+          to="/dashboard"
+          className="nav-link"
+          style={{ color: location.pathname === "/dashboard" ? "var(--violet-light)" : undefined }}
+        >
+          Dashboard
+        </Link>
+      </div>
+
+      {/* CTA Buttons */}
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <Link
+          to="/login"
+          className="btn btn-outline"
+          style={{ padding: "9px 20px", fontSize: 13, borderRadius: 12 }}
+        >
+          Login
+        </Link>
+        <Link
+          to="/register"
+          className="btn btn-primary"
+          style={{ padding: "9px 20px", fontSize: 13, borderRadius: 12 }}
+        >
+          Get Started →
+        </Link>
       </div>
     </nav>
   );
 }
+
 export default Navbar;

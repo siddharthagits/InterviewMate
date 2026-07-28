@@ -11,22 +11,24 @@ import Reports from "./pages/Reports";
 import Profile from "./pages/Profile";
 import MockTestPage from "./pages/MockTestPage";
 import MockTestList from "./pages/MockTestList";
+import CompanyAssessment from "./pages/CompanyAssessment";
 
 function App() {
   return (
     <Routes>
-      <Route path="/" element={<Home />} />
-      <Route path="/login" element={<Login />} />
-      <Route path="/register" element={<Register />} />
-      <Route path="/dashboard" element={<Dashboard />} />
-      <Route path="/setup" element={<InterviewSetup />} />
-      <Route path="/interview" element={<Interview />} />
-      <Route path="/results" element={<Results />} />
-      <Route path="/history" element={<History />} />
-      <Route path="/reports" element={<Reports />} />
-      <Route path="/profile" element={<Profile />} />
+      <Route path="/"                    element={<Home />} />
+      <Route path="/login"               element={<Login />} />
+      <Route path="/register"            element={<Register />} />
+      <Route path="/dashboard"           element={<Dashboard />} />
+      <Route path="/setup"               element={<InterviewSetup />} />
+      <Route path="/interview"           element={<Interview />} />
+      <Route path="/results"             element={<Results />} />
+      <Route path="/history"             element={<History />} />
+      <Route path="/reports"             element={<Reports />} />
+      <Route path="/profile"             element={<Profile />} />
       <Route path="/mock-test/:category" element={<MockTestPage />} />
-      <Route path="/mock-tests" element={<MockTestList />} />
+      <Route path="/mock-tests"          element={<MockTestList />} />
+      <Route path="/company-assessment"  element={<CompanyAssessment />} />
     </Routes>
   );
 }

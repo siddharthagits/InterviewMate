@@ -370,12 +370,31 @@ def _build_fallback(data):
     return questions
 
 
+# Company interview style hints
+_COMPANY_HINTS = {
+    "Google":    "Focus on algorithmic complexity, system design scalability, and abstract problem-solving. Questions should be similar to Google's FAANG-level interviews.",
+    "Amazon":    "Emphasize Leadership Principles, customer obsession, and scalable system design. Include behavioral questions tied to Amazon's 16 LPs.",
+    "Meta":      "Focus on product thinking, large-scale distributed systems, and coding efficiency. Mirror Meta's loop-style interview pattern.",
+    "Microsoft": "Blend of OOP design, coding patterns, and system design. Questions should reflect Microsoft's structured, methodical interview style.",
+    "TCS":       "Focus on basic programming concepts, aptitude-style coding, database queries, and core CS fundamentals. Reflect TCS NQT/Ninja style.",
+    "Wipro":     "Emphasize core programming, data structures, and scenario-based problem solving. Reflect Wipro Elite/WILP interview patterns.",
+    "Infosys":   "Focus on fundamental CS concepts, basic algorithms, and logical reasoning. Reflect Infosys InfyTQ and Specialist Programmer style.",
+    "Startup":   "Prioritize full-stack thinking, practical problem solving, product intuition, and ability to work independently.",
+}
+
+
 def _gemini_generate(data):
     if _client is None:
         return None
+
+    company     = getattr(data, 'company', None) or ""
+    company_ctx = ""
+    if company and company in _COMPANY_HINTS:
+        company_ctx = f"\nCompany Style — {company}: {_COMPANY_HINTS[company]}\nTailor question style and content to reflect {company}'s known interview patterns."
+
     prompt = f"""Generate exactly 35 unique interview questions for a {data.role} with {data.experience} experience.
 Programming Language: {data.language}
-Difficulty Level: {data.difficulty.upper()}
+Difficulty Level: {data.difficulty.upper()}{company_ctx}
 
 CRITICAL INSTRUCTION: You MUST strictly enforce the {data.difficulty.upper()} difficulty level.
 - EASY: Basic syntax, core concepts, simple definitions, and common methods.
@@ -389,21 +408,18 @@ Return ONLY a JSON array with exactly:
 
 Return ONLY valid JSON array, no markdown."""
 
-    for model in ("gemini-2.0-flash","gemini-2.5-flash","gemini-2.5-flash-lite"):
+    for model in ("gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"):
         try:
             resp = _client.models.generate_content(model=model, contents=prompt)
             text = resp.text.strip()
             if text.startswith("```json"): text = text[7:]
-            if text.startswith("```"): text = text[3:]
-            if text.endswith("```"): text = text[:-3]
-            text = text.strip()
-            
-            # Find the first '[' and last ']'
+            if text.startswith("```"):     text = text[3:]
+            if text.endswith("```"):       text = text[:-3]
+            text  = text.strip()
             start = text.find('[')
-            end = text.rfind(']')
+            end   = text.rfind(']')
             if start != -1 and end != -1:
                 text = text[start:end+1]
-            
             parsed = json.loads(text)
             if isinstance(parsed, list) and len(parsed) >= 35:
                 return parsed[:35]
@@ -417,3 +433,8 @@ def generate_questions(data):
     if result:
         return result
     return _build_fallback(data)
+
+
+def get_questions_map(questions: list) -> dict:
+    """Convert question list to {id: question_dict} for fast lookup."""
+    return {q.get("id", i): q for i, q in enumerate(questions)}
