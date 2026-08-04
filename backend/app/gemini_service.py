@@ -17,18 +17,27 @@ if genai is not None and os.getenv("GEMINI_API_KEY"):
 
 
 # ── Helpers ────────────────────────────────────────────────────────────────────
-def _call_gemini(prompt: str) -> str | None:
-    """Try all available Gemini models and return raw text or None."""
+def _call_gemini(prompt: str) -> tuple[str | None, str]:
+    """Try all available Gemini models and return (text, error_message)."""
     if not client:
-        return None
-    for model in ("gemini-2.0-flash", "gemini-2.5-flash", "gemini-2.5-flash-lite"):
+        return None, "Client not initialized (GEMINI_API_KEY missing or invalid)."
+    
+    last_err = ""
+    for model in ("gemini-2.0-flash", "gemini-2.0-flash-lite", "gemini-2.5-flash-lite", "gemini-flash-latest"):
         try:
             resp = client.models.generate_content(model=model, contents=prompt)
             text = resp.text.strip().replace("```json", "").replace("```", "").strip()
-            return text
-        except Exception:
+            return text, ""
+        except Exception as e:
+            err_str = str(e)
+            if "429" in err_str or "RESOURCE_EXHAUSTED" in err_str:
+                last_err = "API Quota / Rate limit exceeded (429). Check your Gemini API key limits at https://ai.google.dev/."
+            elif "404" in err_str:
+                last_err = f"Model {model} is not available."
+            else:
+                last_err = f"Gemini Error: {err_str[:120]}"
             continue
-    return None
+    return None, last_err
 
 
 def _parse_json(text: str) -> dict | list | None:
@@ -85,7 +94,7 @@ Candidate text answers: {text_answers}
 Return ONLY valid JSON (no markdown):
 {{"text_score": 75, "feedback": "...", "strengths": ["..."], "improvements": ["..."]}}
 """
-    raw = _call_gemini(prompt)
+    raw, _ = _call_gemini(prompt)
     if not raw:
         return None
     parsed = _parse_json(raw)
@@ -194,7 +203,7 @@ Return ONLY valid JSON (no markdown):
 score: 0-10 (10 = perfect), verdict: "Excellent"|"Good"|"Partial"|"Weak"|"Skipped"
 missed_keywords: up to 4 important terms/concepts the answer missed.
 """
-            raw = _call_gemini(prompt)
+            raw, _ = _call_gemini(prompt)
             parsed = _parse_json(raw) if raw else None
             if parsed and "score" in parsed:
                 per_q.append({
@@ -289,7 +298,7 @@ Return ONLY valid JSON (no markdown):
 All dimension values: 0-100. readiness: overall 0-100.
 roadmap: 3 actionable steps with specific area and concrete action.
 """
-    raw = _call_gemini(prompt)
+    raw, _ = _call_gemini(prompt)
     parsed = _parse_json(raw) if raw else None
     if parsed and "readiness" in parsed and "dimensions" in parsed:
         return parsed
@@ -371,3 +380,20 @@ def evaluate_answers(interview_data, answers, questions_map: dict = None):
         "per_question_feedback": per_q,       # NEW
         "readiness":    readiness,             # NEW
     }
+
+def explain_question(question: str, subject: str) -> str:
+    """Dynamically explain a question using Gemini in ~200 words."""
+    if not client:
+        return f"[OFFLINE DEMO MODE]\n\nImagine this is a highly detailed, 200-word explanation of the question: '{question}'.\n\nTo see real AI-generated explanations, please add your GEMINI_API_KEY to the backend/.env file and restart the server. For now, this placeholder demonstrates how the UI expands seamlessly to fit detailed, rich-text feedback retrieved from the backend."
+    
+    prompt = f"""You are a friendly and expert computer science tutor. 
+Please explain the answer to the following {subject} question in about 200 words. 
+Use easy-to-understand language, real-world analogies if possible, and avoid overly academic jargon.
+
+Question: {question}
+
+Explanation:"""
+    raw, err = _call_gemini(prompt)
+    if raw:
+        return raw
+    return f"Failed to generate explanation. {err}"

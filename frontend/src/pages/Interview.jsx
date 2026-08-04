@@ -82,7 +82,7 @@ function CompanyBadge({ company }) {
       background: `${c}15`, color: c, border: `1px solid ${c}40`,
       textTransform: "uppercase", letterSpacing: "0.06em",
     }}>
-      🏢 {company}
+      {company}
     </span>
   );
 }

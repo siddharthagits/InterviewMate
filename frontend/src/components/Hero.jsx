@@ -125,7 +125,7 @@ function Hero() {
           style={{
             display: "inline-block",
             minWidth: "2ch",
-            background: "linear-gradient(135deg, #c4b5fd 0%, #06b6d4 60%, #fcd34d 100%)",
+            background: "var(--hero-gradient)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
             backgroundClip: "text",
@@ -208,7 +208,7 @@ function Hero() {
             style={{
               textAlign: "center",
               padding: "0 40px",
-              borderRight: i < stats.length - 1 ? "1px solid rgba(255,255,255,0.06)" : "none",
+              borderRight: i < stats.length - 1 ? "1px solid var(--hero-divider)" : "none",
             }}
           >
             <div
@@ -216,7 +216,7 @@ function Hero() {
                 fontSize: 36,
                 fontWeight: 900,
                 fontFamily: "'Sora', sans-serif",
-                background: "linear-gradient(135deg, #c4b5fd, #06b6d4)",
+                background: "var(--hero-stat-gradient)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",

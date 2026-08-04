@@ -105,7 +105,7 @@ function MockTestPage() {
         overflow: "hidden",
         transition: "width 0.3s ease",
         flexShrink: 0,
-        background: "#080e1c",
+        background: "var(--sidebar)",
         borderRight: "1px solid rgba(255,255,255,0.06)",
         display: "flex",
         flexDirection: "column",
@@ -116,7 +116,7 @@ function MockTestPage() {
           <div style={{ marginBottom: 20 }}>
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
               <span style={{ fontSize: 22 }}>{test.icon}</span>
-              <span style={{ fontWeight: 800, fontSize: 15, color: "#f1f5f9" }}>{test.title}</span>
+              <span style={{ fontWeight: 800, fontSize: 15, color: "var(--text)" }}>{test.title}</span>
             </div>
             <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{total} Questions · {test.duration} min</div>
           </div>
@@ -202,7 +202,7 @@ function MockTestPage() {
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
           padding: "14px 28px",
-          background: "#0a1020",
+          background: "var(--card)",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           flexShrink: 0,
           gap: 16,
@@ -216,7 +216,7 @@ function MockTestPage() {
               ☰
             </button>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "#f1f5f9" }}>{test.title}</div>
+              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{test.title}</div>
               <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{test.subtitle}</div>
             </div>
           </div>
@@ -439,7 +439,7 @@ function MockTestPage() {
               {scorePercent >= 80 ? "Excellent!" : scorePercent >= 60 ? "Well Done!" : scorePercent >= 40 ? "Good Effort!" : "Keep Practicing!"}
             </h2>
             <p style={{ color: "var(--text-muted)", fontSize: 15, marginBottom: 28 }}>
-              You scored <strong style={{ color: "#f1f5f9" }}>{score}/{total}</strong> correct answers
+              You scored <strong style={{ color: "var(--text)" }}>{score}/{total}</strong> correct answers
             </p>
 
             {/* Stats grid */}

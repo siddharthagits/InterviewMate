@@ -1,10 +1,21 @@
 import os
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
+from app.database import close_mongodb_connection, connect_to_mongodb
 from app.routes.interview import router as interview_router
 
-app = FastAPI(title="InterviewMate API")
+
+@asynccontextmanager
+async def lifespan(_: FastAPI):
+    connect_to_mongodb()
+    yield
+    close_mongodb_connection()
+
+
+app = FastAPI(title="InterviewMate API", lifespan=lifespan)
 
 # Allow localhost (dev) + Netlify production + any Netlify preview URLs
 origins = [

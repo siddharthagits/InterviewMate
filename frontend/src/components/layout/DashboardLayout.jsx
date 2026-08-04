@@ -1,10 +1,13 @@
+import { useState } from "react";
 import Sidebar from "./Sidebar";
 
 function DashboardLayout({ children }) {
+  const [sidebarOpen, setSidebarOpen] = useState(true);
+
   return (
-    <div style={{ display: "flex", minHeight: "100vh" }}>
-      <Sidebar />
-      <main style={{ flex: 1, padding: "40px", overflowY: "auto" }}>
+    <div className="dashboard-layout">
+      <Sidebar isOpen={sidebarOpen} onToggle={() => setSidebarOpen((prev) => !prev)} />
+      <main className="dashboard-main">
         {children}
       </main>
     </div>

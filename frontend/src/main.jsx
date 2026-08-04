@@ -6,13 +6,16 @@ import App from "./App";
 import "./index.css";
 
 import { InterviewProvider } from "./context/InterviewContext";
+import { ThemeProvider } from "./context/ThemeContext";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
   <React.StrictMode>
     <BrowserRouter>
-      <InterviewProvider>
-        <App />
-      </InterviewProvider>
+      <ThemeProvider>
+        <InterviewProvider>
+          <App />
+        </InterviewProvider>
+      </ThemeProvider>
     </BrowserRouter>
   </React.StrictMode>
 );

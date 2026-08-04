@@ -130,7 +130,7 @@ function FeatureCard({ feat }) {
     const card = cardRef.current;
     if (!card) return;
     card.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0)";
-    card.style.borderColor = "rgba(255,255,255,0.06)";
+    card.style.borderColor = "var(--glass-border)";
     card.style.boxShadow = "none";
   };
 
@@ -170,7 +170,7 @@ function FeatureCard({ feat }) {
 
       {/* Title + Badge */}
       <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", marginBottom: 12 }}>
-        <h3 style={{ fontSize: 16, fontWeight: 800, color: "#f1f5f9", lineHeight: 1.3, letterSpacing: "-0.2px" }}>
+        <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", lineHeight: 1.3, letterSpacing: "-0.2px" }}>
           {feat.title}
         </h3>
         <span
@@ -287,7 +287,7 @@ function Features() {
             }}
           />
           <div style={{ position: "relative" }}>
-            <div style={{ fontSize: 20, fontWeight: 800, color: "#f1f5f9", marginBottom: 6, letterSpacing: "-0.3px" }}>
+            <div style={{ fontSize: 20, fontWeight: 800, color: "var(--text)", marginBottom: 6, letterSpacing: "-0.3px" }}>
               Ready to start practicing?
             </div>
             <div style={{ fontSize: 14, color: "var(--text-muted)" }}>

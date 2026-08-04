@@ -40,3 +40,23 @@ class ReadinessDimension(BaseModel):      # NEW
 class EvaluationRequest(BaseModel):
     interview_data: dict
     answers: List[AnswerSubmission]
+
+class ExplainRequest(BaseModel):
+    question: str
+    subject: str
+
+
+class InterviewSessionCreate(BaseModel):
+    user_id: Optional[str] = None
+    interview_data: Dict[str, Any]
+    answers: List[AnswerSubmission]
+    evaluation: Dict[str, Any]
+
+
+class InterviewSessionResponse(BaseModel):
+    id: str
+    user_id: Optional[str] = None
+    interview_data: Dict[str, Any]
+    answers: List[AnswerSubmission]
+    evaluation: Dict[str, Any]
+    created_at: str

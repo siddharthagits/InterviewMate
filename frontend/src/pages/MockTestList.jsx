@@ -9,7 +9,7 @@ function MockTestList() {
 
       {/* ── Header ── */}
       <div style={{
-        background: "linear-gradient(180deg, rgba(13,21,38,0.98) 0%, var(--bg) 100%)",
+        background: "linear-gradient(180deg, var(--card) 0%, var(--bg) 100%)",
         borderBottom: "1px solid rgba(255,255,255,0.06)",
         padding: "28px 40px 32px",
       }}>
@@ -57,7 +57,7 @@ function MockTestList() {
                   borderRadius: 12, padding: "10px 18px", textAlign: "center",
                 }}>
                   <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
-                  <div style={{ fontSize: 16, fontWeight: 800, color: "#f1f5f9" }}>{val}</div>
+                  <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{val}</div>
                   <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{label}</div>
                 </div>
               ))}
@@ -104,7 +104,7 @@ function MockTestListItem({ test, index, onStart }) {
   return (
     <div
       style={{
-        background: "rgba(13,21,38,0.85)",
+        background: "var(--card)",
         border: `1px solid rgba(255,255,255,0.07)`,
         borderRadius: 16,
         padding: "20px 24px",
@@ -147,7 +147,7 @@ function MockTestListItem({ test, index, onStart }) {
       {/* Main Info */}
       <div style={{ flex: 1, minWidth: 0 }}>
         <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 5, flexWrap: "wrap" }}>
-          <h3 style={{ fontSize: 16, fontWeight: 800, color: "#f1f5f9", margin: 0 }}>{test.title}</h3>
+          <h3 style={{ fontSize: 16, fontWeight: 800, color: "var(--text)", margin: 0 }}>{test.title}</h3>
           <span style={{
             fontSize: 10, fontWeight: 700, padding: "2px 8px", borderRadius: 99,
             background: "rgba(16,185,129,0.12)", color: "#34d399",

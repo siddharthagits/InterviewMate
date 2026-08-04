@@ -87,7 +87,7 @@ function MockTestCard({ test, onStart }) {
     <div
       className="mock-test-card"
       style={{
-        background: "rgba(13,21,38,0.9)",
+        background: "var(--card)",
         border: `1px solid ${test.colorBorder}`,
         borderRadius: 20,
         padding: "28px 24px",
@@ -134,7 +134,7 @@ function MockTestCard({ test, onStart }) {
           {test.icon}
         </div>
         <div>
-          <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 3, color: "#f1f5f9" }}>{test.title}</h3>
+          <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 3, color: "var(--text)" }}>{test.title}</h3>
           <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.4 }}>{test.subtitle}</p>
         </div>
       </div>
