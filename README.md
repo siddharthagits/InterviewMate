@@ -3,7 +3,7 @@
 # 🎯 InterviewMate
 ### *The Ultimate AI-Powered Interview Preparation & Assessment Platform*
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-aiinterviewmate.vercel.app-black?style=for-the-badge&logo=vercel&logoColor=white)](https://aiinterviewmate.vercel.app/)
+[![Live Demo](https://img.shields.io/badge/Live_Demo-aiinterviewmate.vercel.app-000000?style=for-the-badge&logo=vercel&logoColor=white&labelColor=0070F3)](https://aiinterviewmate.vercel.app/)
 [![GitHub Stars](https://img.shields.io/github/stars/siddharthagits/InterviewMate?style=for-the-badge&color=ffd700)](https://github.com/siddharthagits/InterviewMate/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/siddharthagits/InterviewMate?style=for-the-badge&color=60a5fa)](https://github.com/siddharthagits/InterviewMate/network/members)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
