@@ -108,6 +108,8 @@ function FeatureCard({ feat }) {
   const cardRef = useRef(null);
 
   const handleMouseMove = (e) => {
+    // only apply 3D tilt on devices that support hover / pointer fine
+    if (window.innerWidth < 768) return;
     const card = cardRef.current;
     if (!card) return;
     const rect = card.getBoundingClientRect();
@@ -126,7 +128,7 @@ function FeatureCard({ feat }) {
     card.style.boxShadow = `0 20px 50px ${feat.color}20`;
   };
 
-  const handleMouseLeave = (e) => {
+  const handleMouseLeave = () => {
     const card = cardRef.current;
     if (!card) return;
     card.style.transform = "perspective(800px) rotateX(0deg) rotateY(0deg) translateZ(0)";
@@ -199,7 +201,7 @@ function Features() {
   const nav = useNavigate();
 
   return (
-    <section style={{ padding: "100px 32px 110px", position: "relative" }}>
+    <section className="features-section">
       {/* Background gradient */}
       <div
         style={{
@@ -212,16 +214,16 @@ function Features() {
       <div style={{ maxWidth: 1160, margin: "0 auto", position: "relative" }}>
 
         {/* Header */}
-        <div style={{ textAlign: "center", marginBottom: 64 }}>
+        <div style={{ textAlign: "center", marginBottom: 54 }}>
           <div className="glow-pill fade-up" style={{ marginBottom: 20 }}>
             ⚡ Platform Features
           </div>
           <h2
             className="fade-up"
             style={{
-              fontSize: "clamp(28px, 4vw, 46px)",
+              fontSize: "clamp(26px, 4vw, 46px)",
               fontWeight: 900,
-              lineHeight: 1.15,
+              lineHeight: 1.2,
               marginBottom: 16,
               letterSpacing: "-1px",
               animationDelay: "0.1s",
@@ -234,7 +236,7 @@ function Features() {
             className="fade-up"
             style={{
               color: "var(--text-muted)",
-              fontSize: 16,
+              fontSize: 15,
               maxWidth: 520,
               margin: "0 auto",
               lineHeight: 1.8,
@@ -246,35 +248,14 @@ function Features() {
         </div>
 
         {/* 3D Feature Grid */}
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "repeat(auto-fit, minmax(320px, 1fr))",
-            gap: 22,
-            marginBottom: 60,
-          }}
-        >
+        <div className="features-grid">
           {feats.map((feat) => (
             <FeatureCard key={feat.title} feat={feat} />
           ))}
         </div>
 
         {/* Bottom CTA strip */}
-        <div
-          style={{
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            flexWrap: "wrap",
-            gap: 24,
-            background: "linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.05))",
-            border: "1px solid rgba(124,58,237,0.2)",
-            borderRadius: 24,
-            padding: "32px 40px",
-            position: "relative",
-            overflow: "hidden",
-          }}
-        >
+        <div className="features-cta-strip">
           {/* Glow background */}
           <div
             style={{
@@ -294,7 +275,7 @@ function Features() {
               Join candidates who prepare smarter with InterviewMate.
             </div>
           </div>
-          <div style={{ display: "flex", gap: 12, flexWrap: "wrap", position: "relative" }}>
+          <div className="features-cta-actions">
             <button className="btn btn-primary" style={{ fontSize: 14, padding: "12px 28px" }} onClick={() => nav("/setup")}>
               Start Interview →
             </button>

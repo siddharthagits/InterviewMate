@@ -67,24 +67,13 @@ function Hero() {
   }, [displayed, typing, roleIdx]);
 
   const stats = [
-    { icon: <IconStar />, value: "35", label: "Questions/Session" },
+    { icon: <IconStar />, value: "35+", label: "Questions/Session" },
     { icon: <IconTarget />, value: "3",  label: "Question Formats" },
     { icon: <IconStar />,  value: "AI",  label: "Instant Scoring" },
   ];
 
   return (
-    <section
-      style={{
-        minHeight: "100vh",
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-        textAlign: "center",
-        padding: "120px 24px 80px",
-        position: "relative",
-      }}
-    >
+    <section className="hero-section">
       {/* Section glow blob */}
       <div
         style={{
@@ -92,7 +81,8 @@ function Hero() {
           top: "15%",
           left: "50%",
           transform: "translateX(-50%)",
-          width: 600,
+          width: "90%",
+          maxWidth: 600,
           height: 600,
           borderRadius: "50%",
           background: "radial-gradient(circle, rgba(124,58,237,0.12) 0%, transparent 70%)",
@@ -102,18 +92,16 @@ function Hero() {
       />
 
       {/* Badge pill */}
-      <div className="glow-pill fade-up" style={{ marginBottom: 32 }}>
+      <div className="glow-pill fade-up" style={{ marginBottom: 28 }}>
         <IconStar />
         AI-Powered Interview Practice
       </div>
 
       {/* Main Heading */}
       <h1
-        className="fade-up"
+        className="fade-up hero-heading"
         style={{
-          fontSize: "clamp(36px, 5.5vw, 68px)",
-          fontWeight: 900,
-          lineHeight: 1.1,
+          lineHeight: 1.15,
           maxWidth: 820,
           letterSpacing: "-1.5px",
           animationDelay: "0.1s",
@@ -140,12 +128,11 @@ function Hero() {
 
       {/* Subheading */}
       <p
-        className="fade-up"
+        className="fade-up hero-subheading"
         style={{
-          marginTop: 28,
+          marginTop: 24,
           maxWidth: 580,
           color: "var(--text-muted)",
-          fontSize: 18,
           lineHeight: 1.8,
           animationDelay: "0.2s",
         }}
@@ -158,33 +145,29 @@ function Hero() {
 
       {/* CTA Buttons */}
       <div
-        className="fade-up"
+        className="fade-up hero-cta-container"
         style={{
-          marginTop: 44,
-          display: "flex",
-          gap: 12,
-          flexWrap: "wrap",
-          justifyContent: "center",
+          marginTop: 36,
           animationDelay: "0.3s",
         }}
       >
         <button
           className="btn btn-primary"
-          style={{ fontSize: 15, padding: "14px 32px", gap: 10 }}
+          style={{ fontSize: 15, padding: "14px 28px", gap: 10 }}
           onClick={() => nav("/setup")}
         >
           <IconPlay /> Start Free Interview
         </button>
         <button
           className="btn btn-gold"
-          style={{ fontSize: 15, padding: "14px 32px", gap: 10 }}
+          style={{ fontSize: 15, padding: "14px 28px", gap: 10 }}
           onClick={() => nav("/mock-tests")}
         >
           <IconTarget /> Free Mock Tests
         </button>
         <button
           className="btn btn-outline"
-          style={{ fontSize: 15, padding: "14px 28px", gap: 10 }}
+          style={{ fontSize: 15, padding: "14px 24px", gap: 10 }}
           onClick={() => nav("/dashboard")}
         >
           <IconLayout /> View Dashboard
@@ -193,27 +176,20 @@ function Hero() {
 
       {/* Stats Row */}
       <div
-        className="fade-up"
+        className="fade-up hero-stats-grid"
         style={{
-          marginTop: 72,
-          display: "flex",
-          gap: 0,
-          justifyContent: "center",
+          marginTop: 56,
           animationDelay: "0.4s",
         }}
       >
-        {stats.map(({ icon, value, label }, i) => (
+        {stats.map(({ value, label }, i) => (
           <div
             key={label}
-            style={{
-              textAlign: "center",
-              padding: "0 40px",
-              borderRight: i < stats.length - 1 ? "1px solid var(--hero-divider)" : "none",
-            }}
+            className={`hero-stat-card ${i < stats.length - 1 ? "has-divider" : ""}`}
           >
             <div
               style={{
-                fontSize: 36,
+                fontSize: "clamp(28px, 4vw, 36px)",
                 fontWeight: 900,
                 fontFamily: "'Sora', sans-serif",
                 background: "var(--hero-stat-gradient)",
@@ -245,23 +221,23 @@ function Hero() {
         className="float"
         style={{
           position: "absolute",
-          bottom: 32,
+          bottom: 24,
           left: "50%",
           transform: "translateX(-50%)",
           display: "flex",
           flexDirection: "column",
           alignItems: "center",
-          gap: 8,
+          gap: 6,
           opacity: 0.4,
         }}
       >
-        <div style={{ fontSize: 11, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)" }}>
+        <div style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)" }}>
           Scroll
         </div>
         <div
           style={{
             width: 1,
-            height: 40,
+            height: 32,
             background: "linear-gradient(180deg, var(--violet), transparent)",
             borderRadius: 2,
           }}

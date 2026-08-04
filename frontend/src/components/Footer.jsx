@@ -20,12 +20,16 @@ const LinkedinIcon = () => (
 const links = {
   Platform: [
     { label: "Start Interview", to: "/setup" },
+    { label: "Voice Interview", to: "/voice" },
     { label: "Dashboard", to: "/dashboard" },
     { label: "History", to: "/history" },
     { label: "Profile", to: "/profile" },
   ],
-  "Mock Tests": [
-    { label: "All Mock Tests", to: "/mock-tests" },
+  Practice: [
+    { label: "Mock Tests", to: "/mock-tests" },
+    { label: "Question Bank", to: "/question-bank" },
+    { label: "Company Tests", to: "/company-assessment" },
+    { label: "Typing Test", to: "/typing-test" },
   ],
   Account: [
     { label: "Login", to: "/login" },
@@ -35,24 +39,14 @@ const links = {
 
 function Footer() {
   return (
-    <footer
-      style={{
-        background: "var(--sidebar)",
-        borderTop: "1px solid rgba(255,255,255,0.04)",
-        padding: "64px 48px 0",
-        color: "var(--text-muted)",
-        fontSize: 13,
-        position: "relative",
-        overflow: "hidden",
-      }}
-    >
+    <footer className="footer-container">
       {/* Background glow top */}
       <div
         style={{
           position: "absolute",
           top: 0, left: "50%",
           transform: "translateX(-50%)",
-          width: 600, height: 2,
+          width: "100%", maxWidth: 600, height: 2,
           background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(6,182,212,0.3), transparent)",
         }}
       />
@@ -69,49 +63,45 @@ function Footer() {
       />
 
       {/* Main grid */}
-      <div
-        style={{
-          maxWidth: 1200,
-          margin: "0 auto",
-          display: "grid",
-          gridTemplateColumns: "2fr 1fr 1fr 1fr",
-          gap: 40,
-          paddingBottom: 52,
-          position: "relative",
-        }}
-      >
+      <div className="footer-grid">
         {/* Brand column */}
-        <div>
-          <span
-            style={{
-              fontFamily: "'Sora', sans-serif",
-              fontWeight: 900,
-              fontSize: 24,
-              display: "block",
-              marginBottom: 16,
-              background: "linear-gradient(135deg, #c4b5fd 0%, #06b6d4 60%, #fcd34d 100%)",
-              WebkitBackgroundClip: "text",
-              WebkitTextFillColor: "transparent",
-              backgroundClip: "text",
-              letterSpacing: "-0.5px",
-            }}
-          >
-            InterviewMate
-          </span>
-          <p style={{ lineHeight: 1.8, maxWidth: 280, color: "var(--text-muted)", fontSize: 13 }}>
-            AI-powered mock interview platform to help you ace technical interviews. Practice MCQs, code output, and in-depth answers — with instant Gemini AI feedback.
+        <div className="footer-brand-col">
+          <Link to="/" style={{ textDecoration: "none" }}>
+            <span
+              style={{
+                fontFamily: "'Sora', sans-serif",
+                fontWeight: 900,
+                fontSize: 24,
+                display: "block",
+                marginBottom: 16,
+                background: "linear-gradient(135deg, #c4b5fd 0%, #06b6d4 60%, #fcd34d 100%)",
+                WebkitBackgroundClip: "text",
+                WebkitTextFillColor: "transparent",
+                backgroundClip: "text",
+                letterSpacing: "-0.5px",
+              }}
+            >
+              InterviewMate
+            </span>
+          </Link>
+          <p style={{ lineHeight: 1.8, maxWidth: 300, color: "var(--text-muted)", fontSize: 13 }}>
+            AI-powered mock interview platform to help you ace technical and behavioral interviews with instant Gemini AI feedback.
           </p>
 
           {/* Social icons */}
-          <div style={{ display: "flex", gap: 10, marginTop: 24 }}>
+          <div style={{ display: "flex", gap: 10, marginTop: 24, flexWrap: "wrap" }}>
             {[
-              { icon: <GithubIcon />, label: "GitHub" },
-              { icon: <TwitterIcon />, label: "Twitter" },
-              { icon: <LinkedinIcon />, label: "LinkedIn" },
-            ].map(({ icon, label }) => (
-              <button
+              { icon: <GithubIcon />, label: "GitHub", href: "https://github.com/siddharthagits/InterviewMate" },
+              { icon: <TwitterIcon />, label: "Twitter", href: "#" },
+              { icon: <LinkedinIcon />, label: "LinkedIn", href: "#" },
+            ].map(({ icon, label, href }) => (
+              <a
                 key={label}
+                href={href}
+                target={href.startsWith("http") ? "_blank" : undefined}
+                rel="noreferrer"
                 title={label}
+                aria-label={label}
                 style={{
                   width: 38, height: 38,
                   borderRadius: 12,
@@ -119,7 +109,7 @@ function Footer() {
                   border: "1px solid rgba(255,255,255,0.07)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   color: "var(--text-muted)",
-                  cursor: "pointer",
+                  textDecoration: "none",
                   transition: "all 0.2s",
                 }}
                 onMouseEnter={e => {
@@ -136,19 +126,19 @@ function Footer() {
                 }}
               >
                 {icon}
-              </button>
+              </a>
             ))}
           </div>
         </div>
 
         {/* Link columns */}
         {Object.entries(links).map(([section, items]) => (
-          <div key={section}>
+          <div key={section} className="footer-links-col">
             <div
               style={{
                 fontWeight: 700, fontSize: 11,
                 letterSpacing: "0.1em", textTransform: "uppercase",
-                color: "var(--violet-light)", marginBottom: 20,
+                color: "var(--violet-light)", marginBottom: 18,
               }}
             >
               {section}
@@ -175,35 +165,26 @@ function Footer() {
       </div>
 
       {/* Bottom bar */}
-      <div
-        style={{
-          borderTop: "1px solid rgba(255,255,255,0.04)",
-          padding: "20px 0",
-          maxWidth: 1200, margin: "0 auto",
-          display: "flex", justifyContent: "space-between", alignItems: "center",
-          flexWrap: "wrap", gap: 10,
-          position: "relative",
-        }}
-      >
+      <div className="footer-bottom-bar">
         <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
           © {new Date().getFullYear()} InterviewMate. All rights reserved.
         </span>
-        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+        <div className="footer-bottom-badge-row">
           <span
             style={{
               fontSize: 11, fontWeight: 700,
-              padding: "3px 12px", borderRadius: 99,
+              padding: "4px 12px", borderRadius: 99,
               background: "rgba(16,185,129,0.08)",
               color: "#34d399",
               border: "1px solid rgba(16,185,129,0.2)",
-              display: "flex", alignItems: "center", gap: 5,
+              display: "inline-flex", alignItems: "center", gap: 6,
             }}
           >
             <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#34d399", display: "inline-block", boxShadow: "0 0 6px #34d399" }} />
             All systems operational
           </span>
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            · Built with ❤️ using Gemini AI
+            · Powered by Google Gemini AI
           </span>
         </div>
       </div>
