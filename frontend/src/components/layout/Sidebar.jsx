@@ -81,24 +81,35 @@ const links = [
 ];
 
 
-function Sidebar({ isOpen, onToggle }) {
+function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
   const { pathname } = useLocation();
 
   return (
-    <aside className={`sidebar ${isOpen ? "open" : "collapsed"}`}>
+    <aside className={`sidebar ${isOpen ? "open" : "collapsed"}${isMobile ? " mobile-drawer" : ""}`}>
       <div className="sidebar-brand-area">
-        <Link to="/" className="sidebar-brand" style={{ textDecoration: "none" }}>
+        <Link to="/" className="sidebar-brand" style={{ textDecoration: "none" }} onClick={onClose}>
           Interview<span style={{ color: "#fcd34d" }}>Mate</span>
         </Link>
 
-        <button
-          type="button"
-          className="sidebar-toggle"
-          onClick={onToggle}
-          aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-        >
-          <span className="sidebar-toggle-dots">⋯</span>
-        </button>
+        {isMobile ? (
+          <button
+            type="button"
+            className="sidebar-close-btn"
+            onClick={onClose}
+            aria-label="Close sidebar"
+          >
+            ✕
+          </button>
+        ) : (
+          <button
+            type="button"
+            className="sidebar-toggle"
+            onClick={onToggle}
+            aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
+          >
+            <span className="sidebar-toggle-dots">⋯</span>
+          </button>
+        )}
       </div>
 
       <nav className="sidebar-nav">
@@ -108,6 +119,7 @@ function Sidebar({ isOpen, onToggle }) {
             <Link
               key={to}
               to={to}
+              onClick={onClose}
               className={`sidebar-link${isActive ? " active" : ""}`}
               style={isActive && green ? {
                 background: "rgba(16,185,129,0.12)",
@@ -124,16 +136,16 @@ function Sidebar({ isOpen, onToggle }) {
                 border: "1px solid rgba(6,182,212,0.25)",
                 boxShadow: "0 0 16px rgba(6,182,212,0.1)",
               } : undefined}
-              title={isOpen ? undefined : label}
+              title={isOpen || isMobile ? undefined : label}
             >
               <span className="sidebar-icon">{icon}</span>
-              {isOpen && <span className="sidebar-link-label">{label}</span>}
+              {(isOpen || isMobile) && <span className="sidebar-link-label">{label}</span>}
             </Link>
           );
         })}
       </nav>
 
-      {isOpen ? (
+      {(isOpen || isMobile) ? (
         <div style={{ marginTop: "auto", paddingTop: 24 }}>
           <div
             style={{

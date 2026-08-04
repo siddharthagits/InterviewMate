@@ -13,8 +13,20 @@ function MockTestPage() {
   const [timeLeft, setTimeLeft] = useState(test ? test.duration * 60 : 0);
   const [submitted, setSubmitted] = useState(false);
   const [showResult, setShowResult] = useState(false);
-  const [sidebarOpen, setSidebarOpen] = useState(true);
+  const [sidebarOpen, setSidebarOpen] = useState(typeof window !== "undefined" ? window.innerWidth >= 900 : true);
+  const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 900 : false);
   const timerRef = useRef(null);
+
+  useEffect(() => {
+    const checkResize = () => {
+      const mobile = window.innerWidth < 900;
+      setIsMobile(mobile);
+      if (!mobile) setSidebarOpen(true);
+    };
+    checkResize();
+    window.addEventListener("resize", checkResize);
+    return () => window.removeEventListener("resize", checkResize);
+  }, []);
 
   useEffect(() => {
     if (!test || submitted) return;
@@ -54,6 +66,9 @@ function MockTestPage() {
   function goToQuestion(idx) {
     setCurrentQ(idx);
     setVisited(prev => new Set([...prev, idx]));
+    if (isMobile) {
+      setSidebarOpen(false);
+    }
   }
 
   function handleSubmit(auto = false) {
@@ -97,28 +112,60 @@ function MockTestPage() {
   };
 
   return (
-    <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)", fontFamily: "'Inter', sans-serif", color: "var(--text)" }}>
+    <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)", fontFamily: "'Inter', sans-serif", color: "var(--text)", position: "relative" }}>
+
+      {/* Mobile Drawer Backdrop */}
+      {sidebarOpen && isMobile && (
+        <div
+          onClick={() => setSidebarOpen(false)}
+          style={{
+            position: "fixed", inset: 0, background: "rgba(0,0,0,0.65)",
+            backdropFilter: "blur(4px)", zIndex: 190,
+          }}
+        />
+      )}
 
       {/* ── Sidebar Question Palette ── */}
-      <div style={{
-        width: sidebarOpen ? 260 : 0,
-        overflow: "hidden",
-        transition: "width 0.3s ease",
-        flexShrink: 0,
-        background: "var(--sidebar)",
-        borderRight: "1px solid rgba(255,255,255,0.06)",
-        display: "flex",
-        flexDirection: "column",
-      }}>
+      <div
+        className="mock-test-sidebar"
+        style={{
+          width: isMobile ? 280 : sidebarOpen ? 260 : 0,
+          overflow: "hidden",
+          transition: "transform 0.3s ease, width 0.3s ease",
+          flexShrink: 0,
+          background: "var(--sidebar)",
+          borderRight: "1px solid rgba(255,255,255,0.06)",
+          display: "flex",
+          flexDirection: "column",
+          position: isMobile ? "fixed" : "relative",
+          top: 0, bottom: 0, left: 0,
+          zIndex: isMobile ? 200 : 10,
+          transform: isMobile ? (sidebarOpen ? "translateX(0)" : "translateX(-100%)") : "none",
+          boxShadow: isMobile && sidebarOpen ? "8px 0 30px rgba(0,0,0,0.5)" : "none",
+        }}
+      >
         <div style={{ padding: "20px 16px", overflowY: "auto", flex: 1 }}>
 
-          {/* Test info */}
-          <div style={{ marginBottom: 20 }}>
-            <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-              <span style={{ fontSize: 22 }}>{test.icon}</span>
-              <span style={{ fontWeight: 800, fontSize: 15, color: "var(--text)" }}>{test.title}</span>
+          {/* Test info & Mobile close */}
+          <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
+            <div>
+              <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
+                <span style={{ fontSize: 22 }}>{test.icon}</span>
+                <span style={{ fontWeight: 800, fontSize: 15, color: "var(--text)" }}>{test.title}</span>
+              </div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{total} Questions · {test.duration} min</div>
             </div>
-            <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{total} Questions · {test.duration} min</div>
+            {isMobile && (
+              <button
+                onClick={() => setSidebarOpen(false)}
+                style={{
+                  background: "rgba(255,255,255,0.08)", border: "none", color: "#fff",
+                  width: 32, height: 32, borderRadius: 8, cursor: "pointer", fontSize: 14,
+                }}
+              >
+                ✕
+              </button>
+            )}
           </div>
 
           {/* Legend */}
@@ -196,47 +243,49 @@ function MockTestPage() {
       </div>
 
       {/* ── Main Content ── */}
-      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflow: "hidden" }}>
+      <div style={{ flex: 1, display: "flex", flexDirection: "column", overflowX: "hidden", minWidth: 0 }}>
 
         {/* Header */}
         <div style={{
           display: "flex", alignItems: "center", justifyContent: "space-between",
-          padding: "14px 28px",
+          padding: "14px 20px",
           background: "var(--card)",
           borderBottom: "1px solid rgba(255,255,255,0.07)",
           flexShrink: 0,
-          gap: 16,
+          gap: 12,
           flexWrap: "wrap",
         }}>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
             <button
               onClick={() => setSidebarOpen(v => !v)}
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 16 }}
             >
-              ☰
+              ☰ Palette
             </button>
             <div>
-              <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{test.title}</div>
-              <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{test.subtitle}</div>
+              <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text)" }}>{test.title}</div>
+              <div style={{ fontSize: 11, color: "var(--text-muted)" }}>{test.subtitle}</div>
             </div>
           </div>
 
-          {/* Timer */}
-          <div style={{
-            display: "flex", alignItems: "center", gap: 8,
-            background: `${timerColor}18`,
-            border: `1px solid ${timerColor}55`,
-            borderRadius: 12, padding: "8px 18px",
-          }}>
-            <span style={{ fontSize: 18 }}>⏱</span>
-            <span style={{ fontSize: 20, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: timerColor }}>
-              {formatTime(timeLeft)}
-            </span>
-          </div>
+          {/* Timer & Exit */}
+          <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
+            <div style={{
+              display: "flex", alignItems: "center", gap: 6,
+              background: `${timerColor}18`,
+              border: `1px solid ${timerColor}55`,
+              borderRadius: 10, padding: "6px 14px",
+            }}>
+              <span style={{ fontSize: 16 }}>⏱</span>
+              <span style={{ fontSize: 16, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: timerColor }}>
+                {formatTime(timeLeft)}
+              </span>
+            </div>
 
-          <button onClick={() => navigate("/")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", color: "var(--text-muted)", borderRadius: 8, padding: "8px 14px", cursor: "pointer", fontSize: 13 }}>
-            ✕ Exit
-          </button>
+            <button onClick={() => navigate("/")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", color: "var(--text-muted)", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12 }}>
+              ✕ Exit
+            </button>
+          </div>
         </div>
 
         {/* Question Progress */}
@@ -245,10 +294,10 @@ function MockTestPage() {
         </div>
 
         {/* Question Body */}
-        <div style={{ flex: 1, overflowY: "auto", padding: "32px 40px 40px", maxWidth: 820, margin: "0 auto", width: "100%" }}>
+        <div style={{ flex: 1, overflowY: "auto", padding: "24px 18px 40px", maxWidth: 820, margin: "0 auto", width: "100%" }}>
 
           {/* Q number badge */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{
               fontSize: 12, fontWeight: 700, padding: "4px 14px", borderRadius: 99,
               background: test.colorLight, color: test.color, border: `1px solid ${test.colorBorder}`,
@@ -263,7 +312,7 @@ function MockTestPage() {
           {/* Question text */}
           <div style={{
             background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.08)",
-            borderRadius: 16, padding: "24px 28px", marginBottom: 28,
+            borderRadius: 16, padding: "20px 20px", marginBottom: 20,
           }}>
             {q.isCode ? (
               <>
@@ -272,21 +321,21 @@ function MockTestPage() {
                 </p>
                 <pre style={{
                   background: "#060d1c", border: "1px solid rgba(99,102,241,0.2)",
-                  borderRadius: 12, padding: "18px 22px",
+                  borderRadius: 12, padding: "14px 16px",
                   fontFamily: "'JetBrains Mono', monospace", fontSize: 13,
-                  lineHeight: 1.8, color: "#a5f3fc", overflowX: "auto",
+                  lineHeight: 1.7, color: "#a5f3fc", overflowX: "auto",
                   whiteSpace: "pre",
                 }}>
                   {q.question.split("\n").slice(1).join("\n").trim()}
                 </pre>
               </>
             ) : (
-              <p style={{ fontSize: 15, lineHeight: 1.8, fontWeight: 500 }}>{q.question}</p>
+              <p style={{ fontSize: 15, lineHeight: 1.75, fontWeight: 500, margin: 0 }}>{q.question}</p>
             )}
           </div>
 
           {/* Options */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
+          <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {q.options.map((opt, i) => {
               const isSelected = answers[q.id] === i;
               const isCorrect = submitted && i === q.correct;
@@ -298,9 +347,7 @@ function MockTestPage() {
 
               if (isCorrect) { borderColor = "#10b981"; bg = "rgba(16,185,129,0.12)"; textColor = "#6ee7b7"; }
               else if (isWrong) { borderColor = "#ef4444"; bg = "rgba(239,68,68,0.1)"; textColor = "#fca5a5"; }
-              else if (isSelected) { borderColor = test.color; bg = test.colorLight; }
-
-              const letters = ["A", "B", "C", "D"];
+              else if (isSelected) { borderColor = test.color; bg = test.colorLight; textColor = test.color; }
 
               return (
                 <button
@@ -308,30 +355,24 @@ function MockTestPage() {
                   onClick={() => handleAnswer(i)}
                   disabled={submitted}
                   style={{
-                    display: "flex", alignItems: "center", gap: 14,
-                    padding: "15px 20px", borderRadius: 14,
-                    border: `1.5px solid ${borderColor}`,
-                    background: bg, color: textColor,
+                    background: bg, border: `1px solid ${borderColor}`,
+                    borderRadius: 12, padding: "14px 16px",
+                    display: "flex", alignItems: "flex-start", gap: 12,
                     cursor: submitted ? "default" : "pointer",
-                    textAlign: "left", fontSize: 14, lineHeight: 1.5,
-                    transition: "all 0.18s",
-                    fontFamily: "'Inter', sans-serif",
-                    width: "100%",
+                    textAlign: "left", transition: "all 0.15s",
+                    color: textColor, width: "100%",
                   }}
-                  onMouseEnter={e => { if (!submitted && !isSelected) e.currentTarget.style.borderColor = test.color; }}
-                  onMouseLeave={e => { if (!submitted && !isSelected) e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)"; }}
                 >
                   <span style={{
-                    width: 30, height: 30, borderRadius: "50%", flexShrink: 0,
+                    width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
+                    background: isSelected ? test.color : "rgba(255,255,255,0.06)",
+                    color: isSelected ? "#fff" : "var(--text-muted)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontWeight: 800, fontSize: 13,
-                    background: isCorrect ? "#10b981" : isWrong ? "#ef4444" : isSelected ? test.color : "rgba(255,255,255,0.07)",
-                    color: (isCorrect || isWrong || isSelected) ? "#fff" : "var(--text-muted)",
-                    transition: "all 0.18s",
-                  }}>{letters[i]}</span>
-                  <span style={{ fontFamily: q.isCode ? "'JetBrains Mono', monospace" : "inherit" }}>{opt}</span>
-                  {isCorrect && <span style={{ marginLeft: "auto", flexShrink: 0, fontSize: 18 }}>✅</span>}
-                  {isWrong && <span style={{ marginLeft: "auto", flexShrink: 0, fontSize: 18 }}>❌</span>}
+                    fontSize: 12, fontWeight: 700, marginTop: 1,
+                  }}>
+                    {["A", "B", "C", "D"][i]}
+                  </span>
+                  <span style={{ fontSize: 14, lineHeight: 1.5, flex: 1 }}>{opt}</span>
                 </button>
               );
             })}
@@ -340,25 +381,25 @@ function MockTestPage() {
           {/* Explanation (after submit) */}
           {submitted && q.explanation && (
             <div style={{
-              marginTop: 20, padding: "16px 20px",
+              marginTop: 20, padding: "16px 18px",
               background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.25)",
               borderRadius: 12,
             }}>
               <div style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc", marginBottom: 6 }}>💡 EXPLANATION</div>
-              <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65 }}>{q.explanation}</p>
+              <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65, margin: 0 }}>{q.explanation}</p>
             </div>
           )}
 
           {/* Nav Buttons */}
-          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 36 }}>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", gap: 10, marginTop: 32, flexWrap: "wrap" }}>
             <button
               onClick={() => goToQuestion(Math.max(0, currentQ - 1))}
               disabled={currentQ === 0}
               style={{
-                padding: "11px 24px", borderRadius: 10,
+                padding: "10px 18px", borderRadius: 10,
                 border: "1px solid rgba(255,255,255,0.12)",
                 background: "rgba(255,255,255,0.04)", color: currentQ === 0 ? "var(--text-muted)" : "var(--text)",
-                cursor: currentQ === 0 ? "not-allowed" : "pointer", fontSize: 14, fontWeight: 600,
+                cursor: currentQ === 0 ? "not-allowed" : "pointer", fontSize: 13, fontWeight: 600,
               }}
             >
               ← Previous
@@ -366,19 +407,12 @@ function MockTestPage() {
 
             {!submitted && (
               <button
-                onClick={() => {
-                  if (answers[q.id] === undefined) {
-                    // Mark as visited/skip
-                    goToQuestion(Math.min(total - 1, currentQ + 1));
-                  } else {
-                    goToQuestion(Math.min(total - 1, currentQ + 1));
-                  }
-                }}
+                onClick={() => goToQuestion(Math.min(total - 1, currentQ + 1))}
                 style={{
-                  padding: "11px 20px", borderRadius: 10,
+                  padding: "10px 16px", borderRadius: 10,
                   border: "1px solid rgba(255,255,255,0.12)",
                   background: "rgba(255,255,255,0.04)", color: "var(--text-muted)",
-                  cursor: "pointer", fontSize: 14, fontWeight: 600,
+                  cursor: "pointer", fontSize: 13, fontWeight: 600,
                 }}
               >
                 Skip →
@@ -388,14 +422,14 @@ function MockTestPage() {
             <button
               onClick={() => currentQ < total - 1 ? goToQuestion(currentQ + 1) : (!submitted ? (window.confirm(`Submit test? You've answered ${attempted}/${total} questions.`) && handleSubmit()) : null)}
               style={{
-                padding: "11px 28px", borderRadius: 10,
+                padding: "10px 22px", borderRadius: 10,
                 border: "none",
                 background: test.gradient, color: "#fff",
-                cursor: "pointer", fontSize: 14, fontWeight: 700,
+                cursor: "pointer", fontSize: 13, fontWeight: 700,
                 boxShadow: `0 4px 16px ${test.color}44`,
               }}
             >
-              {currentQ < total - 1 ? "Next →" : submitted ? "—" : "Submit ✔"}
+              {currentQ < total - 1 ? "Next →" : submitted ? "Review Done" : "Submit ✔"}
             </button>
           </div>
         </div>
@@ -407,63 +441,63 @@ function MockTestPage() {
           position: "fixed", inset: 0, background: "rgba(0,0,0,0.85)",
           display: "flex", alignItems: "center", justifyContent: "center",
           zIndex: 1000, backdropFilter: "blur(8px)",
-          padding: 24,
+          padding: 16, overflowY: "auto",
         }}>
           <div style={{
             background: "#0d1526", border: "1px solid rgba(99,102,241,0.3)",
-            borderRadius: 24, padding: "40px 36px", maxWidth: 520, width: "100%",
+            borderRadius: 24, padding: "32px 24px", maxWidth: 480, width: "100%",
             textAlign: "center",
-            boxShadow: "0 40px 100px rgba(0,0,0,0.6), 0 0 0 1px rgba(99,102,241,0.2)",
+            boxShadow: "0 40px 100px rgba(0,0,0,0.6)",
           }}>
             {/* Score Ring */}
             <div style={{
-              width: 140, height: 140, borderRadius: "50%", margin: "0 auto 28px",
+              width: 120, height: 120, borderRadius: "50%", margin: "0 auto 20px",
               background: `conic-gradient(${scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444"} ${scorePercent * 3.6}deg, rgba(255,255,255,0.06) 0deg)`,
               display: "flex", alignItems: "center", justifyContent: "center",
               position: "relative",
             }}>
               <div style={{
-                position: "absolute", inset: 10, borderRadius: "50%",
+                position: "absolute", inset: 8, borderRadius: "50%",
                 background: "#0d1526",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               }}>
-                <div style={{ fontSize: 28, fontWeight: 900, color: scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444" }}>{scorePercent}%</div>
-                <div style={{ fontSize: 11, color: "var(--text-muted)" }}>Score</div>
+                <div style={{ fontSize: 24, fontWeight: 900, color: scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444" }}>{scorePercent}%</div>
+                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Score</div>
               </div>
             </div>
 
-            <div style={{ fontSize: 32, marginBottom: 8 }}>
+            <div style={{ fontSize: 28, marginBottom: 6 }}>
               {scorePercent >= 80 ? "🏆" : scorePercent >= 60 ? "🎉" : scorePercent >= 40 ? "👍" : "💪"}
             </div>
-            <h2 style={{ fontSize: 24, fontWeight: 800, marginBottom: 6 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>
               {scorePercent >= 80 ? "Excellent!" : scorePercent >= 60 ? "Well Done!" : scorePercent >= 40 ? "Good Effort!" : "Keep Practicing!"}
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 15, marginBottom: 28 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 24 }}>
               You scored <strong style={{ color: "var(--text)" }}>{score}/{total}</strong> correct answers
             </p>
 
             {/* Stats grid */}
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 32 }}>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 8, marginBottom: 24 }}>
               {[
                 { label: "Correct", value: score, color: "#10b981" },
                 { label: "Wrong", value: attempted - score, color: "#ef4444" },
                 { label: "Skipped", value: total - attempted, color: "#f59e0b" },
               ].map(({ label, value, color }) => (
-                <div key={label} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 12, padding: "14px 8px", border: `1px solid ${color}33` }}>
-                  <div style={{ fontSize: 22, fontWeight: 800, color }}>{value}</div>
-                  <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 3 }}>{label}</div>
+                <div key={label} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "10px 4px", border: `1px solid ${color}33` }}>
+                  <div style={{ fontSize: 18, fontWeight: 800, color }}>{value}</div>
+                  <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
                 </div>
               ))}
             </div>
 
-            <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
+            <div style={{ display: "flex", gap: 10, justifyContent: "center", flexWrap: "wrap" }}>
               <button
                 onClick={() => { setShowResult(false); setCurrentQ(0); }}
                 style={{
-                  padding: "12px 24px", borderRadius: 12,
+                  padding: "10px 20px", borderRadius: 10,
                   border: "1px solid rgba(255,255,255,0.15)",
                   background: "rgba(255,255,255,0.05)", color: "var(--text)",
-                  cursor: "pointer", fontWeight: 600, fontSize: 14,
+                  cursor: "pointer", fontWeight: 600, fontSize: 13, flex: "1 1 auto",
                 }}
               >
                 Review Answers
@@ -471,10 +505,10 @@ function MockTestPage() {
               <button
                 onClick={() => navigate("/")}
                 style={{
-                  padding: "12px 24px", borderRadius: 12, border: "none",
+                  padding: "10px 20px", borderRadius: 10, border: "none",
                   background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
-                  color: "#fff", cursor: "pointer", fontWeight: 700, fontSize: 14,
-                  boxShadow: "0 4px 20px rgba(99,102,241,0.4)",
+                  color: "#fff", cursor: "pointer", fontWeight: 700, fontSize: 13,
+                  boxShadow: "0 4px 20px rgba(99,102,241,0.4)", flex: "1 1 auto",
                 }}
               >
                 Back to Home

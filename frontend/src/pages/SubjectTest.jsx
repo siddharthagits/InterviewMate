@@ -712,10 +712,9 @@ export default function SubjectTest() {
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
 
       {/* ── Hero Header ── */}
-      <div style={{
+      <div className="subject-test-header" style={{
         background: `linear-gradient(135deg, ${subject.color}12, rgba(6,182,212,0.04))`,
         borderBottom: "1px solid rgba(255,255,255,0.05)",
-        padding: "36px 40px 28px",
         position: "relative", overflow: "hidden",
       }}>
         {/* Top accent */}
@@ -734,11 +733,11 @@ export default function SubjectTest() {
             <span style={{ color: subject.color, fontWeight: 600 }}>{subject.shortName}</span>
           </div>
 
-          <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 16, flexWrap: "wrap" }}>
             <div style={{
               width: 56, height: 56, borderRadius: 16,
               background: `${subject.color}20`, border: `1px solid ${subject.color}35`,
-              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28,
+              display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0,
             }}>
               {subject.icon}
             </div>
@@ -750,7 +749,7 @@ export default function SubjectTest() {
               }}>
                 {subject.name}
               </h1>
-              <p style={{ color: "var(--text-muted)", fontSize: 13 }}>{subject.description}</p>
+              <p style={{ color: "var(--text-muted)", fontSize: 13, margin: 0 }}>{subject.description}</p>
             </div>
           </div>
 
@@ -767,7 +766,7 @@ export default function SubjectTest() {
       </div>
 
       {/* ── Content ── */}
-      <div style={{ maxWidth: 960, margin: "0 auto", padding: "32px 40px 80px" }}>
+      <div className="subject-test-content" style={{ maxWidth: 960, margin: "0 auto" }}>
 
         {/* Tab switcher */}
         <div style={{

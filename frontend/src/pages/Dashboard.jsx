@@ -171,14 +171,7 @@ function Dashboard() {
       </div>
 
       {/* Stats grid */}
-      <div
-        style={{
-          display: "grid",
-          gridTemplateColumns: "repeat(3, 1fr)",
-          gap: 16,
-          marginBottom: 28,
-        }}
-      >
+      <div className="dashboard-stats-grid">
         {stats.map((s, i) => (
           <StatCard key={s.label} {...s} delay={i * 0.07} />
         ))}
@@ -186,14 +179,7 @@ function Dashboard() {
 
       {/* Score ring + Breakdown */}
       {hasResult && (
-        <div
-          style={{
-            display: "grid",
-            gridTemplateColumns: "auto 1fr",
-            gap: 24,
-            marginBottom: 24,
-          }}
-        >
+        <div className="dashboard-score-grid">
           {/* Score Ring */}
           <div
             className="glass fade-up"

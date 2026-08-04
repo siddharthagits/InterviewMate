@@ -274,10 +274,9 @@ export default function CompanyAssessment() {
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
 
       {/* ── Hero ── */}
-      <div style={{
+      <div className="company-header" style={{
         background: "linear-gradient(180deg, rgba(59,130,246,0.1) 0%, transparent 100%)",
         borderBottom: "1px solid rgba(255,255,255,0.05)",
-        padding: "52px 40px 44px",
         position: "relative", overflow: "hidden",
       }}>
         {/* Background glow */}
@@ -343,7 +342,7 @@ export default function CompanyAssessment() {
               <div style={{
                 fontSize: 56, marginBottom: 10,
                 filter: "drop-shadow(0 0 20px rgba(59,130,246,0.4))",
-              }}></div>
+              }}>🏢</div>
               <div style={{
                 fontSize: 32, fontWeight: 900, fontFamily: "'Sora', sans-serif",
                 background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
@@ -366,7 +365,7 @@ export default function CompanyAssessment() {
       </div>
 
       {/* ── Section filter ── */}
-      <div style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "16px 40px" }}>
+      <div className="company-filter-bar" style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.04)" }}>
         <div style={{ maxWidth: 1160, margin: "0 auto", display: "flex", gap: 8, flexWrap: "wrap", alignItems: "center" }}>
           <span style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 600, marginRight: 4 }}>Filter by section:</span>
           {sections.map(sec => (
@@ -388,7 +387,7 @@ export default function CompanyAssessment() {
       </div>
 
       {/* ── Content ── */}
-      <div style={{ maxWidth: 1160, margin: "0 auto", padding: "36px 40px 72px" }}>
+      <div className="company-content" style={{ maxWidth: 1160, margin: "0 auto" }}>
 
         {/* Pattern guide */}
         <div style={{ marginBottom: 36 }}>
@@ -407,7 +406,7 @@ export default function CompanyAssessment() {
 
         <div style={{
           display: "grid",
-          gridTemplateColumns: "repeat(auto-fill, minmax(320px, 1fr))",
+          gridTemplateColumns: "repeat(auto-fill, minmax(min(290px, 100%), 1fr))",
           gap: 22,
         }}>
           {TCS_NQT_YEARS.map((paper, i) => (

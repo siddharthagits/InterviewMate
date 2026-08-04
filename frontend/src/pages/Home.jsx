@@ -23,7 +23,7 @@ function Home() {
   }, [location.hash]);
 
   return (
-    <div style={{ position: "relative", minHeight: "100vh", background: "var(--bg)", overflow: "hidden" }}>
+    <div style={{ position: "relative", minHeight: "100vh", background: "var(--bg)", width: "100%", overflowX: "hidden" }}>
 
       {/* Particle canvas — fixed behind everything */}
       <div style={{ position: "fixed", inset: 0, zIndex: 0, pointerEvents: "none" }}>

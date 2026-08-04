@@ -355,15 +355,14 @@ export default function VoiceInterview() {
       `}</style>
 
       {/* ── Top bar ── */}
-      <div style={{
+      <div className="voice-interview-topbar" style={{
         position:"sticky", top:0, zIndex:100,
         display:"flex", alignItems:"center", justifyContent:"space-between",
-        padding:"12px 28px",
         background:"rgba(4,8,15,0.9)", backdropFilter:"blur(20px)",
         borderBottom:"1px solid rgba(255,255,255,0.06)",
-        gap:16, flexWrap:"wrap",
+        gap:12, flexWrap:"wrap",
       }}>
-        <div style={{ display:"flex", alignItems:"center", gap:12 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
           <span style={{
             fontFamily:"'Sora', sans-serif", fontSize:18, fontWeight:900,
             background:"linear-gradient(135deg, #c4b5fd, #06b6d4, #fcd34d)",
@@ -373,18 +372,18 @@ export default function VoiceInterview() {
             fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99,
             background:"rgba(16,185,129,0.12)", color:"#10b981",
             border:"1px solid rgba(16,185,129,0.3)", textTransform:"uppercase", letterSpacing:"0.07em",
-          }}>🎙 Voice Interview</span>
+          }}>🎙 Voice</span>
           <span style={{ fontSize:12, color:"var(--text-muted)" }}>
             {interviewData.role}
           </span>
         </div>
-        <div style={{ display:"flex", alignItems:"center", gap:16 }}>
+        <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
           <span style={{ fontSize:12, color:"var(--text-muted)" }}>
-            ✅ {answeredCount}/{questions.length} answered
+            ✅ {answeredCount}/{questions.length}
           </span>
           <span style={{
             fontFamily:"'JetBrains Mono', monospace", fontSize:13, fontWeight:700,
-            padding:"5px 12px", borderRadius:8,
+            padding:"5px 10px", borderRadius:8,
             background:"rgba(255,255,255,0.04)", color:"var(--text-muted)",
           }}>
             ⏱ {fmtSecs(totalSecs)}
@@ -394,7 +393,7 @@ export default function VoiceInterview() {
             onClick={() => submitAll()}
             disabled={submitting}
             style={{
-              padding:"7px 16px", fontSize:12,
+              padding:"6px 14px", fontSize:12,
               background:"rgba(239,68,68,0.08)", border:"1px solid rgba(239,68,68,0.3)",
               color:"#ef4444",
             }}
@@ -414,14 +413,7 @@ export default function VoiceInterview() {
       </div>
 
       {/* ── Main two-panel layout ── */}
-      <div style={{
-        maxWidth:1100, margin:"0 auto",
-        padding:"28px 20px",
-        display:"grid",
-        gridTemplateColumns:"1fr 1fr",
-        gap:20,
-        alignItems:"start",
-      }}>
+      <div className="voice-interview-layout">
 
         {/* ── LEFT: AI Interviewer panel ── */}
         <div style={{ display:"flex", flexDirection:"column", gap:16 }}>

@@ -8,11 +8,7 @@ function MockTestList() {
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', sans-serif" }}>
 
       {/* ── Header ── */}
-      <div style={{
-        background: "linear-gradient(180deg, var(--card) 0%, var(--bg) 100%)",
-        borderBottom: "1px solid rgba(255,255,255,0.06)",
-        padding: "28px 40px 32px",
-      }}>
+      <div className="mock-test-header">
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <button
             onClick={() => navigate("/")}
@@ -28,7 +24,7 @@ function MockTestList() {
           </button>
 
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
-            <div>
+            <div style={{ maxWidth: 520 }}>
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)",
@@ -54,7 +50,7 @@ function MockTestList() {
               ].map(({ icon, val, label }) => (
                 <div key={label} style={{
                   background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.08)",
-                  borderRadius: 12, padding: "10px 18px", textAlign: "center",
+                  borderRadius: 12, padding: "10px 18px", textAlign: "center", flex: "1 1 auto",
                 }}>
                   <div style={{ fontSize: 18, marginBottom: 2 }}>{icon}</div>
                   <div style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>{val}</div>
@@ -67,7 +63,7 @@ function MockTestList() {
       </div>
 
       {/* ── Test List ── */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "32px 40px 60px" }}>
+      <div className="mock-test-container" style={{ maxWidth: 900, margin: "0 auto" }}>
 
         {/* Filter hint */}
         <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 20 }}>
@@ -103,16 +99,11 @@ function MockTestListItem({ test, index, onStart }) {
 
   return (
     <div
+      className="mock-test-list-item"
       style={{
         background: "var(--card)",
         border: `1px solid rgba(255,255,255,0.07)`,
         borderRadius: 16,
-        padding: "20px 24px",
-        display: "flex",
-        alignItems: "center",
-        gap: 20,
-        transition: "all 0.22s ease",
-        cursor: "default",
         position: "relative",
         overflow: "hidden",
         animation: `fadeUp 0.3s ease ${index * 0.07}s both`,
@@ -170,7 +161,7 @@ function MockTestListItem({ test, index, onStart }) {
       </div>
 
       {/* Meta */}
-      <div style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end", flexShrink: 0 }}>
+      <div className="mock-test-meta" style={{ display: "flex", flexDirection: "column", gap: 8, alignItems: "flex-end", flexShrink: 0 }}>
         <div style={{ display: "flex", gap: 16, fontSize: 13, color: "var(--text-muted)" }}>
           <span style={{ display: "flex", alignItems: "center", gap: 5 }}>
             <span>❓</span> {test.totalQuestions} Qs
@@ -189,6 +180,7 @@ function MockTestListItem({ test, index, onStart }) {
       {/* Start Button */}
       <button
         onClick={onStart}
+        className="mock-test-start-btn"
         style={{
           padding: "10px 22px", borderRadius: 10, border: "none",
           background: test.gradient, color: "#fff",
