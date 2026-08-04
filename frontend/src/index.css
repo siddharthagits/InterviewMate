@@ -1409,6 +1409,69 @@ kbd.typing-kbd {
   flex-wrap: wrap;
 }
 
+/* ── About Component Styles ────────────────────────────────────────────────── */
+.about-section {
+  padding: 100px 32px 110px;
+  position: relative;
+  width: 100%;
+  border-top: 1px solid rgba(255,255,255,0.03);
+}
+
+.about-pillars-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(260px, 100%), 1fr));
+  gap: 20px;
+  margin-bottom: 48px;
+}
+
+.about-pillar-card {
+  background: var(--card);
+  border: 1px solid var(--glass-border);
+  border-radius: 20px;
+  padding: 28px 24px;
+  transition: transform 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease;
+  position: relative;
+}
+
+.about-pillar-card:hover {
+  transform: translateY(-4px);
+  border-color: rgba(124,58,237,0.3);
+  box-shadow: 0 16px 36px rgba(0,0,0,0.3), 0 0 20px rgba(124,58,237,0.08);
+}
+
+.about-deployment-card {
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05), rgba(0,112,243,0.04));
+  border: 1px solid rgba(124,58,237,0.25);
+  border-radius: 24px;
+  padding: 36px 40px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 36px;
+  position: relative;
+  overflow: hidden;
+}
+
+.about-deployment-info {
+  flex: 1.2;
+}
+
+.about-tech-cloud {
+  flex: 1;
+  background: rgba(0,0,0,0.2);
+  border: 1px solid var(--glass-border);
+  border-radius: 18px;
+  padding: 24px;
+}
+
+[data-theme="light"] .about-tech-cloud {
+  background: rgba(255,255,255,0.7);
+}
+
+[data-theme="light"] .about-deployment-card {
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.04), rgba(0,112,243,0.03));
+}
+
 /* ── Footer Component Styles ───────────────────────────────────────────────── */
 .footer-container {
   background: var(--sidebar);
@@ -1535,6 +1598,23 @@ kbd.typing-kbd {
     min-width: 140px;
     justify-content: center;
   }
+  .about-section {
+    padding: 70px 20px 80px;
+  }
+  .about-pillars-grid {
+    grid-template-columns: 1fr;
+    gap: 16px;
+    margin-bottom: 36px;
+  }
+  .about-deployment-card {
+    flex-direction: column;
+    align-items: flex-start;
+    padding: 28px 20px;
+    gap: 24px;
+  }
+  .about-tech-cloud {
+    width: 100%;
+  }
   .footer-container {
     padding: 44px 20px 0;
   }
@@ -1610,6 +1690,18 @@ kbd.typing-kbd {
   }
   .features-cta-actions .btn {
     width: 100%;
+  }
+  .about-section {
+    padding: 50px 14px 60px;
+  }
+  .about-pillar-card {
+    padding: 20px 16px;
+  }
+  .about-deployment-card {
+    padding: 20px 16px;
+  }
+  .about-tech-cloud {
+    padding: 16px 12px;
   }
   .footer-container {
     padding: 36px 14px 0;

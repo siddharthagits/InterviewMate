@@ -103,6 +103,19 @@ function Navbar() {
       )
     },
     {
+      to: "/#about",
+      label: "About",
+      activeColor: "#38bdf8",
+      isHash: true,
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <circle cx="12" cy="12" r="10"/>
+          <line x1="12" y1="16" x2="12" y2="12"/>
+          <line x1="12" y1="8" x2="12.01" y2="8"/>
+        </svg>
+      )
+    },
+    {
       to: "/dashboard",
       label: "Dashboard",
       activeColor: "var(--violet-light)",
@@ -115,6 +128,17 @@ function Navbar() {
       )
     },
   ];
+
+  const handleNavClick = (item, e) => {
+    setMobileMenuOpen(false);
+    if (item.isHash) {
+      if (location.pathname === "/") {
+        e.preventDefault();
+        const el = document.getElementById("about");
+        if (el) el.scrollIntoView({ behavior: "smooth" });
+      }
+    }
+  };
 
   return (
     <>
@@ -143,6 +167,7 @@ function Navbar() {
             <Link
               key={item.to}
               to={item.to}
+              onClick={(e) => handleNavClick(item, e)}
               className="nav-link"
               style={{
                 color: item.isActive ? item.activeColor : undefined,
@@ -234,7 +259,7 @@ function Navbar() {
                 style={{
                   color: item.isActive ? item.activeColor : undefined,
                 }}
-                onClick={() => setMobileMenuOpen(false)}
+                onClick={(e) => handleNavClick(item, e)}
               >
                 <span className="navbar-mobile-link-icon">{item.icon}</span>
                 <span className="navbar-mobile-link-label">{item.label}</span>

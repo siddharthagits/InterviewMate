@@ -1,10 +1,27 @@
+import { useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
 import Features from "../components/Features";
+import AboutSection from "../components/AboutSection";
 import Footer from "../components/Footer";
 import ParticleBackground from "../components/ParticleBackground";
 
 function Home() {
+  const location = useLocation();
+
+  useEffect(() => {
+    if (location.hash) {
+      const id = location.hash.replace("#", "");
+      const el = document.getElementById(id);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
+    }
+  }, [location.hash]);
+
   return (
     <div style={{ position: "relative", minHeight: "100vh", background: "var(--bg)", overflow: "hidden" }}>
 
@@ -32,6 +49,7 @@ function Home() {
       <div style={{ position: "relative", zIndex: 2 }}>
         <Hero />
         <Features />
+        <AboutSection />
         <Footer />
       </div>
 
