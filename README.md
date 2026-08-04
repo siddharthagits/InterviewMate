@@ -3,7 +3,7 @@
 # 🎯 InterviewMate
 ### *The Ultimate AI-Powered Interview Preparation & Assessment Platform*
 
-[![Live Demo](https://img.shields.io/badge/Live%20Demo-interviewmateai.netlify.app-00C7B7?style=for-the-badge&logo=netlify&logoColor=white)](https://interviewmateai.netlify.app)
+[![Live Demo](https://img.shields.io/badge/Live%20Demo-aiinterviewmate.vercel.app-black?style=for-the-badge&logo=vercel&logoColor=white)](https://aiinterviewmate.vercel.app/)
 [![GitHub Stars](https://img.shields.io/github/stars/siddharthagits/InterviewMate?style=for-the-badge&color=ffd700)](https://github.com/siddharthagits/InterviewMate/stargazers)
 [![GitHub Forks](https://img.shields.io/github/forks/siddharthagits/InterviewMate?style=for-the-badge&color=60a5fa)](https://github.com/siddharthagits/InterviewMate/network/members)
 [![License: MIT](https://img.shields.io/badge/License-MIT-green.svg?style=for-the-badge)](https://opensource.org/licenses/MIT)
@@ -22,7 +22,7 @@
 
 **InterviewMate** is an intelligent, full-stack interview readiness ecosystem engineered to transform technical, behavioral, and company-specific interview preparation. Powered by **Google Gemini AI**, it delivers realistic voice simulation, adaptive mock testing, automated code and speech evaluation, and personalized career roadmaps.
 
-[🚀 Explore Live Demo](https://interviewmateai.netlify.app) • [✨ Key Features](#-key-features) • [🏗️ Architecture](#-system-architecture) • [⚡ Quick Start](#-quick-start-guide) • [🔌 API Docs](#-api-endpoints)
+[🚀 Explore Live Demo](https://aiinterviewmate.vercel.app/) • [✨ Key Features](#-key-features) • [🏗️ Architecture](#-system-architecture) • [⚡ Quick Start](#-quick-start-guide) • [🔌 API Docs](#-api-endpoints)
 
 </div>
 
@@ -150,7 +150,7 @@ flowchart TD
 | **Backend** | FastAPI, Python 3.11+, Uvicorn, Pydantic v2, Python-Dotenv |
 | **AI / Machine Learning** | Google Gemini 2.0 (`google-genai` SDK), Prompt Engineering, Web Speech API |
 | **Database** | MongoDB Atlas, Motor (Async MongoDB Driver) |
-| **Deployment & DevOps** | Render (Backend), Netlify (Frontend), CI/CD Ready |
+| **Deployment & DevOps** | Vercel (Frontend), Render (Backend), CI/CD Ready |
 
 ---
 

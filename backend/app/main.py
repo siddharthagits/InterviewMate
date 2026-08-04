@@ -17,13 +17,14 @@ async def lifespan(_: FastAPI):
 
 app = FastAPI(title="InterviewMate API", lifespan=lifespan)
 
-# Allow localhost (dev) + Netlify production + any Netlify preview URLs
+# Allow localhost (dev) + Vercel / Netlify production + preview URLs
 origins = [
     "http://localhost:5173",
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
-    "https://interviewmateai.netlify.app",   # your production Netlify URL
+    "https://aiinterviewmate.vercel.app",    # your production Vercel URL
+    "https://interviewmateai.netlify.app",   # Netlify URL
 ]
 
 # Allow extra origins via environment variable (e.g. for Render preview URLs)
@@ -34,7 +35,7 @@ if extra:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https://.*\.netlify\.app",  # covers all Netlify preview deploys
+    allow_origin_regex=r"https://.*(\.vercel\.app|\.netlify\.app)",  # covers all Vercel and Netlify preview deploys
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
