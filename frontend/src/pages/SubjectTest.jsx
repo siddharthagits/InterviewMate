@@ -222,7 +222,7 @@ function TopicRow({ topic, subject, index }) {
               lineHeight: 1.6, display: "flex", gap: 12,
             }}>
               <span style={{ fontSize: 18 }}>🤖</span>
-              <div>
+              <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
                 <strong style={{ color: "#10b981", display: "block", marginBottom: 6 }}>AI Dive In:</strong>
                 {aiExplanation}
               </div>
