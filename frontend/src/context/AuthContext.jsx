@@ -96,6 +96,52 @@ export function AuthProvider({ children }) {
     return newUser;
   };
 
+  const socialLogin = (provider = "google") => {
+    const providerProfiles = {
+      google: { name: "Alex Morgan", email: "alex.morgan@gmail.com", provider: "Google" },
+      github: { name: "Dev Siddhartha", email: "dev.siddhartha@github.com", provider: "GitHub" },
+      linkedin: { name: "Sarah Chen", email: "sarah.chen@linkedin.com", provider: "LinkedIn" },
+      x: { name: "Max Rivera", email: "max.rivera@x.com", provider: "X" },
+    };
+
+    const profile = providerProfiles[provider] || {
+      name: `${provider.toUpperCase()} User`,
+      email: `${provider}.user@interviewmate.ai`,
+      provider: provider.toUpperCase(),
+    };
+
+    let registered = [];
+    try {
+      registered = JSON.parse(localStorage.getItem(USERS_STORAGE_KEY) || "[]");
+    } catch {
+      registered = [];
+    }
+
+    let existing = registered.find((u) => u.email.toLowerCase() === profile.email.toLowerCase());
+    if (!existing) {
+      existing = {
+        id: "usr-" + Date.now(),
+        name: profile.name,
+        email: profile.email,
+        provider: profile.provider,
+        joinedAt: Date.now(),
+      };
+      registered.push(existing);
+      localStorage.setItem(USERS_STORAGE_KEY, JSON.stringify(registered));
+    }
+
+    const sessionUser = {
+      ...existing,
+      lastLogin: Date.now(),
+    };
+
+    localStorage.setItem(AUTH_STORAGE_KEY, JSON.stringify(sessionUser));
+    setUser(sessionUser);
+    window.dispatchEvent(new Event("im_auth_changed"));
+    window.dispatchEvent(new Event("im_activity_updated"));
+    return sessionUser;
+  };
+
   const logout = () => {
     localStorage.removeItem(AUTH_STORAGE_KEY);
     setUser(null);
@@ -110,6 +156,7 @@ export function AuthProvider({ children }) {
         isLoggedIn: !!user,
         login,
         registerUser,
+        socialLogin,
         logout,
       }}
     >
