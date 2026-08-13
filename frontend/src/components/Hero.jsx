@@ -2,11 +2,12 @@ import { useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 
 const ROLES = [
-  "Frontend Interview",
-  "Backend Interview",
-  "System Design Round",
-  "DSA Challenge",
-  "Full Stack Interview",
+  "AI Voice Interview",
+  "Company Assessment",
+  "Frontend & Backend Round",
+  "System Design & DSA",
+  "Live Typing Speed Test",
+  "Aptitude & Reasoning",
 ];
 
 // Inline SVG icons — no emojis
@@ -19,6 +20,14 @@ const IconStar = () => (
 const IconPlay = () => (
   <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
     <polygon points="5,3 19,12 5,21" />
+  </svg>
+);
+
+const IconMic = () => (
+  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+    <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+    <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+    <line x1="12" y1="19" x2="12" y2="22"/>
   </svg>
 );
 
@@ -50,13 +59,13 @@ function Hero() {
 
     if (typing) {
       if (displayed.length < target.length) {
-        timeout = setTimeout(() => setDisplayed(target.slice(0, displayed.length + 1)), 55);
+        timeout = setTimeout(() => setDisplayed(target.slice(0, displayed.length + 1)), 50);
       } else {
         timeout = setTimeout(() => setTyping(false), 1800);
       }
     } else {
       if (displayed.length > 0) {
-        timeout = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 30);
+        timeout = setTimeout(() => setDisplayed(displayed.slice(0, -1)), 25);
       } else {
         setRoleIdx((i) => (i + 1) % ROLES.length);
         setTyping(true);
@@ -68,8 +77,9 @@ function Hero() {
 
   const stats = [
     { icon: <IconStar />, value: "35+", label: "Questions/Session" },
-    { icon: <IconTarget />, value: "3",  label: "Question Formats" },
-    { icon: <IconStar />,  value: "AI",  label: "Instant Scoring" },
+    { icon: <IconTarget />, value: "6+",  label: "Practice Tracks" },
+    { icon: <IconStar />,  value: "Voice AI", label: "Real-Time Feedback" },
+    { icon: <IconStar />,  value: "1500+", label: "Question Bank" },
   ];
 
   return (
@@ -94,7 +104,7 @@ function Hero() {
       {/* Badge pill */}
       <div className="glow-pill fade-up" style={{ marginBottom: 28 }}>
         <IconStar />
-        AI-Powered Interview Practice
+        Next-Gen AI Interview &amp; Assessment Ecosystem
       </div>
 
       {/* Main Heading */}
@@ -102,7 +112,8 @@ function Hero() {
         className="fade-up hero-heading"
         style={{
           lineHeight: 1.15,
-          maxWidth: 820,
+          maxWidth: 1100,
+          width: "100%",
           letterSpacing: "-1.5px",
           animationDelay: "0.1s",
         }}
@@ -113,6 +124,8 @@ function Hero() {
           style={{
             display: "inline-block",
             minWidth: "2ch",
+            whiteSpace: "nowrap",
+            maxWidth: "100%",
             background: "var(--hero-gradient)",
             WebkitBackgroundClip: "text",
             WebkitTextFillColor: "transparent",
@@ -131,16 +144,16 @@ function Hero() {
         className="fade-up hero-subheading"
         style={{
           marginTop: 24,
-          maxWidth: 580,
+          maxWidth: 640,
           color: "var(--text-muted)",
           lineHeight: 1.8,
           animationDelay: "0.2s",
         }}
       >
         Practice with{" "}
-        <strong style={{ color: "var(--violet-light)" }}>35 adaptive questions</strong> — MCQs,
-        code output challenges, and in-depth answers — then get{" "}
-        <strong style={{ color: "var(--gold-light)" }}>instant AI feedback</strong> on every answer.
+        <strong style={{ color: "var(--violet-light)" }}>interactive Voice AI interviews</strong>,{" "}
+        <strong style={{ color: "var(--gold-light)" }}>company-specific assessments</strong>, and{" "}
+        <strong style={{ color: "var(--cyan)" }}>35 adaptive technical questions</strong> — complete with instant feedback, typing tests, and a smart dashboard.
       </p>
 
       {/* CTA Buttons */}
@@ -153,24 +166,24 @@ function Hero() {
       >
         <button
           className="btn btn-primary"
-          style={{ fontSize: 15, padding: "14px 28px", gap: 10 }}
+          style={{ fontSize: 15, padding: "14px 26px", gap: 10 }}
           onClick={() => nav("/setup")}
         >
-          <IconPlay /> Start Free Interview
+          <IconPlay /> Start Technical Interview
         </button>
         <button
           className="btn btn-gold"
-          style={{ fontSize: 15, padding: "14px 28px", gap: 10 }}
-          onClick={() => nav("/mock-tests")}
+          style={{ fontSize: 15, padding: "14px 26px", gap: 10 }}
+          onClick={() => nav("/voice")}
         >
-          <IconTarget /> Free Mock Tests
+          <IconMic /> Voice AI Interview
         </button>
         <button
           className="btn btn-outline"
-          style={{ fontSize: 15, padding: "14px 24px", gap: 10 }}
+          style={{ fontSize: 15, padding: "14px 22px", gap: 10 }}
           onClick={() => nav("/dashboard")}
         >
-          <IconLayout /> View Dashboard
+          <IconLayout /> Candidate Dashboard
         </button>
       </div>
 
@@ -189,25 +202,28 @@ function Hero() {
           >
             <div
               style={{
-                fontSize: "clamp(28px, 4vw, 36px)",
+                fontSize: "clamp(22px, 3.2vw, 34px)",
                 fontWeight: 900,
                 fontFamily: "'Sora', sans-serif",
                 background: "var(--hero-stat-gradient)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",
-                letterSpacing: "-1px",
+                letterSpacing: "-0.5px",
+                whiteSpace: "nowrap",
+                lineHeight: 1.15,
               }}
             >
               {value}
             </div>
             <div
               style={{
-                fontSize: 12,
+                fontSize: 12.5,
                 color: "var(--text-muted)",
                 marginTop: 6,
                 fontWeight: 500,
-                letterSpacing: "0.03em",
+                letterSpacing: "0.02em",
+                whiteSpace: "nowrap",
               }}
             >
               {label}

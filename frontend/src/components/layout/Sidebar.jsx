@@ -1,4 +1,5 @@
 import { useLocation, Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 
 // SVG Icons for sidebar
 const icons = {
@@ -65,6 +66,12 @@ const icons = {
       <line x1="10" y1="14" x2="14" y2="14"/>
     </svg>
   ),
+  practice: (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M9 11l3 3L22 4"/>
+      <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
+    </svg>
+  ),
 };
 
 const links = [
@@ -74,6 +81,7 @@ const links = [
   { to: "/voice",              icon: icons.mic,      label: "Voice Interview", green: true },
   { to: "/company-assessment", icon: icons.building, label: "Company Tests",  gold: true },
   { to: "/question-bank",      icon: icons.book,     label: "Question Bank" },
+  { to: "/practice",           icon: icons.practice, label: "Practice Corner" },
   { to: "/typing-test",        icon: icons.keyboard, label: "Typing Test",  cyan: true },
   { to: "/history",            icon: icons.clock,    label: "History" },
   { to: "/reports",            icon: icons.chart,    label: "Reports" },
@@ -83,15 +91,50 @@ const links = [
 
 function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
   const { pathname } = useLocation();
+  const { user, isLoggedIn } = useAuth();
+  const initial = user?.name ? user.name.charAt(0).toUpperCase() : (user?.email ? user.email.charAt(0).toUpperCase() : "G");
 
   return (
     <aside className={`sidebar ${isOpen ? "open" : "collapsed"}${isMobile ? " mobile-drawer" : ""}`}>
+      {/* Desktop floating circular edge toggle button */}
+      {!isMobile && (
+        <button
+          type="button"
+          className="sidebar-edge-toggle"
+          onClick={onToggle}
+          aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
+          title={isOpen ? "Collapse sidebar" : "Expand sidebar"}
+        >
+          {isOpen ? (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M15 18l-6-6 6-6" />
+            </svg>
+          ) : (
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M9 18l6-6-6-6" />
+            </svg>
+          )}
+        </button>
+      )}
+
       <div className="sidebar-brand-area">
-        <Link to="/" className="sidebar-brand" style={{ textDecoration: "none" }} onClick={onClose}>
-          Interview<span style={{ color: "#fcd34d" }}>Mate</span>
+        <Link
+          to="/"
+          className="sidebar-brand"
+          style={{ textDecoration: "none" }}
+          onClick={onClose}
+          title="InterviewMate"
+        >
+          {isOpen || isMobile ? (
+            <>
+              Interview<span style={{ color: "#fcd34d" }}>Mate</span>
+            </>
+          ) : (
+            <span className="sidebar-brand-initial">I</span>
+          )}
         </Link>
 
-        {isMobile ? (
+        {isMobile && (
           <button
             type="button"
             className="sidebar-close-btn"
@@ -99,15 +142,6 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
             aria-label="Close sidebar"
           >
             ✕
-          </button>
-        ) : (
-          <button
-            type="button"
-            className="sidebar-toggle"
-            onClick={onToggle}
-            aria-label={isOpen ? "Collapse sidebar" : "Expand sidebar"}
-          >
-            <span className="sidebar-toggle-dots">⋯</span>
           </button>
         )}
       </div>
@@ -125,7 +159,6 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
                 background: "rgba(16,185,129,0.12)",
                 color: "#10b981",
                 border: "1px solid rgba(16,185,129,0.25)",
-                boxShadow: "0 0 16px rgba(16,185,129,0.1)",
               } : isActive && gold ? {
                 background: "rgba(245,158,11,0.1)",
                 color: "#f59e0b",
@@ -134,7 +167,6 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
                 background: "rgba(6,182,212,0.1)",
                 color: "#06b6d4",
                 border: "1px solid rgba(6,182,212,0.25)",
-                boxShadow: "0 0 16px rgba(6,182,212,0.1)",
               } : undefined}
               title={isOpen || isMobile ? undefined : label}
             >
@@ -146,25 +178,72 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
       </nav>
 
       {(isOpen || isMobile) ? (
-        <div style={{ marginTop: "auto", paddingTop: 24 }}>
-          <div
+        <div style={{ marginTop: "auto", paddingTop: 18 }}>
+          <Link
+            to="/profile"
+            onClick={onClose}
             style={{
-              background: "linear-gradient(135deg, rgba(124,58,237,0.12), rgba(6,182,212,0.06))",
-              border: "1px solid rgba(124,58,237,0.2)",
+              textDecoration: "none",
+              display: "flex",
+              alignItems: "center",
+              gap: 12,
+              background: "rgba(255,255,255,0.03)",
+              border: "1px solid var(--glass-border)",
               borderRadius: 14,
-              padding: "14px 16px",
+              padding: "10px 14px",
+              transition: "all 0.2s ease",
             }}
           >
-            <div style={{ fontSize: 12, fontWeight: 700, color: "var(--violet-light)", marginBottom: 4 }}>
-              Powered by
+            <div
+              style={{
+                width: 32,
+                height: 32,
+                borderRadius: "50%",
+                background: "linear-gradient(135deg, var(--violet), var(--cyan))",
+                display: "flex",
+                alignItems: "center",
+                justifyContent: "center",
+                fontSize: 13,
+                fontWeight: 900,
+                color: "#fff",
+                flexShrink: 0,
+              }}
+            >
+              {initial}
             </div>
-            <div style={{ fontSize: 13, color: "var(--text-muted)", fontWeight: 500 }}>
-              Gemini AI ✨
+            <div style={{ overflow: "hidden" }}>
+              <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
+                {isLoggedIn && user ? (user.name || user.email.split("@")[0]) : "Guest User"}
+              </div>
+              <div style={{ fontSize: 11, color: isLoggedIn ? "#10b981" : "var(--text-dim)", fontWeight: 600 }}>
+                {isLoggedIn ? "● Active Credentials" : "○ Nil Mode"}
+              </div>
             </div>
-          </div>
+          </Link>
         </div>
       ) : (
-        <div className="sidebar-bottom-card collapsed" />
+        <div className="sidebar-bottom-card collapsed">
+          <Link
+            to="/profile"
+            title={isLoggedIn && user ? (user.name || user.email) : "Profile"}
+            style={{
+              width: 34,
+              height: 34,
+              borderRadius: "50%",
+              background: "linear-gradient(135deg, var(--violet), var(--cyan))",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: 13,
+              fontWeight: 900,
+              color: "#fff",
+              textDecoration: "none",
+              margin: "0 auto",
+            }}
+          >
+            {initial}
+          </Link>
+        </div>
       )}
     </aside>
   );

@@ -1,4 +1,5 @@
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import { mockTestList } from "../data/mockTestData";
 
 function MockTestList() {
@@ -6,8 +7,9 @@ function MockTestList() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", fontFamily: "'Inter', sans-serif" }}>
-
-      {/* ── Header ── */}
+      <Navbar />
+      <div style={{ paddingTop: 68 }}>
+        {/* ── Header ── */}
       <div className="mock-test-header">
         <div style={{ maxWidth: 900, margin: "0 auto" }}>
           <button
@@ -88,6 +90,7 @@ function MockTestList() {
           <div>We're constantly adding new mock tests across topics.</div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

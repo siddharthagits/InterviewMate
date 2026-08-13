@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
+import ThemeToggle from "../components/ThemeToggle";
+import { logUserActivity } from "../utils/activityTracker";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const FILLERS = ["um","uh","like","you know","basically","literally","right","so","kind of","sort of","actually","anyway"];
@@ -190,6 +192,25 @@ export default function VoiceResults() {
 
   const [label, labelColor] = commLabel(score);
 
+  useEffect(() => {
+    if (result && result.score !== undefined) {
+      logUserActivity({
+        type: "voice",
+        title: `${interviewData?.role || "AI"} Voice Interview`,
+        category: "Voice AI",
+        score: score,
+        metrics: {
+          clarity: `${clarityScore}%`,
+          pacing: `${avgWpm} WPM`,
+          fillers: `${totalFillers} detected`,
+        },
+        icon: "🎙️",
+        color: "#06b6d4",
+        badge: score >= 75 ? "Strong" : "Completed",
+      });
+    }
+  }, [result]);
+
   if (!result) return (
     <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, background:"var(--bg)", padding:32, textAlign:"center" }}>
       <div style={{ fontSize:48 }}>🎙</div>
@@ -200,7 +221,12 @@ export default function VoiceResults() {
   );
 
   return (
-    <div style={{ minHeight:"100vh", background:"var(--bg)", color:"var(--text)", padding:"40px 20px 60px" }}>
+    <div style={{ minHeight:"100vh", background:"var(--bg)", color:"var(--text)", padding:"40px 20px 60px", position:"relative" }}>
+      {/* Top right Theme Toggle */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
       <style>{`
         @keyframes vrFadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
       `}</style>

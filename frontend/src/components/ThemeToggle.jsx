@@ -6,51 +6,76 @@ export default function ThemeToggle() {
 
   return (
     <button
+      type="button"
       onClick={toggle}
-      title={isDark ? "Switch to Light Mode" : "Switch to Dark Mode"}
-      aria-label="Toggle theme"
+      className="theme-toggle-btn"
+      aria-label={`Switch to ${isDark ? "Light" : "Dark"} mode`}
+      title={`Switch to ${isDark ? "Light" : "Dark"} mode`}
       style={{
-        width: 42,
-        height: 42,
-        borderRadius: "50%",
-        border: isDark
-          ? "1px solid rgba(255,255,255,0.1)"
-          : "1px solid rgba(0,0,0,0.12)",
-        background: isDark
-          ? "rgba(255,255,255,0.06)"
-          : "rgba(0,0,0,0.06)",
+        background: "transparent",
+        border: "none",
+        padding: "2px 4px",
         cursor: "pointer",
-        display: "flex",
+        display: "inline-flex",
+        flexDirection: "column",
         alignItems: "center",
         justifyContent: "center",
-        transition: "all 0.3s cubic-bezier(0.4,0,0.2,1)",
-        position: "relative",
-        overflow: "hidden",
-        flexShrink: 0,
-      }}
-      onMouseEnter={e => {
-        e.currentTarget.style.transform = "scale(1.1) rotate(15deg)";
-        e.currentTarget.style.background = isDark
-          ? "rgba(255,255,255,0.12)"
-          : "rgba(0,0,0,0.1)";
-      }}
-      onMouseLeave={e => {
-        e.currentTarget.style.transform = "scale(1) rotate(0deg)";
-        e.currentTarget.style.background = isDark
-          ? "rgba(255,255,255,0.06)"
-          : "rgba(0,0,0,0.06)";
+        gap: 3,
+        userSelect: "none",
+        fontFamily: "'Inter', system-ui, -apple-system, sans-serif",
       }}
     >
-      {/* Animated icon */}
-      <span
+      {/* Switch Track */}
+      <div
         style={{
-          fontSize: 18,
-          display: "block",
-          transition: "transform 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s",
-          transform: isDark ? "rotate(0deg)" : "rotate(180deg)",
+          width: 48,
+          height: 25,
+          borderRadius: 999,
+          background: !isDark ? "#d3d6dc" : "#1a1c20",
+          border: !isDark
+            ? "1px solid rgba(0,0,0,0.06)"
+            : "1px solid rgba(255,255,255,0.1)",
+          position: "relative",
+          display: "flex",
+          alignItems: "center",
+          boxShadow: !isDark
+            ? "inset 0 1px 3px rgba(0,0,0,0.12)"
+            : "inset 0 2px 4px rgba(0,0,0,0.6)",
+          transition: "background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease",
+          flexShrink: 0,
         }}
       >
-        {isDark ? "🌙" : "☀️"}
+        {/* Sliding Knob */}
+        <div
+          style={{
+            width: 19,
+            height: 19,
+            borderRadius: "50%",
+            background: !isDark ? "#ffffff" : "#464a52",
+            boxShadow: !isDark
+              ? "0 2px 4px rgba(0,0,0,0.2)"
+              : "0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.12)",
+            position: "absolute",
+            top: 2,
+            left: 3,
+            transform: isDark ? "translateX(23px)" : "translateX(0px)",
+            transition: "transform 0.25s cubic-bezier(0.4, 0, 0.2, 1), background 0.25s ease",
+          }}
+        />
+      </div>
+
+      {/* Mode Label Underneath */}
+      <span
+        style={{
+          fontSize: 12,
+          fontWeight: 600,
+          color: isDark ? "#f1f5f9" : "#1e293b",
+          lineHeight: 1.1,
+          letterSpacing: "-0.1px",
+          transition: "color 0.25s ease",
+        }}
+      >
+        {isDark ? "Dark" : "Light"}
       </span>
     </button>
   );

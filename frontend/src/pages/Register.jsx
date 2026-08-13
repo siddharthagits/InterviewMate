@@ -1,8 +1,11 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
+import { useAuth } from "../context/AuthContext";
 
 const S = {
-  wrap: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px" },
+  wrap: { minHeight:"100vh", display:"flex", alignItems:"center", justifyContent:"center", padding:"40px 20px", position:"relative", background:"var(--bg)" },
   card: { width:"100%", maxWidth:440, background:"var(--card)", border:"1px solid var(--glass-border)", borderRadius:20, overflow:"hidden" },
   header: { padding:"32px 36px 24px", borderBottom:"1px solid var(--glass-border)" },
   body: { padding:"28px 36px 36px" },
@@ -13,11 +16,27 @@ const S = {
 
 function Register() {
   const navigate = useNavigate();
+  const { registerUser } = useAuth();
+  const [authError, setAuthError] = useState("");
   const { register, handleSubmit, watch, formState:{ errors } } = useForm();
-  const onSubmit = () => navigate("/dashboard");
+
+  const onSubmit = (data) => {
+    try {
+      setAuthError("");
+      registerUser(data.name, data.email, data.password);
+      navigate("/dashboard");
+    } catch (err) {
+      setAuthError(err.message || "Failed to create account");
+    }
+  };
 
   return (
     <div style={S.wrap}>
+      {/* Top right Theme Toggle */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
       <div style={S.card}>
         <div style={S.header}>
           <Link to="/" className="grad-text" style={{ fontSize:18, fontWeight:800, textDecoration:"none", display:"inline-block" }}>InterviewMate</Link>
@@ -25,6 +44,11 @@ function Register() {
           <p style={{ color:"var(--text-muted)", fontSize:14, marginTop:4 }}>Join InterviewMate today</p>
         </div>
         <div style={S.body}>
+          {authError && (
+            <div style={{ padding: "10px 14px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, color: "var(--red)", fontSize: 13, marginBottom: 18 }}>
+              ⚠️ {authError}
+            </div>
+          )}
           <form onSubmit={handleSubmit(onSubmit)}>
             {[
               { name:"name", label:"Full Name", type:"text", placeholder:"John Doe", rules:{ required:"Name required" } },
@@ -54,4 +78,5 @@ function Register() {
     </div>
   );
 }
+
 export default Register;

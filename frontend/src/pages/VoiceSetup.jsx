@@ -1,6 +1,7 @@
 import { useState, useEffect, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 const STEPS = [
   {
@@ -124,6 +125,11 @@ export default function VoiceSetup() {
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
       padding: "40px 20px", background: "var(--bg)", position: "relative", overflow: "hidden",
     }}>
+      {/* Top right Theme Toggle */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
       <style>{`
         @keyframes mcRipple {
           0%   { transform: scale(1);   opacity: 0.5; }

@@ -1,8 +1,8 @@
 import { useEffect, useRef } from "react";
 
-const PARTICLE_COUNT = 80;
+const PARTICLE_COUNT = 120;
 const MAX_DIST = 120;
-const SPEED = 0.3;
+const SPEED = 0.4;
 
 function randomBetween(a, b) {
   return a + Math.random() * (b - a);
@@ -12,20 +12,20 @@ function randomBetween(a, b) {
 const HUES = [
   { h: 262, s: 80, l: 70 },  // violet
   { h: 192, s: 90, l: 60 },  // cyan
-  { h: 38,  s: 95, l: 65 },  // gold
+  { h: 38, s: 95, l: 65 },  // gold
 ];
 
 export default function ParticleBackground() {
   const canvasRef = useRef(null);
-  const animRef   = useRef(null);
-  const mouseRef  = useRef({ x: -9999, y: -9999 });
+  const animRef = useRef(null);
+  const mouseRef = useRef({ x: -9999, y: -9999 });
 
   useEffect(() => {
     const canvas = canvasRef.current;
-    const ctx    = canvas.getContext("2d");
+    const ctx = canvas.getContext("2d");
 
     const resize = () => {
-      canvas.width  = canvas.offsetWidth;
+      canvas.width = canvas.offsetWidth;
       canvas.height = canvas.offsetHeight;
     };
     resize();
@@ -35,11 +35,11 @@ export default function ParticleBackground() {
     const particles = Array.from({ length: PARTICLE_COUNT }, () => {
       const color = HUES[Math.floor(Math.random() * HUES.length)];
       return {
-        x:   randomBetween(0, canvas.width),
-        y:   randomBetween(0, canvas.height),
-        vx:  randomBetween(-SPEED, SPEED),
-        vy:  randomBetween(-SPEED, SPEED),
-        r:   randomBetween(0.8, 2.2),
+        x: randomBetween(0, canvas.width),
+        y: randomBetween(0, canvas.height),
+        vx: randomBetween(-SPEED, SPEED),
+        vy: randomBetween(-SPEED, SPEED),
+        r: randomBetween(0.8, 2.2),
         hue: color.h,
         sat: color.s,
         lit: color.l,
@@ -65,7 +65,7 @@ export default function ParticleBackground() {
         // Mouse attraction
         const dx = mouseRef.current.x - p.x;
         const dy = mouseRef.current.y - p.y;
-        const d  = Math.hypot(dx, dy);
+        const d = Math.hypot(dx, dy);
         if (d < 180 && d > 0) {
           p.vx += (dx / d) * 0.01;
           p.vy += (dy / d) * 0.01;
@@ -82,10 +82,10 @@ export default function ParticleBackground() {
         p.y += p.vy;
 
         // Wrap edges
-        if (p.x < 0)               p.x = canvas.width;
-        if (p.x > canvas.width)    p.x = 0;
-        if (p.y < 0)               p.y = canvas.height;
-        if (p.y > canvas.height)   p.y = 0;
+        if (p.x < 0) p.x = canvas.width;
+        if (p.x > canvas.width) p.x = 0;
+        if (p.y < 0) p.y = canvas.height;
+        if (p.y > canvas.height) p.y = 0;
 
         // Draw dot with glow
         ctx.save();
@@ -101,8 +101,8 @@ export default function ParticleBackground() {
       // Connecting lines
       for (let i = 0; i < particles.length; i++) {
         for (let j = i + 1; j < particles.length; j++) {
-          const dx   = particles[i].x - particles[j].x;
-          const dy   = particles[i].y - particles[j].y;
+          const dx = particles[i].x - particles[j].x;
+          const dy = particles[i].y - particles[j].y;
           const dist = Math.hypot(dx, dy);
           if (dist < MAX_DIST) {
             const alpha = (1 - dist / MAX_DIST) * 0.2;

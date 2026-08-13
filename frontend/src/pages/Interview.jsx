@@ -4,7 +4,9 @@ import api from "../api/api";
 import { useInterview } from "../context/InterviewContext";
 import MCQOptions from "../components/interview/MCQOptions";
 import CodeSnippet from "../components/interview/CodeSnippet";
+import ThemeToggle from "../components/ThemeToggle";
 import { buildFallbackQuestions } from "../data/questionBank";
+import ConfirmModal from "../components/ConfirmModal";
 
 
 // Per-question time limits for pressure mode (seconds)
@@ -97,6 +99,7 @@ export default function Interview() {
   const [answers,     setAnswers]     = useState({});
   const [submitting,  setSubmitting]  = useState(false);
   const [timedOut,    setTimedOut]    = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   // Global timer (when NOT in pressure mode)
   const [globalSecs, setGlobalSecs] = useState(900);
@@ -245,12 +248,12 @@ export default function Interview() {
 
   const goNext = async () => {
     if (idx < questions.length - 1) setIdx(p => p + 1);
-    else await submitAll({ ...answers });
+    else setConfirmOpen(true);
   };
 
   const skip = async () => {
     if (idx < questions.length - 1) setIdx(p => p + 1);
-    else await submitAll({ ...answers });
+    else setConfirmOpen(true);
   };
 
   const goBack = () => { if (idx > 0) setIdx(p => p - 1); };
@@ -309,11 +312,14 @@ export default function Interview() {
               </span>
             )}
           </div>
-          <TimerBadge
-            secs={displaySecs}
-            pressureMode={pressureMode}
-            qType={displayQType}
-          />
+          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+            <ThemeToggle />
+            <TimerBadge
+              secs={displaySecs}
+              pressureMode={pressureMode}
+              qType={displayQType}
+            />
+          </div>
         </div>
 
         {timedOut && (
@@ -532,7 +538,7 @@ export default function Interview() {
 
             <button
               className="btn"
-              onClick={() => submitAll({ ...answers })}
+              onClick={() => setConfirmOpen(true)}
               disabled={submitting || timedOut}
               style={{
                 width: "100%", marginTop: 20, fontSize: 13,
@@ -547,6 +553,17 @@ export default function Interview() {
 
         </div>
       </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        icon="📝"
+        title="Submit Interview?"
+        message={`You've answered ${Object.values(answers).filter(a => a && (a.selected !== null || (a.text && a.text.trim()))).length} of ${questions.length} questions. Once submitted you cannot go back.`}
+        confirmText="Yes, Submit"
+        cancelText="Keep Going"
+        onConfirm={() => { setConfirmOpen(false); submitAll({ ...answers }); }}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }

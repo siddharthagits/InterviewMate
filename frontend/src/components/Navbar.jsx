@@ -2,10 +2,12 @@ import { Link, useLocation } from "react-router-dom";
 import { useState, useEffect } from "react";
 import ThemeToggle from "./ThemeToggle";
 import { useTheme } from "../context/ThemeContext";
+import { useAuth } from "../context/AuthContext";
 
 function Navbar() {
   const location = useLocation();
   const { theme } = useTheme();
+  const { user, isLoggedIn } = useAuth();
   const [scrolled, setScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
@@ -46,6 +48,18 @@ function Navbar() {
           <polyline points="14 2 14 8 20 8"/>
           <line x1="16" y1="13" x2="8" y2="13"/>
           <line x1="16" y1="17" x2="8" y2="17"/>
+        </svg>
+      )
+    },
+    {
+      to: "/practice",
+      label: "Practice",
+      activeColor: "#f59e0b",
+      isActive: location.pathname.startsWith("/practice"),
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M9 11l3 3L22 4"/>
+          <path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/>
         </svg>
       )
     },
@@ -99,6 +113,18 @@ function Navbar() {
           <line x1="14" y1="10" x2="14.01" y2="10" strokeWidth="2.5"/><line x1="18" y1="10" x2="18.01" y2="10" strokeWidth="2.5"/>
           <line x1="6" y1="14" x2="6.01" y2="14" strokeWidth="2.5"/><line x1="18" y1="14" x2="18.01" y2="14" strokeWidth="2.5"/>
           <line x1="10" y1="14" x2="14" y2="14" strokeWidth="2.5"/>
+        </svg>
+      )
+    },
+    {
+      to: "/hr-interview",
+      label: "HR Guide",
+      activeColor: "#10b981",
+      isActive: location.pathname === "/hr-interview",
+      icon: (
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/>
+          <path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/>
         </svg>
       )
     },
@@ -199,20 +225,64 @@ function Navbar() {
         {/* Desktop CTA Buttons & Theme Toggle */}
         <div className="navbar-cta-desktop">
           <ThemeToggle />
-          <Link
-            to="/login"
-            className="btn btn-outline"
-            style={{ padding: "8px 18px", fontSize: 13, borderRadius: 12 }}
-          >
-            Login
-          </Link>
-          <Link
-            to="/register"
-            className="btn btn-primary"
-            style={{ padding: "8px 20px", fontSize: 13, borderRadius: 12 }}
-          >
-            Get Started →
-          </Link>
+          {isLoggedIn && user ? (
+            <>
+              <Link
+                to="/profile"
+                className="btn btn-outline"
+                style={{
+                  padding: "6px 14px",
+                  fontSize: 12.5,
+                  borderRadius: 12,
+                  display: "inline-flex",
+                  alignItems: "center",
+                  gap: 8,
+                }}
+              >
+                <span
+                  style={{
+                    width: 22,
+                    height: 22,
+                    borderRadius: "50%",
+                    background: "var(--violet)",
+                    color: "#fff",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: 11,
+                    fontWeight: 900,
+                  }}
+                >
+                  {user.name ? user.name.charAt(0).toUpperCase() : "U"}
+                </span>
+                <span>{user.name || user.email.split("@")[0]}</span>
+              </Link>
+              <Link
+                to="/dashboard"
+                className="btn btn-primary"
+                style={{ padding: "8px 18px", fontSize: 13, borderRadius: 12 }}
+              >
+                Dashboard →
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link
+                to="/login"
+                className="btn btn-outline"
+                style={{ padding: "8px 18px", fontSize: 13, borderRadius: 12 }}
+              >
+                Login
+              </Link>
+              <Link
+                to="/register"
+                className="btn btn-primary"
+                style={{ padding: "8px 20px", fontSize: 13, borderRadius: 12 }}
+              >
+                Get Started →
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile Header Actions (Theme Toggle + Hamburger Button) */}
@@ -288,22 +358,45 @@ function Navbar() {
 
           {/* Mobile Auth Actions */}
           <div className="navbar-mobile-auth">
-            <Link
-              to="/login"
-              className="btn btn-outline"
-              style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Login
-            </Link>
-            <Link
-              to="/register"
-              className="btn btn-primary"
-              style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
-              onClick={() => setMobileMenuOpen(false)}
-            >
-              Get Started →
-            </Link>
+            {isLoggedIn && user ? (
+              <>
+                <Link
+                  to="/profile"
+                  className="btn btn-outline"
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  👤 {user.name || user.email}
+                </Link>
+                <Link
+                  to="/dashboard"
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Go to Dashboard →
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/login"
+                  className="btn btn-outline"
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Login
+                </Link>
+                <Link
+                  to="/register"
+                  className="btn btn-primary"
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  Get Started →
+                </Link>
+              </>
+            )}
           </div>
         </div>
       </div>

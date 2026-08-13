@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import { TCS_NQT_YEARS } from "../data/companyQuestions";
 
 // ── Section colour map ────────────────────────────────────────────────────────
@@ -272,9 +273,10 @@ export default function CompanyAssessment() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-
-      {/* ── Hero ── */}
-      <div className="company-header" style={{
+      <Navbar />
+      <div style={{ paddingTop: 68 }}>
+        {/* ── Hero ── */}
+        <div className="company-header" style={{
         background: "linear-gradient(180deg, rgba(59,130,246,0.1) 0%, transparent 100%)",
         borderBottom: "1px solid rgba(255,255,255,0.05)",
         position: "relative", overflow: "hidden",
@@ -437,6 +439,7 @@ export default function CompanyAssessment() {
           </div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

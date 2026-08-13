@@ -3,112 +3,122 @@ import { useRef } from "react";
 
 // Inline SVG Icons
 const icons = {
+  mic: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M12 2a3 3 0 0 0-3 3v7a3 3 0 0 0 6 0V5a3 3 0 0 0-3-3z"/>
+      <path d="M19 10v2a7 7 0 0 1-14 0v-2"/>
+      <line x1="12" y1="19" x2="12" y2="22"/>
+    </svg>
+  ),
+  building: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="2" />
+      <path d="M9 3v18"/><path d="M3 9h6"/><path d="M3 15h6"/><path d="M15 9h3"/><path d="M15 15h3"/>
+    </svg>
+  ),
+  book: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
+      <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
+    </svg>
+  ),
+  keyboard: (
+    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="2" y="6" width="20" height="12" rx="2"/>
+      <line x1="6" y1="10" x2="6.01" y2="10" strokeWidth="2.5"/><line x1="10" y1="10" x2="10.01" y2="10" strokeWidth="2.5"/>
+      <line x1="14" y1="10" x2="14.01" y2="10" strokeWidth="2.5"/><line x1="18" y1="10" x2="18.01" y2="10" strokeWidth="2.5"/>
+      <line x1="6" y1="14" x2="6.01" y2="14" strokeWidth="2.5"/><line x1="18" y1="14" x2="18.01" y2="14" strokeWidth="2.5"/>
+      <line x1="10" y1="14" x2="14" y2="14" strokeWidth="2.5"/>
+    </svg>
+  ),
   brain: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
       <path d="M9.5 2C7 2 5 4 5 6.5c0 .5.1 1 .2 1.5C3.4 8.8 2 10.5 2 12.5 2 15 4 17 6.5 17H9v3.5a1.5 1.5 0 003 0V17h2.5c2.5 0 4.5-2 4.5-4.5 0-2-.8-3.5-2.2-4.3A4.5 4.5 0 009.5 2z"/>
       <path d="M9 9h1m5 0h1m-6 4h1"/>
     </svg>
   ),
-  target: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-      <circle cx="12" cy="12" r="10"/><circle cx="12" cy="12" r="6"/><circle cx="12" cy="12" r="2"/>
-    </svg>
-  ),
-  layers: (
+  dashboard: (
     <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <polygon points="12,2 2,7 12,12 22,7"/>
-      <polyline points="2,17 12,22 22,17"/>
-      <polyline points="2,12 12,17 22,12"/>
-    </svg>
-  ),
-  clock: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round">
-      <circle cx="12" cy="12" r="10"/><polyline points="12,6 12,12 16,14"/>
-    </svg>
-  ),
-  chart: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <line x1="18" y1="20" x2="18" y2="10"/>
-      <line x1="12" y1="20" x2="12" y2="4"/>
-      <line x1="6"  y1="20" x2="6"  y2="14"/>
-      <line x1="2"  y1="20" x2="22" y2="20"/>
-    </svg>
-  ),
-  flask: (
-    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M9 3h6m-6 0v6l-5 9a1 1 0 001 1h12a1 1 0 001-1l-5-9V3M9 3H7m10 0h2"/>
+      <rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/>
+      <rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/>
     </svg>
   ),
 };
 
 const feats = [
   {
-    icon: icons.brain,
-    title: "AI-Powered Evaluation",
-    desc: "Gemini AI instantly grades your text answers, pinpoints weak areas, and delivers actionable improvement tips — zero bias.",
-    badge: "Gemini AI",
+    icon: icons.mic,
+    title: "AI Voice Mock Interviewer",
+    desc: "Real-time conversational speech simulation. AI asks adaptive questions, listens to spoken answers, and scores communication, tone, and pacing.",
+    badge: "Voice AI",
     color: "#7c3aed",
     colorLight: "rgba(124,58,237,0.1)",
     colorBorder: "rgba(124,58,237,0.3)",
     gradient: "linear-gradient(135deg, #7c3aed, #5b21b6)",
+    route: "/voice",
   },
   {
-    icon: icons.target,
-    title: "Role-Specific Questions",
-    desc: "Pick your job role, tech stack, experience level, and difficulty. Every question set is dynamically tailored to your target position.",
-    badge: "Adaptive",
-    color: "#06b6d4",
-    colorLight: "rgba(6,182,212,0.1)",
-    colorBorder: "rgba(6,182,212,0.3)",
-    gradient: "linear-gradient(135deg, #06b6d4, #0891b2)",
-  },
-  {
-    icon: icons.layers,
-    title: "3 Question Formats",
-    desc: "MCQs to test theory, code-output snippets to test debugging, and open-ended answers to test depth — all in one session.",
-    badge: "35 Questions",
+    icon: icons.building,
+    title: "Company-Targeted Tracks",
+    desc: "Curated exam environments aligned to the hiring standards and test patterns of TCS NQT, Infosys, Amazon, Google, and Wipro.",
+    badge: "Company Prep",
     color: "#f59e0b",
     colorLight: "rgba(245,158,11,0.1)",
     colorBorder: "rgba(245,158,11,0.3)",
     gradient: "linear-gradient(135deg, #f59e0b, #d97706)",
+    route: "/company-assessment",
   },
   {
-    icon: icons.clock,
-    title: "Timed Interview Mode",
-    desc: "Simulate real interview pressure with a live countdown. Pick 15, 30, or 45-minute sessions and train yourself to think fast.",
-    badge: "15–45 min",
-    color: "#ef4444",
-    colorLight: "rgba(239,68,68,0.1)",
-    colorBorder: "rgba(239,68,68,0.3)",
-    gradient: "linear-gradient(135deg, #ef4444, #dc2626)",
+    icon: icons.book,
+    title: "CS Question Bank & Tests",
+    desc: "1500+ topic-wise questions across OS, DBMS, Computer Networks, OOPs, and DSA with instant answer reveals and timed tests.",
+    badge: "Question Bank",
+    color: "#06b6d4",
+    colorLight: "rgba(6,182,212,0.1)",
+    colorBorder: "rgba(6,182,212,0.3)",
+    gradient: "linear-gradient(135deg, #06b6d4, #0891b2)",
+    route: "/question-bank",
   },
   {
-    icon: icons.chart,
-    title: "Detailed Score Report",
-    desc: "After every session — section-wise scores, correct vs wrong breakdown, AI feedback on each answer, and a full performance summary.",
-    badge: "Instant",
+    icon: icons.keyboard,
+    title: "Live Typing Speed Test",
+    desc: "Test and improve your typing speed with real-time WPM, accuracy %, backspace tracker, and live speed rating badges.",
+    badge: "Typing Test",
     color: "#10b981",
     colorLight: "rgba(16,185,129,0.1)",
     colorBorder: "rgba(16,185,129,0.3)",
     gradient: "linear-gradient(135deg, #10b981, #059669)",
+    route: "/typing-test",
   },
   {
-    icon: icons.flask,
-    title: "Free Mock Tests",
-    desc: "Standalone timed mock tests across Aptitude, Quants, Reasoning, Coding, GK, and English — no login required.",
-    badge: "Free",
+    icon: icons.brain,
+    title: "Adaptive AI Evaluation",
+    desc: "Gemini AI grades your technical answers, pinpoints edge-case misses, and delivers deep actionable improvement tips with zero bias.",
+    badge: "Gemini AI",
     color: "#ec4899",
     colorLight: "rgba(236,72,153,0.1)",
     colorBorder: "rgba(236,72,153,0.3)",
     gradient: "linear-gradient(135deg, #ec4899, #db2777)",
+    route: "/setup",
+  },
+  {
+    icon: icons.dashboard,
+    title: "Unified Candidate Dashboard",
+    desc: "Sleek collapsible sidebar navigation with initial badge, historical interview analytics, score breakdowns, and profile reports.",
+    badge: "Dashboard",
+    color: "#6366f1",
+    colorLight: "rgba(99,102,241,0.1)",
+    colorBorder: "rgba(99,102,241,0.3)",
+    gradient: "linear-gradient(135deg, #6366f1, #4f46e5)",
+    route: "/dashboard",
   },
 ];
 
 function FeatureCard({ feat }) {
+  const nav = useNavigate();
   const cardRef = useRef(null);
 
   const handleMouseMove = (e) => {
-    // only apply 3D tilt on devices that support hover / pointer fine
     if (window.innerWidth < 768) return;
     const card = cardRef.current;
     if (!card) return;
@@ -142,6 +152,11 @@ function FeatureCard({ feat }) {
       className="feature-card"
       onMouseMove={handleMouseMove}
       onMouseLeave={handleMouseLeave}
+      onClick={() => feat.route && nav(feat.route)}
+      style={{ cursor: feat.route ? "pointer" : "default" }}
+      role="button"
+      tabIndex={0}
+      onKeyDown={(e) => e.key === "Enter" && feat.route && nav(feat.route)}
     >
       {/* Top gradient accent line */}
       <div
@@ -190,9 +205,15 @@ function FeatureCard({ feat }) {
         </span>
       </div>
 
-      <p style={{ color: "var(--text-muted)", fontSize: 13.5, lineHeight: 1.75, margin: 0 }}>
+      <p style={{ color: "var(--text-muted)", fontSize: 13.5, lineHeight: 1.75, margin: "0 0 14px 0" }}>
         {feat.desc}
       </p>
+
+      {feat.route && (
+        <div style={{ fontSize: 12, fontWeight: 700, color: feat.color, display: "flex", alignItems: "center", gap: 6 }}>
+          Explore Feature <span>→</span>
+        </div>
+      )}
     </div>
   );
 }

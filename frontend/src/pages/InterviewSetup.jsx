@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
+import ThemeToggle from "../components/ThemeToggle";
 
 
 // ── Steps config ───────────────────────────────────────────────────────────────
@@ -94,6 +95,10 @@ export default function InterviewSetup() {
         overflow: "hidden",
       }}
     >
+      {/* Top right Theme Toggle */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
       {/* BG glow */}
       <div style={{
         position: "absolute", top: "20%", left: "50%",

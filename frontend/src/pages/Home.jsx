@@ -2,10 +2,12 @@ import { useEffect } from "react";
 import { useLocation } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import Hero from "../components/Hero";
+import DashboardShowcase from "../components/DashboardShowcase";
 import Features from "../components/Features";
 import AboutSection from "../components/AboutSection";
 import Footer from "../components/Footer";
 import ParticleBackground from "../components/ParticleBackground";
+import PracticeSection from "../components/PracticeSection";
 
 function Home() {
   const location = useLocation();
@@ -48,7 +50,9 @@ function Home() {
       {/* Scrollable page content — offset for fixed navbar */}
       <div style={{ position: "relative", zIndex: 2 }}>
         <Hero />
+        <DashboardShowcase />
         <Features />
+        <PracticeSection />
         <AboutSection />
         <Footer />
       </div>

@@ -1,10 +1,24 @@
+import { useState } from "react";
 import { useForm } from "react-hook-form";
 import { Link, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
-  const { register, handleSubmit, formState: { errors } } = useForm();
-  const onSubmit = () => navigate("/dashboard");
+  const { login } = useAuth();
+  const [authError, setAuthError] = useState("");
+  const { register, handleSubmit, formState: { errors, isSubmitting } } = useForm();
+
+  const onSubmit = (data) => {
+    try {
+      setAuthError("");
+      login(data.email, data.password);
+      navigate("/dashboard");
+    } catch (err) {
+      setAuthError(err.message || "Failed to log in");
+    }
+  };
 
   return (
     <div
@@ -19,6 +33,11 @@ function Login() {
         overflow: "hidden",
       }}
     >
+      {/* Top right Theme Toggle */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
       {/* Glow blob */}
       <div
         style={{
@@ -89,6 +108,11 @@ function Login() {
 
           {/* Form */}
           <div style={{ padding: "28px 36px 36px" }}>
+            {authError && (
+              <div style={{ padding: "10px 14px", background: "rgba(239,68,68,0.12)", border: "1px solid rgba(239,68,68,0.3)", borderRadius: 10, color: "var(--red)", fontSize: 13, marginBottom: 18 }}>
+                ⚠️ {authError}
+              </div>
+            )}
             <form onSubmit={handleSubmit(onSubmit)}>
               <div style={{ marginBottom: 20 }}>
                 <label

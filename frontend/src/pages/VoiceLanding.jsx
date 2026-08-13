@@ -1,5 +1,6 @@
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
+import Navbar from "../components/Navbar";
 
 // ── Animated equalizer bars ───────────────────────────────────────────────────
 function EqBars({ count = 20, color = "#10b981", height = 48 }) {
@@ -80,7 +81,9 @@ function StepCard({ num, title, desc, color }) {
 export default function VoiceLanding() {
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-      <style>{`
+      <Navbar />
+      <div style={{ paddingTop: 68 }}>
+        <style>{`
         @keyframes voiceEq {
           from { transform: scaleY(0.4); }
           to   { transform: scaleY(1.6); }
@@ -344,6 +347,7 @@ export default function VoiceLanding() {
             </div>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

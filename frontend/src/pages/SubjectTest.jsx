@@ -1,7 +1,10 @@
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 import { SUBJECTS, QUESTIONS, getSubjectMeta, getSubjectTopics } from "../data/subjectQuestions";
 import api from "../api/api";
+import ConfirmModal from "../components/ConfirmModal";
+import { logUserActivity } from "../utils/activityTracker";
 
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
@@ -269,6 +272,7 @@ function TestRunner({ questions, subject, onFinish }) {
   const [idx, setIdx] = useState(0);
   const [answers, setAnswers] = useState({});
   const [secs, setSecs] = useState(questions.length * 60); // 1 min per question
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const q = questions[idx];
   const isLast = idx === questions.length - 1;
@@ -397,13 +401,24 @@ function TestRunner({ questions, subject, onFinish }) {
         >Skip →</button>
         <button
           className="btn btn-primary"
-          onClick={() => { if (isLast) submitTest(); else setIdx(p => p + 1); }}
+          onClick={() => { if (isLast) setConfirmOpen(true); else setIdx(p => p + 1); }}
           disabled={answers[idx] === undefined && !isLast}
           style={{ flex: 1, fontSize: 14 }}
         >
           {isLast ? "Submit Test ✓" : "Next →"}
         </button>
       </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        icon="📋"
+        title="Submit Test?"
+        message={`You've answered ${Object.keys(answers).length} of ${questions.length} questions. Once submitted you cannot change your answers.`}
+        confirmText="Submit Now"
+        cancelText="Go Back"
+        onConfirm={() => { setConfirmOpen(false); submitTest(); }}
+        onCancel={() => setConfirmOpen(false)}
+      />
     </div>
   );
 }
@@ -691,7 +706,25 @@ export default function SubjectTest() {
   const handleFinish = useCallback((result) => {
     setTestResult(result);
     setTestState("results");
-  }, []);
+    if (result && subject) {
+      const total = result.total || result.questions?.length || 1;
+      const pct = Math.round((result.score / total) * 100);
+      logUserActivity({
+        type: "subject",
+        title: `${subject.name} Concept Quiz`,
+        category: "Question Bank",
+        score: pct,
+        metrics: {
+          accuracy: `${pct}%`,
+          score: `${result.score}/${total}`,
+          subject: subject.shortName || subject.name,
+        },
+        icon: subject.icon || "📚",
+        color: subject.color || "#ec4899",
+        badge: pct >= 70 ? "Mastered" : "Completed",
+      });
+    }
+  }, [subject]);
 
   const handleRetake = useCallback(() => {
     setTestResult(null);
@@ -724,13 +757,16 @@ export default function SubjectTest() {
         }} />
 
         <div style={{ maxWidth: 960, margin: "0 auto" }}>
-          {/* Breadcrumb */}
-          <div style={{ display: "flex", gap: 8, alignItems: "center", marginBottom: 20, fontSize: 13, color: "var(--text-muted)" }}>
-            <Link to="/" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Home</Link>
-            <span>›</span>
-            <Link to="/question-bank" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Question Bank</Link>
-            <span>›</span>
-            <span style={{ color: subject.color, fontWeight: 600 }}>{subject.shortName}</span>
+          {/* Breadcrumb & ThemeToggle */}
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <div style={{ display: "flex", gap: 8, alignItems: "center", fontSize: 13, color: "var(--text-muted)" }}>
+              <Link to="/" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Home</Link>
+              <span>›</span>
+              <Link to="/question-bank" style={{ color: "var(--text-muted)", textDecoration: "none" }}>Question Bank</Link>
+              <span>›</span>
+              <span style={{ color: subject.color, fontWeight: 600 }}>{subject.shortName}</span>
+            </div>
+            <ThemeToggle />
           </div>
 
           <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 16, flexWrap: "wrap" }}>

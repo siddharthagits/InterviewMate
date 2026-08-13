@@ -2,6 +2,8 @@ import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
 import { useInterview } from "../context/InterviewContext";
+import ThemeToggle from "../components/ThemeToggle";
+import ConfirmModal from "../components/ConfirmModal";
 
 // ── Speech helpers ─────────────────────────────────────────────────────────────
 const synth = window.speechSynthesis;
@@ -141,6 +143,7 @@ export default function VoiceInterview() {
   const [totalSecs,  setTotalSecs]  = useState(0);
   const [wpm,        setWpm]        = useState(0);
   const [fillerCount,setFillerCount]= useState(0);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   const srRef      = useRef(null);
   const answersRef = useRef([]);
@@ -284,7 +287,7 @@ export default function VoiceInterview() {
   const goNext = async () => {
     srRef.current?.stop();
     if (idx < questions.length - 1) setIdx(p => p + 1);
-    else await submitAll();
+    else setConfirmOpen(true);
   };
 
   const submitAll = async () => {
@@ -346,6 +349,7 @@ export default function VoiceInterview() {
   );
 
   return (
+    <>
     <div style={{ minHeight:"100vh", background:"var(--bg)", color:"var(--text)", fontFamily:"'Inter', sans-serif" }}>
       <style>{`
         @keyframes micRipple { 0%{transform:scale(1);opacity:0.6} 100%{transform:scale(2.2);opacity:0} }
@@ -388,9 +392,10 @@ export default function VoiceInterview() {
           }}>
             ⏱ {fmtSecs(totalSecs)}
           </span>
+          <ThemeToggle />
           <button
             className="btn"
-            onClick={() => submitAll()}
+            onClick={() => setConfirmOpen(true)}
             disabled={submitting}
             style={{
               padding:"6px 14px", fontSize:12,
@@ -692,5 +697,17 @@ export default function VoiceInterview() {
         </div>
       </div>
     </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        icon="🎤"
+        title="End Voice Session?"
+        message={`You've answered ${answers.filter(a => a && a.trim()).length} of ${questions.length} questions. Your session will be evaluated and you cannot go back.`}
+        confirmText="Submit Session"
+        cancelText="Keep Going"
+        onConfirm={() => { setConfirmOpen(false); submitAll(); }}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </>
   );
 }

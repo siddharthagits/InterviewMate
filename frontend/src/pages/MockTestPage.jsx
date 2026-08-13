@@ -1,6 +1,9 @@
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 import { mockTests } from "../data/mockTestData";
+import ConfirmModal from "../components/ConfirmModal";
+import { logUserActivity } from "../utils/activityTracker";
 
 function MockTestPage() {
   const { category } = useParams();
@@ -15,6 +18,7 @@ function MockTestPage() {
   const [showResult, setShowResult] = useState(false);
   const [sidebarOpen, setSidebarOpen] = useState(typeof window !== "undefined" ? window.innerWidth >= 900 : true);
   const [isMobile, setIsMobile] = useState(typeof window !== "undefined" ? window.innerWidth < 900 : false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
   const timerRef = useRef(null);
 
   useEffect(() => {
@@ -75,6 +79,31 @@ function MockTestPage() {
     clearInterval(timerRef.current);
     setSubmitted(true);
     setShowResult(true);
+
+    try {
+      let correct = 0;
+      questions.forEach((qu) => {
+        if (answers[qu.id] === qu.correct) correct++;
+      });
+      const pct = Math.round((correct / questions.length) * 100);
+      logUserActivity({
+        id: "mock_" + Date.now(),
+        type: "practice",
+        title: test.title || "Mock Test Assessment",
+        category: "Practice",
+        score: pct,
+        metrics: {
+          score: `${correct}/${questions.length}`,
+          accuracy: `${pct}%`,
+          attempted: `${Object.keys(answers).length}/${questions.length}`,
+        },
+        icon: "🧠",
+        color: "#6366f1",
+        badge: `${pct}% Score`,
+      });
+    } catch (e) {
+      console.error("Failed to log mock test activity:", e);
+    }
   }
 
   function calcScore() {
@@ -112,6 +141,7 @@ function MockTestPage() {
   };
 
   return (
+    <>
     <div style={{ display: "flex", minHeight: "100vh", background: "var(--bg)", fontFamily: "'Inter', sans-serif", color: "var(--text)", position: "relative" }}>
 
       {/* Mobile Drawer Backdrop */}
@@ -226,9 +256,7 @@ function MockTestPage() {
         {!submitted && (
           <div style={{ padding: "16px" }}>
             <button
-              onClick={() => {
-                if (window.confirm(`Submit test? You've answered ${attempted}/${total} questions.`)) handleSubmit();
-              }}
+              onClick={() => setConfirmOpen(true)}
               style={{
                 width: "100%", padding: "12px 0", borderRadius: 12, border: "none",
                 background: "linear-gradient(135deg,#6366f1,#8b5cf6)",
@@ -268,7 +296,7 @@ function MockTestPage() {
             </div>
           </div>
 
-          {/* Timer & Exit */}
+          {/* Timer & Exit & ThemeToggle */}
           <div style={{ display: "flex", alignItems: "center", gap: 10, marginLeft: "auto" }}>
             <div style={{
               display: "flex", alignItems: "center", gap: 6,
@@ -281,6 +309,8 @@ function MockTestPage() {
                 {formatTime(timeLeft)}
               </span>
             </div>
+
+            <ThemeToggle />
 
             <button onClick={() => navigate("/")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", color: "var(--text-muted)", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12 }}>
               ✕ Exit
@@ -420,7 +450,7 @@ function MockTestPage() {
             )}
 
             <button
-              onClick={() => currentQ < total - 1 ? goToQuestion(currentQ + 1) : (!submitted ? (window.confirm(`Submit test? You've answered ${attempted}/${total} questions.`) && handleSubmit()) : null)}
+              onClick={() => currentQ < total - 1 ? goToQuestion(currentQ + 1) : (!submitted ? setConfirmOpen(true) : null)}
               style={{
                 padding: "10px 22px", borderRadius: 10,
                 border: "none",
@@ -518,6 +548,18 @@ function MockTestPage() {
         </div>
       )}
     </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        icon="✅"
+        title="Submit Test?"
+        message={`You've answered ${attempted} of ${total} questions. Once submitted you cannot change your answers.`}
+        confirmText="Yes, Submit"
+        cancelText="Not Yet"
+        onConfirm={() => { setConfirmOpen(false); handleSubmit(); }}
+        onCancel={() => setConfirmOpen(false)}
+      />
+    </>
   );
 }
 

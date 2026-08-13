@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
+import Navbar from "../components/Navbar";
 import { SUBJECTS, QUESTIONS } from "../data/subjectQuestions";
 
 // ── Subject Card ──────────────────────────────────────────────────────────────
@@ -170,8 +171,9 @@ export default function QuestionBank() {
 
   return (
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
-
-      {/* ── Hero ── */}
+      <Navbar />
+      <div style={{ paddingTop: 68 }}>
+        {/* ── Hero ── */}
       <div style={{
         background: "linear-gradient(180deg, rgba(124,58,237,0.09) 0%, transparent 100%)",
         borderBottom: "1px solid rgba(255,255,255,0.05)",
@@ -314,6 +316,7 @@ export default function QuestionBank() {
           <div>Compiler Design, Computer Architecture, Discrete Maths, and more are on the way.</div>
         </div>
       </div>
+    </div>
     </div>
   );
 }

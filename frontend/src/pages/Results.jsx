@@ -1,6 +1,8 @@
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
+import ThemeToggle from "../components/ThemeToggle";
+import { logUserActivity } from "../utils/activityTracker";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function perfLabel(score) {
@@ -482,6 +484,24 @@ function ResultsPage() {
   const score  = result.score ?? 0;
   const [label, color] = perfLabel(score);
 
+  useEffect(() => {
+    if (ctx && ctx.score !== undefined) {
+      logUserActivity({
+        type: "technical",
+        title: `${interviewData?.role || "Technical"} Mock Interview`,
+        category: "Technical Interview",
+        score: score,
+        metrics: {
+          role: interviewData?.role || "Software Engineer",
+          questions: `${questions?.length || 0} Qs`,
+        },
+        icon: "💻",
+        color: "#7c3aed",
+        badge: score >= 75 ? "Passed" : "Completed",
+      });
+    }
+  }, [ctx]);
+
   const TABS = [
     { id: "results",    label: "📊 Results" },
     { id: "perquestion", label: "🤖 AI Review" },
@@ -496,7 +516,12 @@ function ResultsPage() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", padding: "40px 20px", background: "var(--bg)" }}>
+    <div style={{ minHeight: "100vh", padding: "40px 20px", background: "var(--bg)", position: "relative" }}>
+      {/* Top right Theme Toggle */}
+      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
+        <ThemeToggle />
+      </div>
+
       <div style={{ maxWidth: 780, margin: "0 auto" }}>
 
         {/* Header card */}

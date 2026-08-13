@@ -1,5 +1,6 @@
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
+import { logUserActivity } from "../utils/activityTracker";
 
 // ── Word banks ────────────────────────────────────────────────────────────────
 const WORD_BANKS = {
@@ -258,10 +259,12 @@ export default function TypingTest() {
   const [timeLeft, setTimeLeft]       = useState(30);
   const [started, setStarted]         = useState(false);
   const [finished, setFinished]       = useState(false);
+  const [isFocused, setIsFocused]     = useState(false);
   const [wpmHistory, setWpmHistory]   = useState([]);
 
   // refs that don't need to trigger re-render
   const containerRef   = useRef(null);
+  const hiddenInputRef = useRef(null);
   const wordsRef       = useRef(null);
   const caretRef       = useRef(null);
   const timerRef       = useRef(null);
@@ -272,59 +275,14 @@ export default function TypingTest() {
   const wordsRef2      = useRef(words);
   const startedRef     = useRef(false);
   const finishedRef    = useRef(false);
+  const currentWordIdxRef = useRef(0);
 
   // keep refs in sync
   useEffect(() => { typedHistRef.current = typedHistory; }, [typedHistory]);
   useEffect(() => { wordsRef2.current = words; }, [words]);
   useEffect(() => { startedRef.current = started; }, [started]);
   useEffect(() => { finishedRef.current = finished; }, [finished]);
-
-  // ── Reset ─────────────────────────────────────────────────────────────────
-  const reset = useCallback((newMode, newDuration) => {
-    clearInterval(timerRef.current);
-    clearInterval(wpmRef.current);
-    const m = newMode  ?? mode;
-    const d = newDuration ?? duration;
-    const w = generateWords(m);
-    wordsRef2.current     = w;
-    typedHistRef.current  = [];
-    startedRef.current    = false;
-    finishedRef.current   = false;
-    startTimeRef.current  = null;
-    setWords(w);
-    setTypedHistory([]);
-    setCurrentInput("");
-    setCurrentWordIdx(0);
-    setTimeLeft(d);
-    setStarted(false);
-    setFinished(false);
-    setWpmHistory([]);
-    setTimeout(() => containerRef.current?.focus(), 30);
-  }, [mode, duration]);
-
-  // reset when mode / duration buttons change
-  const handleSetMode = (m) => {
-    const nextDuration = m === "quotes" ? 30 : duration;
-    setMode(m);
-    if (m === "quotes") {
-      setDuration(30);
-    }
-    reset(m, nextDuration);
-  };
-  const handleSetDuration = (d) => {
-    if (mode === "quotes") return;
-    setDuration(d);
-    reset(mode, d);
-  };
-
-  // focus on mount
-  useEffect(() => { containerRef.current?.focus(); }, []);
-
-  // cleanup on unmount
-  useEffect(() => () => {
-    clearInterval(timerRef.current);
-    clearInterval(wpmRef.current);
-  }, []);
+  useEffect(() => { currentWordIdxRef.current = currentWordIdx; }, [currentWordIdx]);
 
   // ── Start timer ───────────────────────────────────────────────────────────
   const startTimer = useCallback((dur) => {
@@ -357,6 +315,58 @@ export default function TypingTest() {
       const sec = Math.round((Date.now() - startTimeRef.current) / 1000);
       setWpmHistory(h => [...h, { sec, wpm }]);
     }, 1000);
+  }, []);
+
+  // ── Reset ─────────────────────────────────────────────────────────────────
+  const reset = useCallback((newMode, newDuration) => {
+    clearInterval(timerRef.current);
+    clearInterval(wpmRef.current);
+    const m = newMode  ?? mode;
+    const d = newDuration ?? duration;
+    const w = generateWords(m);
+    wordsRef2.current        = w;
+    typedHistRef.current     = [];
+    startedRef.current       = false;
+    finishedRef.current      = false;
+    currentWordIdxRef.current = 0;
+    startTimeRef.current     = null;
+    setWords(w);
+    setTypedHistory([]);
+    setCurrentInput("");
+    if (hiddenInputRef.current) hiddenInputRef.current.value = "";
+    setCurrentWordIdx(0);
+    setTimeLeft(d);
+    setStarted(false);
+    setFinished(false);
+    setWpmHistory([]);
+    setTimeout(() => hiddenInputRef.current?.focus(), 50);
+  }, [mode, duration]);
+
+  // reset when mode / duration buttons change
+  const handleSetMode = (m) => {
+    const nextDuration = m === "quotes" ? 30 : duration;
+    setMode(m);
+    if (m === "quotes") {
+      setDuration(30);
+    }
+    reset(m, nextDuration);
+  };
+  const handleSetDuration = (d) => {
+    if (mode === "quotes") return;
+    setDuration(d);
+    reset(mode, d);
+  };
+
+  // focus on mount
+  useEffect(() => {
+    const t = setTimeout(() => hiddenInputRef.current?.focus(), 100);
+    return () => clearTimeout(t);
+  }, []);
+
+  // cleanup on unmount
+  useEffect(() => () => {
+    clearInterval(timerRef.current);
+    clearInterval(wpmRef.current);
   }, []);
 
   // ── Auto-scroll ───────────────────────────────────────────────────────────
@@ -409,70 +419,115 @@ export default function TypingTest() {
 
     caretRef.current.style.height = `${height}px`;
     caretRef.current.style.transform = `translate(${x}px, ${y}px)`;
-    caretRef.current.style.opacity = "1";
-  }, [currentInput, currentWordIdx, words, started]);
+    caretRef.current.style.opacity = isFocused ? "1" : "0.5";
+  }, [currentInput, currentWordIdx, words, started, isFocused]);
 
-  // ── Keyboard handler (the core) ───────────────────────────────────────────
+  // ── Word commit helper ────────────────────────────────────────────────────
+  const commitWord = useCallback((typed) => {
+    if (!startedRef.current) startTimer(duration);
+
+    const newHistory = [...typedHistRef.current, typed];
+    typedHistRef.current = newHistory;
+    setTypedHistory(newHistory);
+
+    const nextIdx = currentWordIdxRef.current + 1;
+    currentWordIdxRef.current = nextIdx;
+    setCurrentWordIdx(nextIdx);
+    setCurrentInput("");
+    if (hiddenInputRef.current) hiddenInputRef.current.value = "";
+
+    // Refill words if running low
+    if (nextIdx >= wordsRef2.current.length - 10) {
+      setWords(prev => {
+        const extended = [...prev, ...generateWords(mode, 40)];
+        wordsRef2.current = extended;
+        return extended;
+      });
+    }
+  }, [duration, mode, startTimer]);
+
+  // ── Native Input Change Handler (works on Mobile virtual keyboards & Desktop) ─
+  const handleInputChange = (e) => {
+    if (finishedRef.current) return;
+    const val = e.target.value;
+
+    if (!startedRef.current && val.length > 0) {
+      startTimer(duration);
+    }
+
+    // Space or newline at end = word submitted
+    if (val.endsWith(" ") || val.endsWith("\n")) {
+      const typed = val.slice(0, -1).trim();
+      if (typed !== "") {
+        commitWord(typed);
+      } else {
+        setCurrentInput("");
+        if (hiddenInputRef.current) hiddenInputRef.current.value = "";
+      }
+      return;
+    }
+
+    // Multi-word input from mobile predictive text / autocomplete
+    if (val.includes(" ")) {
+      const parts = val.split(" ");
+      if (parts.length > 1) {
+        const firstWord = parts[0].trim();
+        if (firstWord !== "") {
+          commitWord(firstWord);
+        }
+        const remainder = parts.slice(1).join(" ");
+        setCurrentInput(remainder);
+        if (hiddenInputRef.current) hiddenInputRef.current.value = remainder;
+        return;
+      }
+    }
+
+    setCurrentInput(val);
+  };
+
+  // ── Keyboard shortcuts & special keys ─────────────────────────────────────
   const handleKeyDown = useCallback((e) => {
     if (finishedRef.current) return;
 
     // Reset shortcuts
-    if (e.key === "Escape" || e.key === "Tab") { e.preventDefault(); reset(); return; }
-
-    // Ignore modifier-key combos (copy/paste etc.)
-    if (e.ctrlKey || e.metaKey || e.altKey) return;
-
-    // Printable character (single char)
-    if (e.key.length === 1) {
+    if (e.key === "Escape" || e.key === "Tab") {
       e.preventDefault();
-
-      if (!startedRef.current) startTimer(duration);
-
-      if (e.key === " ") {
-        // Submit current word on space
-        const typed = currentInput.trim();
-        if (typed === "") return; // ignore leading spaces
-
-        const newHistory = [...typedHistRef.current, typed];
-        typedHistRef.current = newHistory;
-        setTypedHistory(newHistory);
-
-        const nextIdx = currentWordIdx + 1;
-        setCurrentWordIdx(nextIdx);
-        setCurrentInput("");
-
-        // Refill words if running low
-        if (nextIdx >= wordsRef2.current.length - 10) {
-          setWords(prev => {
-            const extended = [...prev, ...generateWords(mode, 40)];
-            wordsRef2.current = extended;
-            return extended;
-          });
-        }
-        return;
-      }
-
-      // Regular character — append
-      setCurrentInput(prev => prev + e.key);
+      reset();
       return;
     }
 
+    // Space with empty input -> prevent page scroll
+    if (e.key === " ") {
+      if (currentInput.trim() === "") {
+        e.preventDefault();
+        return;
+      }
+    }
+
+    // Backspace to previous word when current word is empty
     if (e.key === "Backspace") {
-      e.preventDefault();
-      if (currentInput.length > 0) {
-        // Delete last character of current word
-        setCurrentInput(prev => prev.slice(0, -1));
-      } else if (currentWordIdx > 0) {
-        // Go back to previous word
+      if (currentInput.length === 0 && currentWordIdxRef.current > 0) {
+        e.preventDefault();
         const prevTyped = typedHistRef.current[typedHistRef.current.length - 1] || "";
         const newHistory = typedHistRef.current.slice(0, -1);
         typedHistRef.current = newHistory;
         setTypedHistory(newHistory);
-        setCurrentWordIdx(prev => prev - 1);
+        const prevIdx = currentWordIdxRef.current - 1;
+        currentWordIdxRef.current = prevIdx;
+        setCurrentWordIdx(prevIdx);
         setCurrentInput(prevTyped);
+        if (hiddenInputRef.current) hiddenInputRef.current.value = prevTyped;
       }
     }
-  }, [currentInput, currentWordIdx, duration, mode, reset, startTimer]);
+  }, [currentInput, reset]);
+
+  // ── Focus trigger ─────────────────────────────────────────────────────────
+  const focusInput = () => {
+    if (hiddenInputRef.current) {
+      hiddenInputRef.current.focus();
+      setIsFocused(true);
+    }
+  };
 
   // ── Stats ─────────────────────────────────────────────────────────────────
   const computeStats = () => {
@@ -498,6 +553,28 @@ export default function TypingTest() {
 
     return { wpm, rawWpm, accuracy, correctWords, incorrectChars };
   };
+
+  useEffect(() => {
+    if (finished) {
+      const stats = computeStats();
+      if (stats.rawWpm > 0) {
+        logUserActivity({
+          type: "typing",
+          title: `${duration}s ${mode.toUpperCase()} Typing Test`,
+          category: "Typing Test",
+          score: Math.min(100, Math.round(stats.wpm)),
+          metrics: {
+            wpm: `${stats.wpm} WPM`,
+            accuracy: `${stats.accuracy}%`,
+            raw: `${stats.rawWpm} WPM`,
+          },
+          icon: "⌨️",
+          color: "#10b981",
+          badge: `${stats.wpm} WPM`,
+        });
+      }
+    }
+  }, [finished]);
 
   // ── Live WPM ──────────────────────────────────────────────────────────────
   const liveWpm = (() => {
@@ -562,52 +639,52 @@ export default function TypingTest() {
     const stats = computeStats();
     return (
       <DashboardLayout>
-        <div className="fade-up" style={{ maxWidth: 860, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 48 }}>
+        <div className="fade-up" style={{ maxWidth: 860, margin: "0 auto", padding: "0 12px" }}>
+          <div style={{ textAlign: "center", marginBottom: 36 }}>
             <div className="typing-badge" style={{ marginBottom: 16 }}>⌨️ Test Complete</div>
-            <h1 style={{ fontSize: 36, fontWeight: 900, letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif", marginBottom: 8 }}>
+            <h1 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 900, letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif", marginBottom: 8 }}>
               Your Results
             </h1>
-            <p style={{ color: "var(--text-muted)", fontSize: 15 }}>
+            <p style={{ color: "var(--text-muted)", fontSize: 14 }}>
               {mode} · {duration}s · {new Date().toLocaleDateString()}
             </p>
           </div>
 
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(4, 1fr)", gap: 16, marginBottom: 32 }}>
-            <ResultCard label="WPM"      value={stats.wpm}             sub="words per minute"   color={stats.wpm >= 80 ? "var(--green)" : stats.wpm >= 50 ? "var(--violet-light)" : "var(--gold)"} />
-            <ResultCard label="Accuracy" value={`${stats.accuracy}%`}  sub={`${stats.correctWords} correct words`} color={stats.accuracy >= 98 ? "var(--green)" : stats.accuracy >= 90 ? "var(--violet-light)" : "var(--gold)"} />
-            <ResultCard label="Raw WPM"  value={stats.rawWpm}          sub="before accuracy"    color="var(--cyan)" />
-            <ResultCard label="Errors"   value={stats.incorrectChars}  sub="incorrect chars"    color={stats.incorrectChars === 0 ? "var(--green)" : "var(--red)"} />
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 14, marginBottom: 28 }}>
+            <ResultCard label="WPM"      value={stats.wpm}             sub="words/min"   color={stats.wpm >= 80 ? "var(--green)" : stats.wpm >= 50 ? "var(--violet-light)" : "var(--gold)"} />
+            <ResultCard label="Accuracy" value={`${stats.accuracy}%`}  sub={`${stats.correctWords} words`} color={stats.accuracy >= 98 ? "var(--green)" : stats.accuracy >= 90 ? "var(--violet-light)" : "var(--gold)"} />
+            <ResultCard label="Raw WPM"  value={stats.rawWpm}          sub="raw speed"    color="var(--cyan)" />
+            <ResultCard label="Errors"   value={stats.incorrectChars}  sub="mistakes"    color={stats.incorrectChars === 0 ? "var(--green)" : "var(--red)"} />
           </div>
 
-          <div className="glass" style={{ padding: "20px 28px", marginBottom: 32, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+          <div className="glass" style={{ padding: "16px 22px", marginBottom: 28, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
-              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>Performance</div>
-              <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Sora', sans-serif" }}>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>Performance</div>
+              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'Sora', sans-serif" }}>
                 {stats.wpm >= 100 ? "🚀 Speed Demon" : stats.wpm >= 80 ? "⚡ Fast Typist" : stats.wpm >= 60 ? "✅ Above Average" : stats.wpm >= 40 ? "👍 Average" : "💪 Keep Practicing"}
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
-              <div style={{ fontSize: 13, color: "var(--text-muted)", marginBottom: 4 }}>Time</div>
-              <div style={{ fontSize: 22, fontWeight: 800, fontFamily: "'Sora', sans-serif", color: "var(--violet-light)" }}>{duration}s</div>
+              <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>Time</div>
+              <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'Sora', sans-serif", color: "var(--violet-light)" }}>{duration}s</div>
             </div>
           </div>
 
           {wpmHistory.length > 1 && (
-            <div className="glass" style={{ padding: "24px", marginBottom: 32 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-muted)", marginBottom: 16, textTransform: "uppercase", letterSpacing: "0.08em" }}>
+            <div className="glass" style={{ padding: "20px", marginBottom: 28 }}>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "var(--text-muted)", marginBottom: 14, textTransform: "uppercase", letterSpacing: "0.08em" }}>
                 WPM Over Time
               </div>
               <WpmChart data={wpmHistory} />
             </div>
           )}
 
-          <div style={{ display: "flex", gap: 12, justifyContent: "center" }}>
-            <button className="btn btn-primary" onClick={() => reset()} style={{ padding: "14px 36px", fontSize: 15 }}>
+          <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+            <button className="btn btn-primary" onClick={() => reset()} style={{ padding: "12px 32px", fontSize: 14 }}>
               ↺ Try Again
             </button>
             <button className="btn btn-outline" onClick={() => { setMode("words"); setDuration(30); reset("words", 30); }}
-              style={{ padding: "14px 28px", fontSize: 15 }}>
+              style={{ padding: "12px 24px", fontSize: 14 }}>
               New Test
             </button>
           </div>
@@ -619,20 +696,20 @@ export default function TypingTest() {
   // ── Main test screen ──────────────────────────────────────────────────────
   return (
     <DashboardLayout>
-      <div style={{ maxWidth: 1050, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1050, margin: "0 auto", padding: "0 8px" }}>
 
-        <div style={{ marginBottom: 32 }}>
-          <div className="typing-badge" style={{ marginBottom: 12 }}>⌨️ Typing Speed Test</div>
-          <h1 style={{ fontSize: 28, fontWeight: 900, letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif" }}>
+        <div style={{ marginBottom: 24 }}>
+          <div className="typing-badge" style={{ marginBottom: 10 }}>⌨️ Typing Speed Test</div>
+          <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", fontWeight: 900, letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif" }}>
             How fast do you type?
           </h1>
-          <p style={{ color: "var(--text-muted)", fontSize: 14, marginTop: 6 }}>
-            Click the box and start typing · <kbd className="typing-kbd">Tab</kbd> or <kbd className="typing-kbd">Esc</kbd> to restart
+          <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 4 }}>
+            Tap the box or start typing · <kbd className="typing-kbd">Tab</kbd> or <kbd className="typing-kbd">Esc</kbd> to restart
           </p>
         </div>
 
         {/* Controls */}
-        <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 28, flexWrap: "wrap" }}>
+        <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20, flexWrap: "wrap" }}>
           <div className="typing-seg-group">
             {MODES.map(m => (
               <button key={m} className={`typing-seg${mode === m ? " active" : ""}`}
@@ -644,7 +721,7 @@ export default function TypingTest() {
               </button>
             ))}
           </div>
-          <div style={{ width: 1, height: 28, background: "var(--glass-border)" }} />
+          <div style={{ width: 1, height: 24, background: "var(--glass-border)", display: "inline-block" }} />
           <div className="typing-seg-group">
             {DURATIONS.map(d => (
               <button key={d} className={`typing-seg${duration === d ? " active" : ""}`}
@@ -657,15 +734,15 @@ export default function TypingTest() {
           {started && !finished && (
             <div style={{ marginLeft: "auto", textAlign: "center" }}>
               <div style={{ fontSize: 10, color: "var(--text-muted)", textTransform: "uppercase", letterSpacing: "0.08em" }}>WPM</div>
-              <div style={{ fontSize: 22, fontWeight: 900, color: "var(--violet-light)", fontFamily: "'Sora', sans-serif", lineHeight: 1 }}>{liveWpm}</div>
+              <div style={{ fontSize: 20, fontWeight: 900, color: "var(--violet-light)", fontFamily: "'Sora', sans-serif", lineHeight: 1 }}>{liveWpm}</div>
             </div>
           )}
         </div>
 
         {/* Timer */}
-        <div style={{ textAlign: "center", marginBottom: 20 }}>
+        <div style={{ textAlign: "center", marginBottom: 16 }}>
           <div style={{
-            display: "inline-block", fontSize: 52, fontWeight: 900,
+            display: "inline-block", fontSize: "clamp(36px, 7vw, 52px)", fontWeight: 900,
             fontFamily: "'JetBrains Mono', monospace", color: timerColor,
             lineHeight: 1, transition: "color 0.3s",
             filter: timeLeft <= 5 ? `drop-shadow(0 0 12px ${timerColor})` : "none",
@@ -674,15 +751,50 @@ export default function TypingTest() {
           </div>
         </div>
 
-        {/* Typing area — focusable div captures all keystrokes */}
+        {/* Mobile tap banner hint */}
+        {!isFocused && !finished && (
+          <div style={{ textAlign: "center", marginBottom: 8 }}>
+            <button
+              onClick={focusInput}
+              className="typing-mobile-tap-hint"
+              style={{ cursor: "pointer", border: "1px solid rgba(6,182,212,0.35)", background: "rgba(6,182,212,0.12)" }}
+            >
+              📱 Tap here to open keyboard & start typing
+            </button>
+          </div>
+        )}
+
+        {/* Typing area with invisible real input to trigger mobile keyboards */}
         <div
           ref={containerRef}
-          className={`typing-area${started ? " typing-area--active" : ""}`}
-          tabIndex={0}
-          onKeyDown={handleKeyDown}
-          onFocus={() => {}} // keep focusable
-          style={{ outline: "none" }}
+          onClick={focusInput}
+          onTouchStart={focusInput}
+          className={`typing-area${started || isFocused ? " typing-area--active" : ""}`}
+          style={{
+            outline: isFocused ? "1px solid rgba(6,182,212,0.3)" : "none",
+            boxShadow: isFocused ? "0 0 0 3px rgba(6,182,212,0.08)" : "none",
+            position: "relative",
+            cursor: "text"
+          }}
         >
+          {/* Real hidden native input to summon iOS & Android keyboards and capture text */}
+          <input
+            ref={hiddenInputRef}
+            type="text"
+            className="typing-hidden-input"
+            autoCapitalize="none"
+            autoCorrect="off"
+            autoComplete="off"
+            spellCheck="false"
+            inputMode="text"
+            value={currentInput}
+            onChange={handleInputChange}
+            onKeyDown={handleKeyDown}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            aria-label="Typing test input"
+          />
+
           <div className="typing-viewport">
             <span ref={caretRef} className="typing-caret-inline" />
             <div ref={wordsRef} className="typing-words">
@@ -691,27 +803,27 @@ export default function TypingTest() {
           </div>
         </div>
 
-        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 16, padding: "0 4px" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginTop: 14, padding: "0 4px" }}>
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
-            {!started ? "Click the box above and start typing…" : `Word ${currentWordIdx + 1}`}
+            {!started ? "Tap above to start typing…" : `Word ${currentWordIdx + 1}`}
           </span>
           <button className="btn btn-outline" onClick={() => reset()}
-            style={{ padding: "7px 18px", fontSize: 12, borderRadius: 8 }}>
+            style={{ padding: "6px 16px", fontSize: 12, borderRadius: 8 }}>
             ↺ Restart
           </button>
         </div>
 
         {!started && (
-          <div style={{ marginTop: 40, display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 14 }}>
+          <div style={{ marginTop: 32, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
             {[
               { icon: "🎯", title: "Accuracy first",  desc: "Focus on typing correctly — speed will follow naturally." },
               { icon: "🔄", title: "Reset anytime",   desc: "Press Tab or Esc at any point to restart with new words." },
               { icon: "📈", title: "Track progress",  desc: "Live WPM and accuracy update as you type." },
             ].map(tip => (
-              <div key={tip.title} className="glass" style={{ padding: "18px 20px" }}>
-                <div style={{ fontSize: 22, marginBottom: 8 }}>{tip.icon}</div>
-                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 4, color: "var(--text-dim)" }}>{tip.title}</div>
-                <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.6 }}>{tip.desc}</div>
+              <div key={tip.title} className="glass" style={{ padding: "16px 18px" }}>
+                <div style={{ fontSize: 20, marginBottom: 6 }}>{tip.icon}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 3, color: "var(--text-dim)" }}>{tip.title}</div>
+                <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>{tip.desc}</div>
               </div>
             ))}
           </div>

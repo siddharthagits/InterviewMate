@@ -30,15 +30,28 @@ function DashboardLayout({ children }) {
     }
   }, [location.pathname, isDesktop]);
 
+  // Lock body scroll when mobile sidebar is open
+  useEffect(() => {
+    if (sidebarOpen && !isDesktop) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => {
+      document.body.style.overflow = "";
+    };
+  }, [sidebarOpen, isDesktop]);
+
   return (
     <div className="dashboard-layout">
       {/* Mobile Top Navigation Bar */}
       <div className="dashboard-mobile-topbar">
         <button
           type="button"
-          className="dashboard-mobile-menu-btn"
+          className={`dashboard-mobile-menu-btn ${sidebarOpen ? "active" : ""}`}
           onClick={() => setSidebarOpen((prev) => !prev)}
           aria-label={sidebarOpen ? "Close menu" : "Open menu"}
+          aria-expanded={sidebarOpen}
         >
           <span className="hamburger-line top" />
           <span className="hamburger-line middle" />
@@ -71,7 +84,15 @@ function DashboardLayout({ children }) {
       />
 
       <main className="dashboard-main">
-        {children}
+        {/* Desktop Top Bar with Theme Toggle on top right */}
+        {isDesktop && (
+          <div className="dashboard-desktop-topbar">
+            <ThemeToggle />
+          </div>
+        )}
+        <div className="dashboard-content-wrapper">
+          {children}
+        </div>
       </main>
     </div>
   );

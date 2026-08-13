@@ -20,6 +20,10 @@ import VoiceSetup from "./pages/VoiceSetup";
 import VoiceInterview from "./pages/VoiceInterview";
 import VoiceResults from "./pages/VoiceResults";
 import TypingTest from "./pages/TypingTest";
+import PracticeCorner from "./pages/PracticeCorner";
+import PracticeTopicList from "./pages/PracticeTopicList";
+import PracticeSession from "./pages/PracticeSession";
+import HRInterviewQA from "./pages/HRInterviewQA";
 
 function App() {
   return (
@@ -45,6 +49,10 @@ function App() {
       <Route path="/voice-interview"               element={<VoiceInterview />} />
       <Route path="/voice-results"                 element={<VoiceResults />} />
       <Route path="/typing-test"                   element={<TypingTest />} />
+      <Route path="/practice"                       element={<PracticeCorner />} />
+      <Route path="/practice/:categoryId"           element={<PracticeTopicList />} />
+      <Route path="/practice/:categoryId/:topicId"  element={<PracticeSession />} />
+      <Route path="/hr-interview"                    element={<HRInterviewQA />} />
     </Routes>
   );
 }

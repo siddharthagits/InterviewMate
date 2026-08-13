@@ -1,7 +1,10 @@
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
+import ThemeToggle from "../components/ThemeToggle";
 import { getTCSYear } from "../data/companyQuestions";
 import api from "../api/api";
+import ConfirmModal from "../components/ConfirmModal";
+import { logUserActivity } from "../utils/activityTracker";
 
 // ── Section colour map ────────────────────────────────────────────────────────
 const SECTION_COLORS = {
@@ -308,6 +311,7 @@ function MockTestRunner({ paper, onFinish }) {
   const cutoffPercent = paper.cutoffPercent ?? paper.meta?.cutoffPercent ?? 65;
   const [secs,      setSecs]      = useState(durationMinutes * 60);
   const [finishing, setFinishing] = useState(false);
+  const [confirmOpen, setConfirmOpen] = useState(false);
 
   useEffect(() => {
     if (secs <= 0) { doFinish(); return; }
@@ -338,6 +342,7 @@ function MockTestRunner({ paper, onFinish }) {
   const answered = Object.keys(answers).length;
 
   return (
+    <>
     <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
 
       {/* Sticky header */}
@@ -380,8 +385,11 @@ function MockTestRunner({ paper, onFinish }) {
               {String(m).padStart(2, "0")}:{String(ss).padStart(2, "0")}
             </span>
           </div>
+
+          <ThemeToggle />
+
           <button
-            onClick={doFinish}
+            onClick={() => setConfirmOpen(true)}
             disabled={finishing}
             className="btn btn-gold"
             style={{ padding: "8px 20px", fontSize: 13 }}
@@ -531,6 +539,19 @@ function MockTestRunner({ paper, onFinish }) {
         </div>
       </div>
     </div>
+
+      <ConfirmModal
+        open={confirmOpen}
+        icon="🏢"
+        title="Submit Exam?"
+        message={`You've answered ${answered} of ${paper.questions.length} questions. This action cannot be undone.`}
+        confirmText="Submit Exam"
+        cancelText="Keep Going"
+        onConfirm={() => { setConfirmOpen(false); doFinish(); }}
+        onCancel={() => setConfirmOpen(false)}
+        danger={false}
+      />
+    </>
   );
 }
 
@@ -663,7 +684,26 @@ export default function CompanyExamTest() {
     return (
       <MockTestRunner
         paper={paper}
-        onFinish={res => { setResult(res); setMode("result"); }}
+        onFinish={res => {
+          setResult(res);
+          setMode("result");
+          const totalQ = paper.questions?.length || 1;
+          const pct = Math.round((res.correct / totalQ) * 100);
+          logUserActivity({
+            type: "company",
+            title: `${paper.company || "Company"} Assessment (${paper.year || ""})`,
+            category: "Company Exam",
+            score: pct,
+            metrics: {
+              accuracy: `${pct}%`,
+              score: `${res.correct}/${totalQ}`,
+              company: paper.company,
+            },
+            icon: "🏢",
+            color: "#f59e0b",
+            badge: pct >= 70 ? "Passed" : "Attempted",
+          });
+        }}
       />
     );
   }
@@ -700,12 +740,15 @@ export default function CompanyExamTest() {
         padding: "40px 40px 32px",
       }}>
         <div style={{ maxWidth: 1100, margin: "0 auto" }}>
-          <button
-            onClick={() => navigate("/company-assessment")}
-            style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", marginBottom: 20, fontSize: 13 }}
-          >
-            ← All TCS NQT Papers
-          </button>
+          <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 20 }}>
+            <button
+              onClick={() => navigate("/company-assessment")}
+              style={{ background: "transparent", border: "none", color: "var(--text-muted)", cursor: "pointer", fontSize: 13 }}
+            >
+              ← All TCS NQT Papers
+            </button>
+            <ThemeToggle />
+          </div>
 
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 24 }}>
             <div>
