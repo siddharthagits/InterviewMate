@@ -48,8 +48,3 @@ def home():
     return {
         "message": "Welcome to InterviewMate Backend"
     }
-
-@app.get("/health")
-def health_check():
-    """Lightweight health-check used by Render and the frontend keep-alive ping."""
-    return {"status": "ok"}
