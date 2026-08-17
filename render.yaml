@@ -11,7 +11,8 @@ services:
       - key: PYTHON_VERSION
         value: 3.11.0
 
-  - type: static
+  - type: web
+    env: static
     name: interviewmate-frontend
     rootDir: frontend
     buildCommand: npm install && npm run build
