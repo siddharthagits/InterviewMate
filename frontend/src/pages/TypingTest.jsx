@@ -47,6 +47,38 @@ const WORD_BANKS = {
     "make it work make it right make it fast",
     "any fool can write code that a computer can understand good programmers write code that humans can understand",
   ],
+  phrases: [
+    "stay hungry stay foolish",
+    "done is better than perfect",
+    "ship it and iterate",
+    "move fast and build things",
+    "fail fast learn faster",
+    "keep it simple and stupid",
+    "think big start small act now",
+    "code today debug tomorrow",
+    "progress over perfection",
+    "build measure learn repeat",
+    "every expert was once a beginner",
+    "consistency beats intensity",
+    "one bug at a time",
+    "clean code is happy code",
+    "commit early commit often",
+    "read the docs save your day",
+    "test early test often test well",
+    "less code fewer problems",
+    "name things clearly think clearly",
+    "refactor before it hurts",
+    "talk to your users first",
+    "solve the problem not the symptom",
+    "great software is never finished",
+    "comments are for the why not the what",
+    "always code as if the next maintainer is a serial killer who knows where you live",
+    "make the hard thing easy and the easy thing automatic",
+    "good enough today beats perfect tomorrow",
+    "focus on the outcome not the output",
+    "small commits tell a better story",
+    "the best code is no code at all",
+  ],
   codeSnippets: [
     `const useFetchData = (url) => {
   const [data, setData] = useState(null);
@@ -117,12 +149,18 @@ function isAdmin(user: UserProfile): boolean {
 };
 
 const DURATIONS = [15, 30, 60, 90, 120];
-const MODES = ["words", "punctuation", "numbers", "quotes", "programming"];
+const MODES = ["words", "punctuation", "numbers", "quotes", "phrases", "programming"];
 
 function generateWords(mode, count = 80) {
   if (mode === "quotes") {
     const q = WORD_BANKS.quotes[Math.floor(Math.random() * WORD_BANKS.quotes.length)];
     return q.split(" ");
+  }
+  if (mode === "phrases") {
+    // Pick 3–5 random phrases and join them into one continuous word stream
+    const shuffled = [...WORD_BANKS.phrases].sort(() => Math.random() - 0.5);
+    const picked = shuffled.slice(0, 4);
+    return picked.join(" ").split(" ");
   }
   if (mode === "programming") {
     const snippet = WORD_BANKS.codeSnippets[Math.floor(Math.random() * WORD_BANKS.codeSnippets.length)];
@@ -344,15 +382,15 @@ export default function TypingTest() {
 
   // reset when mode / duration buttons change
   const handleSetMode = (m) => {
-    const nextDuration = m === "quotes" ? 30 : duration;
+    const nextDuration = (m === "quotes" || m === "phrases") ? 30 : duration;
     setMode(m);
-    if (m === "quotes") {
+    if (m === "quotes" || m === "phrases") {
       setDuration(30);
     }
     reset(m, nextDuration);
   };
   const handleSetDuration = (d) => {
-    if (mode === "quotes") return;
+    if (mode === "quotes" || mode === "phrases") return;
     setDuration(d);
     reset(mode, d);
   };
@@ -717,7 +755,8 @@ export default function TypingTest() {
                 {m === "words" ? "📝 Words" :
                  m === "punctuation" ? "🔣 Punctuation" :
                  m === "numbers" ? "🔢 Numbers" :
-                 m === "quotes" ? "💬 Quotes" : "💻 Code"}
+                 m === "quotes" ? "💬 Quotes" :
+                 m === "phrases" ? "✍️ Phrases" : "💻 Code"}
               </button>
             ))}
           </div>
@@ -726,7 +765,7 @@ export default function TypingTest() {
             {DURATIONS.map(d => (
               <button key={d} className={`typing-seg${duration === d ? " active" : ""}`}
                 onClick={() => handleSetDuration(d)}
-                disabled={(started && !finished) || (mode === "quotes" && d !== 30)}>
+                disabled={(started && !finished) || ((mode === "quotes" || mode === "phrases") && d !== 30)}>
                 {d}s
               </button>
             ))}
