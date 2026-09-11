@@ -19,12 +19,12 @@ export default function DashboardShowcase() {
   return (
     <section className="showcase-section" style={{ position: "relative", padding: "40px 20px 80px", maxWidth: 1180, margin: "0 auto" }}>
       <div style={{ textAlign: "center", marginBottom: 36 }}>
-        <div className="glow-pill fade-up" style={{ marginBottom: 16, display: "inline-flex", alignItems: "center", gap: 8, color: "#67e8f9" }}>
-          <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
+        <div className="glow-pill glow-pill-cyan fade-up" style={{ marginBottom: 16, display: "inline-flex", alignItems: "center", gap: 8 }}>
+          <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
           <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-            <IconSparkles size={14} color="#67e8f9" /> Experience the New Dashboard
+            <IconSparkles size={14} color="currentColor" /> Experience the New Dashboard
           </span>
-          <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
+          <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
         </div>
         <h2
           className="fade-up"

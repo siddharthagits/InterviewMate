@@ -174,7 +174,7 @@ function Hero() {
           <IconPlay /> Start Technical Interview
         </button>
         <button
-          className="btn btn-gold"
+          className="btn btn-green"
           style={{ fontSize: 15, padding: "14px 26px", gap: 10 }}
           onClick={() => nav("/voice")}
         >

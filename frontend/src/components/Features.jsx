@@ -225,12 +225,12 @@ function Features() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 54 }}>
-          <div className="glow-pill fade-up" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8, color: "#f59e0b" }}>
-            <span style={{ width: 18, height: 1.5, background: "#f59e0b", display: "inline-block", borderRadius: 2 }} />
+          <div className="glow-pill glow-pill-amber fade-up" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <IconZap size={14} color="#f59e0b" /> Platform Features
+              <IconZap size={14} color="currentColor" /> Platform Features
             </span>
-            <span style={{ width: 18, height: 1.5, background: "#f59e0b", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h2
             className="fade-up"

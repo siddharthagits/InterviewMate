@@ -19,14 +19,12 @@ function MockTests() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 56 }}>
-          <div style={{
-            display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(6,182,212,0.1)", border: "1px solid rgba(6,182,212,0.3)",
-            borderRadius: 99, padding: "6px 18px", marginBottom: 20,
-            fontSize: 13, color: "#67e8f9", fontWeight: 600, letterSpacing: "0.04em"
-          }}>
-            <IconTarget size={14} color="#67e8f9" />
-            <span>FREE MOCK TESTS</span>
+          <div className="glow-pill glow-pill-cyan fade-up" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconTarget size={14} color="currentColor" /> Free Mock Tests
+            </span>
+            <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h2 style={{ fontSize: "clamp(28px,4vw,46px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 14 }}>
             Practice with{" "}

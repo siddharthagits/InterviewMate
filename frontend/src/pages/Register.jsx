@@ -52,6 +52,7 @@ export default function Register() {
   const [step, setStep] = useState(1); // 1 = Details, 2 = 4-digit OTP email verification
   const [name, setName] = useState("");
   const [email, setEmail] = useState("");
+  const [gender, setGender] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
   const [otp, setOtp] = useState("");
@@ -209,7 +210,7 @@ export default function Register() {
 
     try {
       setIsSubmitting(true);
-      await registerUser(name.trim(), email.trim().toLowerCase(), password, otp.trim());
+      await registerUser(name.trim(), email.trim().toLowerCase(), password, otp.trim(), gender || null);
       navigate("/dashboard");
     } catch (err) {
       setAuthError(err.message || "Failed to create account. Please check the code and try again.");
@@ -352,7 +353,7 @@ export default function Register() {
                         </span>
                         <input id="register-name" type="text" value={name}
                           onChange={e => { setName(e.target.value); clearErr("name"); setAuthError(""); }}
-                          placeholder="e.g. Siddhartha Sharma" autoComplete="name"
+                          placeholder="e.g. Alex Morgan" autoComplete="name"
                           className={`auth-input ${fieldErrors.name ? "auth-input-error" : ""}`}
                         />
                       </div>
@@ -374,6 +375,29 @@ export default function Register() {
                         />
                       </div>
                       {fieldErrors.email && <p className="auth-field-error">{fieldErrors.email}</p>}
+                    </div>
+
+                    <div className="auth-field">
+                      <label className="auth-label">Gender <span style={{ color: "var(--text-muted)", fontSize: 11, fontWeight: 500 }}>(Optional)</span></label>
+                      <div style={{ display: "grid", gridTemplateColumns: "repeat(3, 1fr)", gap: 8, marginTop: 4 }}>
+                        {["Male", "Female", "Other"].map((g) => {
+                          const active = gender === g;
+                          return (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => {
+                                setGender(active ? "" : g);
+                                setAuthError("");
+                              }}
+                              className={`gender-select-btn ${active ? "active" : ""}`}
+                            >
+                              {active && <span style={{ width: 6, height: 6, borderRadius: "50%", background: "currentColor" }} />}
+                              {g}
+                            </button>
+                          );
+                        })}
+                      </div>
                     </div>
 
                     <div className="auth-field">

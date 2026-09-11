@@ -20,15 +20,16 @@ export async function authSendRegisterOtp(email, name = "") {
 }
 
 /**
- * Register a new user with name, email, password, and optional 4-digit OTP.
+ * Register a new user with name, email, password, optional 4-digit OTP, and optional gender.
  * @param {string} name
  * @param {string} email
  * @param {string} password
  * @param {string} [otp]
+ * @param {string} [gender]
  * @returns {Promise<Object>} User object
  */
-export async function authRegister(name, email, password, otp = null) {
-  const res = await api.post("/auth/register", { name, email, password, otp });
+export async function authRegister(name, email, password, otp = null, gender = null) {
+  const res = await api.post("/auth/register", { name, email, password, otp, gender });
   return res.data;
 }
 
@@ -168,4 +169,18 @@ export async function deleteInterviewSession(sessionId) {
     console.warn("[InterviewMate] Could not delete session:", err?.message);
     return false;
   }
+}
+
+/**
+ * Update user profile attributes (gender, phone, city, linkedin_url, target_role, experience_level, college_or_company, bio).
+ * @param {string} userId
+ * @param {Object} profileData
+ * @returns {Promise<Object>} Updated User object
+ */
+export async function authUpdateProfile(userId, profileData) {
+  const res = await api.put("/auth/profile", {
+    user_id: userId,
+    ...profileData,
+  });
+  return res.data;
 }

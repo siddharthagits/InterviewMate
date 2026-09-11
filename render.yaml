@@ -12,6 +12,18 @@ services:
         sync: false          # Set this to your MongoDB Atlas connection string
       - key: MONGODB_DATABASE
         value: interviewmate
+      - key: GOOGLE_CLIENT_ID
+        sync: false          # Google OAuth Client ID
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false          # Gmail address for sending OTPs
+      - key: SMTP_PASSWORD
+        sync: false          # Gmail App Password
+      - key: SMTP_FROM
+        sync: false
       - key: PYTHON_VERSION
         value: 3.11.0
 
@@ -23,7 +35,11 @@ services:
     staticPublishPath: ./dist
     envVars:
       - key: VITE_API_URL
-        sync: false          # Set to your backend URL, e.g. https://interviewmate-backend.onrender.com
+        sync: false          # Set to backend URL: https://interviewmate-backend.onrender.com
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false          # Same Google Client ID for frontend
+      - key: VITE_GEMINI_API_KEY
+        sync: false
     routes:
       - type: rewrite
         source: /*

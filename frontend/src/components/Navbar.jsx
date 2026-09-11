@@ -335,14 +335,14 @@ function Navbar() {
         className="navbar"
         style={{
           background: scrolled || mobileMenuOpen
-            ? (isLight ? "rgba(240,244,255,0.96)" : "rgba(4,8,15,0.95)")
-            : (isLight ? "rgba(240,244,255,0.85)" : "rgba(4,8,15,0.7)"),
-          borderBottomColor: scrolled || mobileMenuOpen
-            ? (isLight ? "rgba(124,58,237,0.2)" : "rgba(124,58,237,0.15)")
-            : (isLight ? "rgba(15,23,42,0.08)" : "rgba(255,255,255,0.05)"),
-          boxShadow: scrolled || mobileMenuOpen
-            ? (isLight ? "0 4px 30px rgba(15,23,42,0.1)" : "0 4px 40px rgba(0,0,0,0.5)")
+            ? (isLight ? "rgba(250, 248, 245, 0.92)" : "rgba(8, 4, 16, 0.88)")
+            : "transparent",
+          borderBottom: scrolled || mobileMenuOpen
+            ? (isLight ? "1px solid rgba(0, 0, 0, 0.08)" : "1px solid rgba(139, 92, 246, 0.18)")
             : "none",
+          boxShadow: "none",
+          backdropFilter: scrolled || mobileMenuOpen ? "blur(16px)" : "none",
+          WebkitBackdropFilter: scrolled || mobileMenuOpen ? "blur(16px)" : "none",
         }}
       >
         {/* Logo */}
@@ -398,21 +398,21 @@ function Navbar() {
               <Link
                 to="/profile"
                 className="btn btn-outline"
-                style={{ padding: "6px 14px", fontSize: 12.5, borderRadius: 12, display: "inline-flex", alignItems: "center", gap: 8 }}
+                style={{ padding: "7px 16px", fontSize: 13.5, fontWeight: 600, borderRadius: 12, display: "inline-flex", alignItems: "center", gap: 8 }}
               >
                 <span style={{ width: 22, height: 22, borderRadius: "50%", background: "var(--violet)", color: "#fff", display: "inline-flex", alignItems: "center", justifyContent: "center", fontSize: 11, fontWeight: 900 }}>
                   {user.name ? user.name.charAt(0).toUpperCase() : "U"}
                 </span>
                 <span>{user.name || user.email.split("@")[0]}</span>
               </Link>
-              <Link to="/dashboard" className="btn btn-primary" style={{ padding: "8px 18px", fontSize: 13, borderRadius: 12 }}>
+              <Link to="/dashboard" className="btn btn-primary" style={{ padding: "8px 20px", fontSize: 13.5, fontWeight: 700, borderRadius: 12 }}>
                 Dashboard →
               </Link>
             </>
           ) : (
             <>
-              <Link to="/login" className="btn btn-outline" style={{ padding: "8px 18px", fontSize: 13, borderRadius: 12 }}>Login</Link>
-              <Link to="/register" className="btn btn-primary" style={{ padding: "8px 20px", fontSize: 13, borderRadius: 12 }}>Get Started →</Link>
+              <Link to="/login" className="btn btn-outline" style={{ padding: "8px 18px", fontSize: 14.5, fontWeight: 600, borderRadius: 12 }}>Login</Link>
+              <Link to="/register" className="btn btn-primary" style={{ padding: "8px 20px", fontSize: 14.5, fontWeight: 700, borderRadius: 12 }}>Get Started →</Link>
             </>
           )}
         </div>

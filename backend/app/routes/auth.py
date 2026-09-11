@@ -30,6 +30,7 @@ from app.schemas.auth import (
     ForgotPasswordRequest,
     ResetPasswordRequest,
     AuthMessageResponse,
+    UserProfileUpdateRequest,
 )
 
 router = APIRouter(prefix="/auth", tags=["auth"])
@@ -43,11 +44,21 @@ _memory_reset_otps: dict[str, dict] = {}     # clean_email -> {"otp": "1234", "e
 DEMO_EMAIL    = "demo@interviewmate.ai"
 DEMO_PASSWORD = "password123"
 DEMO_USER     = {
-    "id":         "usr-demo",
-    "name":       "Demo Candidate",
-    "email":      DEMO_EMAIL,
-    "provider":   "email",
-    "created_at": "2025-01-01T00:00:00.000Z",
+    "id":                 "usr-demo",
+    "name":               "Demo Candidate",
+    "email":              DEMO_EMAIL,
+    "gender":             "Other",
+    "phone":              "+1 (555) 019-2834",
+    "country":            "United States",
+    "city":               "San Francisco",
+    "address":            "450 Mission St, Suite 200",
+    "linkedin_url":       "linkedin.com/in/democandidate",
+    "target_role":        "Senior Full Stack Engineer",
+    "experience_level":   "3-5 Years",
+    "college_or_company": "InterviewMate Labs",
+    "bio":                "Passionate software engineer preparing for system design and behavioral interviews.",
+    "provider":           "email",
+    "created_at":         "2025-01-01T00:00:00.000Z",
 }
 
 
@@ -168,13 +179,23 @@ def verify_password(password: str, hashed_str: str) -> bool:
 def serialize_user(doc: dict) -> dict:
     """Convert a MongoDB document (or in-memory dict) to a UserResponse-compatible dict."""
     return {
-        "id":         str(doc.get("_id", doc.get("id", ""))),
-        "name":       doc.get("name", "User"),
-        "email":      doc.get("email", ""),
-        "picture":    doc.get("picture", None),
-        "provider":   doc.get("provider", "email"),
-        "created_at": doc.get("created_at", _now()),
-        "last_login": doc.get("last_login", None),
+        "id":                 str(doc.get("_id", doc.get("id", ""))),
+        "name":               doc.get("name", "User"),
+        "email":              doc.get("email", ""),
+        "gender":             doc.get("gender", None),
+        "phone":              doc.get("phone", None),
+        "country":            doc.get("country", None),
+        "city":               doc.get("city", None),
+        "address":            doc.get("address", None),
+        "linkedin_url":       doc.get("linkedin_url", None),
+        "target_role":        doc.get("target_role", None),
+        "experience_level":   doc.get("experience_level", None),
+        "college_or_company": doc.get("college_or_company", None),
+        "bio":                doc.get("bio", None),
+        "picture":            doc.get("picture", None),
+        "provider":           doc.get("provider", "email"),
+        "created_at":         doc.get("created_at", _now()),
+        "last_login":         doc.get("last_login", None),
     }
 
 
@@ -349,13 +370,23 @@ async def register(payload: UserRegisterRequest):
             )
 
         new_user = {
-            "name":          clean_name,
-            "email":         clean_email,
-            "password_hash": pw_hash,
-            "provider":      "email",
-            "picture":       None,
-            "created_at":    now,
-            "last_login":    now,
+            "name":               clean_name,
+            "email":              clean_email,
+            "password_hash":      pw_hash,
+            "gender":             payload.gender.strip() if payload.gender else None,
+            "phone":              None,
+            "country":            None,
+            "city":               None,
+            "address":            None,
+            "linkedin_url":       None,
+            "target_role":        None,
+            "experience_level":   None,
+            "college_or_company": None,
+            "bio":                None,
+            "provider":           "email",
+            "picture":            None,
+            "created_at":         now,
+            "last_login":         now,
         }
         result = await db.users.insert_one(new_user)
         new_user["_id"] = result.inserted_id
@@ -391,14 +422,24 @@ async def register(payload: UserRegisterRequest):
         )
 
     mem_user = {
-        "id":          f"usr-{int(datetime.now().timestamp() * 1000)}",
-        "name":        clean_name,
-        "email":       clean_email,
-        "password_hash": pw_hash,
-        "provider":    "email",
-        "picture":     None,
-        "created_at":  now,
-        "last_login":  now,
+        "id":                 f"usr-{int(datetime.now().timestamp() * 1000)}",
+        "name":               clean_name,
+        "email":              clean_email,
+        "password_hash":      pw_hash,
+        "gender":             payload.gender.strip() if payload.gender else None,
+        "phone":              None,
+        "country":            None,
+        "city":               None,
+        "address":            None,
+        "linkedin_url":       None,
+        "target_role":        None,
+        "experience_level":   None,
+        "college_or_company": None,
+        "bio":                None,
+        "provider":           "email",
+        "picture":            None,
+        "created_at":         now,
+        "last_login":         now,
     }
     _memory_users[clean_email] = mem_user
     _memory_register_otps.pop(clean_email, None)
@@ -813,6 +854,88 @@ async def get_current_user(user_id: str):
     if user is None:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found.")
 
+    return serialize_user(user)
+
+
+# ── Update Profile ────────────────────────────────────────────────────────────
+
+@router.put("/profile", response_model=UserResponse)
+async def update_profile(payload: UserProfileUpdateRequest):
+    """
+    Update user profile attributes (gender, phone, city, linkedin_url, target_role,
+    experience_level, college_or_company, bio) in MongoDB Atlas and memory cache.
+    """
+    uid = payload.user_id.strip()
+    now = _now()
+
+    updates: dict = {"updated_at": now}
+    if payload.name is not None and payload.name.strip():
+        updates["name"] = payload.name.strip()
+    if payload.gender is not None:
+        updates["gender"] = payload.gender.strip() or None
+    if payload.phone is not None:
+        updates["phone"] = payload.phone.strip() or None
+    if payload.country is not None:
+        updates["country"] = payload.country.strip() or None
+    if payload.city is not None:
+        updates["city"] = payload.city.strip() or None
+    if payload.address is not None:
+        updates["address"] = payload.address.strip() or None
+    if payload.linkedin_url is not None:
+        updates["linkedin_url"] = payload.linkedin_url.strip() or None
+    if payload.target_role is not None:
+        updates["target_role"] = payload.target_role.strip() or None
+    if payload.experience_level is not None:
+        updates["experience_level"] = payload.experience_level.strip() or None
+    if payload.college_or_company is not None:
+        updates["college_or_company"] = payload.college_or_company.strip() or None
+    if payload.bio is not None:
+        updates["bio"] = payload.bio.strip() or None
+
+    user = None
+
+    # Demo account fast-path
+    if uid.lower() in (DEMO_EMAIL, "usr-demo"):
+        DEMO_USER.update(updates)
+        return serialize_user({**DEMO_USER, "last_login": now})
+
+    # MongoDB update
+    try:
+        db = get_database()
+        query: dict = {}
+        if ObjectId.is_valid(uid):
+            query = {"$or": [{"_id": ObjectId(uid)}, {"id": uid}, {"email": uid.lower()}]}
+        else:
+            query = {"$or": [{"id": uid}, {"email": uid.lower()}]}
+
+        await db.users.update_one(query, {"$set": updates})
+        user = await db.users.find_one(query)
+        if user:
+            clean_email = (user.get("email") or "").strip().lower()
+            if clean_email:
+                _memory_users[clean_email] = {**user, "id": str(user.get("_id", user.get("id", "")))}
+    except RuntimeError:
+        pass
+    except Exception as err:
+        print(f"[Auth] WARNING - MongoDB profile update error ({err})")
+
+    # In-memory fallback
+    if user is None:
+        uid_lower = uid.lower()
+        mem_u = _memory_users.get(uid_lower)
+        if not mem_u:
+            for u in _memory_users.values():
+                if u.get("id") == uid or u.get("email", "").lower() == uid_lower:
+                    mem_u = u
+                    break
+        if mem_u:
+            mem_u.update(updates)
+            user = mem_u
+
+    if user is None:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User account not found.")
+
+    print(f"[Auth] OK - Profile updated successfully for: {user.get('email')}")
     return serialize_user(user)
 
 

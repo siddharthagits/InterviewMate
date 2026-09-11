@@ -1,8 +1,9 @@
 import { useEffect, useRef } from "react";
+import { useTheme } from "../context/ThemeContext";
 
-const PARTICLE_COUNT = 120;
+const PARTICLE_COUNT = 100;
 const MAX_DIST = 120;
-const SPEED = 0.4;
+const SPEED = 0.3;
 
 function randomBetween(a, b) {
   return a + Math.random() * (b - a);
@@ -16,6 +17,8 @@ const HUES = [
 ];
 
 export default function ParticleBackground() {
+  const { theme } = useTheme();
+  const isLight = theme === "light";
   const canvasRef = useRef(null);
   const animRef = useRef(null);
   const mouseRef = useRef({ x: -9999, y: -9999 });
@@ -138,6 +141,8 @@ export default function ParticleBackground() {
         width: "100%", height: "100%",
         display: "block",
         pointerEvents: "none",
+        opacity: isLight ? 0.22 : 0.72,
+        transition: "opacity 0.4s ease",
       }}
     />
   );

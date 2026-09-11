@@ -119,6 +119,7 @@ class UserRegisterRequest(BaseModel):
     name: str = Field(..., min_length=2, max_length=100)
     email: str = Field(..., min_length=3, max_length=150)
     password: str = Field(..., min_length=8, max_length=100)
+    gender: Optional[str] = Field(default=None, max_length=30)
     otp: Optional[str] = Field(default=None, max_length=10)
 
     @field_validator("email")
@@ -204,6 +205,16 @@ class UserResponse(BaseModel):
     id: str
     name: str
     email: str
+    gender: Optional[str] = None
+    phone: Optional[str] = None
+    country: Optional[str] = None
+    city: Optional[str] = None
+    address: Optional[str] = None
+    linkedin_url: Optional[str] = None
+    target_role: Optional[str] = None
+    experience_level: Optional[str] = None
+    college_or_company: Optional[str] = None
+    bio: Optional[str] = None
     picture: Optional[str] = None
     provider: Optional[str] = "email"
     created_at: str
@@ -277,5 +288,131 @@ class ResetPasswordRequest(BaseModel):
 class AuthMessageResponse(BaseModel):
     message: str
     email: Optional[str] = None
+
+
+class UserProfileUpdateRequest(BaseModel):
+    user_id: str = Field(..., min_length=1)
+    name: Optional[str] = Field(default=None, max_length=100)
+    gender: Optional[str] = Field(default=None, max_length=30)
+    phone: Optional[str] = Field(default=None, max_length=30)
+    country: Optional[str] = Field(default=None, max_length=100)
+    city: Optional[str] = Field(default=None, max_length=100)
+    address: Optional[str] = Field(default=None, max_length=300)
+    linkedin_url: Optional[str] = Field(default=None, max_length=200)
+    target_role: Optional[str] = Field(default=None, max_length=100)
+    experience_level: Optional[str] = Field(default=None, max_length=50)
+    college_or_company: Optional[str] = Field(default=None, max_length=150)
+    bio: Optional[str] = Field(default=None, max_length=500)
+
+    @field_validator("name")
+    @classmethod
+    def validate_name(cls, v: Optional[str]) -> Optional[str]:
+        if v is None:
+            return None
+        clean = v.strip()
+        if len(clean) < 2:
+            raise ValueError("Full name must be at least 2 characters")
+        return clean
+
+    @field_validator("gender")
+    @classmethod
+    def validate_gender(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip().capitalize()
+        if clean not in ("Male", "Female", "Other"):
+            raise ValueError("Gender must be one of: Male, Female, Other")
+        return clean
+
+    @field_validator("phone")
+    @classmethod
+    def validate_phone(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip()
+        # Extract digits
+        digits = re.sub(r"\D", "", clean)
+        if len(digits) < 10 or len(digits) > 15:
+            raise ValueError(
+                "Phone number must contain between 10 and 15 digits including country code (e.g. +91 98765 43210 or +1 555 000 1234)"
+            )
+        if not re.match(r"^[\+]?[0-9\s\-\(\)\.]{10,25}$", clean):
+            raise ValueError("Invalid phone number characters")
+        return clean
+
+    @field_validator("linkedin_url")
+    @classmethod
+    def validate_linkedin(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip().rstrip("/")
+        if not ("linkedin.com" in clean.lower()):
+            if not re.match(r"^[a-zA-Z0-9_\-]{2,50}$", clean):
+                raise ValueError("LinkedIn profile must be a valid username or URL (e.g. linkedin.com/in/your-profile)")
+            return f"https://linkedin.com/in/{clean}"
+        if not re.match(r"^(https?:\/\/)?(www\.)?linkedin\.com\/(in\/)?[a-zA-Z0-9_\-\.%]+\/?$", clean, re.IGNORECASE):
+            raise ValueError("Invalid LinkedIn URL format (e.g. https://linkedin.com/in/your-profile)")
+        if not clean.startswith("http"):
+            clean = f"https://{clean}"
+        return clean
+
+    @field_validator("city")
+    @classmethod
+    def validate_city(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip()
+        if len(clean) < 2:
+            raise ValueError("City must be at least 2 characters")
+        if re.search(r"[<>{}]", clean):
+            raise ValueError("City contains invalid characters")
+        return clean
+
+    @field_validator("target_role")
+    @classmethod
+    def validate_target_role(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip()
+        if len(clean) < 2:
+            raise ValueError("Target role must be at least 2 characters")
+        return clean
+
+    @field_validator("college_or_company")
+    @classmethod
+    def validate_college_or_company(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip()
+        if len(clean) < 2:
+            raise ValueError("College or company name must be at least 2 characters")
+        return clean
+
+    @field_validator("country")
+    @classmethod
+    def validate_country(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip()
+        if len(clean) < 2:
+            raise ValueError("Country name must be at least 2 characters")
+        if re.search(r"[<>{}]", clean):
+            raise ValueError("Country name contains invalid characters")
+        return clean
+
+    @field_validator("address")
+    @classmethod
+    def validate_address(cls, v: Optional[str]) -> Optional[str]:
+        if not v or not v.strip():
+            return None
+        clean = v.strip()
+        if len(clean) < 3:
+            raise ValueError("Address must be at least 3 characters")
+        if len(clean) > 300:
+            raise ValueError("Address cannot exceed 300 characters")
+        if re.search(r"[<>{}]", clean):
+            raise ValueError("Address contains invalid characters")
+        return clean
+
 
 

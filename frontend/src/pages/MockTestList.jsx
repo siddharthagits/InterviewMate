@@ -28,14 +28,10 @@ function MockTestList() {
 
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 16 }}>
             <div style={{ maxWidth: 520 }}>
-              <div style={{
-                display: "inline-flex", alignItems: "center", gap: 8,
-                marginBottom: 12,
-                fontSize: 12, color: "#67e8f9", fontWeight: 800, letterSpacing: "0.14em",
-                textTransform: "uppercase",
-              }}>
-                <span style={{ width: 18, height: 1.5, background: "#06b6d4", display: "inline-block", borderRadius: 2 }} />
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="target" size={13} color="#67e8f9" /> Free Mock Tests</span>
+              <div className="glow-pill glow-pill-cyan" style={{ marginBottom: 12, display: "inline-flex", alignItems: "center", gap: 8 }}>
+                <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="target" size={13} color="currentColor" /> Free Mock Tests</span>
+                <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
               </div>
               <h1 style={{ fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 900, marginBottom: 8, lineHeight: 1.2 }}>
                 All Mock Tests

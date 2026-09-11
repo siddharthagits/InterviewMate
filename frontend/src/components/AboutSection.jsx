@@ -103,12 +103,12 @@ export default function AboutSection() {
         
         {/* Header Badge & Title */}
         <div style={{ textAlign: "center", marginBottom: 52 }}>
-          <div className="glow-pill fade-up" style={{ marginBottom: 18, display: "inline-flex", alignItems: "center", gap: 8, color: "#67e8f9" }}>
-            <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
+          <div className="glow-pill glow-pill-cyan fade-up" style={{ marginBottom: 18, display: "inline-flex", alignItems: "center", gap: 8 }}>
+            <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
             <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
-              <IconTarget size={14} color="#67e8f9" /> About InterviewMate
+              <IconTarget size={14} color="currentColor" /> About InterviewMate
             </span>
-            <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ width: 18, height: 2, background: "currentColor", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h2
             className="fade-up"

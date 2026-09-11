@@ -21,6 +21,7 @@ import {
   authSendRegisterOtp,
   authForgotPassword,
   authResetPassword,
+  authUpdateProfile,
 } from "../api/api";
 
 const AuthContext = createContext(null);
@@ -29,13 +30,23 @@ const AUTH_KEY  = "im_auth_user";
 const USERS_KEY = "im_registered_users";
 
 export const DEFAULT_DEMO_USER = {
-  id:         "usr-demo",
-  name:       "Demo Candidate",
-  email:      "demo@interviewmate.ai",
-  password:   "password123",
-  provider:   "email",
-  created_at: "2025-01-01T00:00:00.000Z",
-  joinedAt:   1735689600000,
+  id:                 "usr-demo",
+  name:               "Demo Candidate",
+  email:              "demo@interviewmate.ai",
+  password:           "password123",
+  gender:             "Other",
+  phone:              "+1 (555) 019-2834",
+  country:            "United States",
+  city:               "San Francisco",
+  address:            "450 Mission St, Suite 200",
+  linkedin_url:       "linkedin.com/in/democandidate",
+  target_role:        "Senior Full Stack Engineer",
+  experience_level:   "3-5 Years",
+  college_or_company: "InterviewMate Labs",
+  bio:                "Passionate software engineer preparing for system design and behavioral interviews.",
+  provider:           "email",
+  created_at:         "2025-01-01T00:00:00.000Z",
+  joinedAt:           1735689600000,
 };
 
 // ── Local-storage helpers ─────────────────────────────────────────────────────
@@ -211,7 +222,7 @@ export function AuthProvider({ children }) {
 
   // ── Register ──────────────────────────────────────────────────────────────
 
-  const registerUser = async (name, email, password, otp = null) => {
+  const registerUser = async (name, email, password, otp = null, gender = null) => {
     const cleanEmail = (email || "").trim().toLowerCase();
     const cleanName  = (name  || "").trim();
 
@@ -221,7 +232,7 @@ export function AuthProvider({ children }) {
 
     // ── Try backend (MongoDB) first ───────────────────────────────────────
     try {
-      const serverUser = await authRegister(cleanName, cleanEmail, password, otp);
+      const serverUser = await authRegister(cleanName, cleanEmail, password, otp, gender);
 
       // Cache locally
       const users = getLocalUsers().filter((u) => u.email !== cleanEmail);
@@ -266,6 +277,7 @@ export function AuthProvider({ children }) {
       id:         "usr-" + Date.now(),
       name:       cleanName,
       email:      cleanEmail,
+      gender:     gender || null,
       provider:   "email",
       created_at: new Date().toISOString(),
       joinedAt:   Date.now(),
@@ -432,6 +444,46 @@ export function AuthProvider({ children }) {
     }
   };
 
+  // ── Update Profile ────────────────────────────────────────────────────────
+
+  const updateProfile = async (profileData) => {
+    if (!user) throw new Error("No user is currently signed in.");
+
+    const userId = user.id || user._id || user.email;
+
+    // Demo account handling
+    if (user.email === DEFAULT_DEMO_USER.email || userId === "usr-demo") {
+      const updated = { ...user, ...profileData };
+      const session = saveSession(updated);
+      setUser(session);
+      broadcastAuth();
+      return session;
+    }
+
+    try {
+      const serverUser = await authUpdateProfile(userId, profileData);
+      const session = saveSession({ ...user, ...serverUser });
+      setUser(session);
+      broadcastAuth();
+      return session;
+    } catch (err) {
+      if (err.response?.data?.detail) {
+        throw new Error(err.response.data.detail);
+      }
+      if (!isNetworkOrServerError(err)) {
+        throw new Error(err.message || "Failed to update profile.");
+      }
+
+      // Offline fallback: save locally
+      console.warn("[Auth] Backend unreachable — saving profile locally.");
+      const updated = { ...user, ...profileData };
+      const session = saveSession(updated);
+      setUser(session);
+      broadcastAuth();
+      return session;
+    }
+  };
+
   // ── Logout ────────────────────────────────────────────────────────────────
 
   const logout = () => {
@@ -449,6 +501,7 @@ export function AuthProvider({ children }) {
         demoLogin,
         sendRegisterOtp,
         registerUser,
+        updateProfile,
         requestPasswordReset,
         resetPassword,
         socialLogin,
