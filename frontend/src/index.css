@@ -933,7 +933,7 @@ body[data-theme="light"] .nav-dropdown-panel::before {
   padding: 10px 12px;
   border-radius: 10px;
   text-decoration: none;
-  color: var(--text-muted);
+  color: var(--text);
   transition: background 0.15s, color 0.15s, transform 0.15s;
   position: relative;
   overflow: hidden;
@@ -958,7 +958,7 @@ body[data-theme="light"] .nav-dropdown-panel::before {
   height: 30px;
   border-radius: 8px;
   background: rgba(255, 255, 255, 0.05);
-  color: var(--item-accent, var(--text-muted));
+  color: var(--item-accent, var(--violet-light));
   flex-shrink: 0;
   transition: background 0.15s, color 0.15s;
 }
@@ -972,21 +972,71 @@ body[data-theme="light"] .nav-dropdown-panel::before {
 .nav-dropdown-item-text {
   display: flex;
   flex-direction: column;
-  gap: 1px;
+  gap: 2px;
   flex: 1;
 }
 
 .nav-dropdown-item-label {
   font-size: 13.5px;
-  font-weight: 600;
-  line-height: 1.2;
+  font-weight: 700;
+  line-height: 1.25;
+  color: var(--text);
 }
 
 .nav-dropdown-item-desc {
-  font-size: 11px;
-  color: var(--text-muted);
-  opacity: 0.7;
-  line-height: 1.3;
+  font-size: 11.5px;
+  color: #94a3b8;
+  opacity: 0.95;
+  line-height: 1.35;
+  font-weight: 500;
+}
+
+/* Light theme high-contrast overrides for dropdown items */
+body[data-theme="light"] .nav-dropdown-item {
+  color: #1e293b;
+}
+
+body[data-theme="light"] .nav-dropdown-item-label {
+  color: #0f172a;
+  font-weight: 700;
+}
+
+body[data-theme="light"] .nav-dropdown-item-desc {
+  color: #475569;
+  opacity: 1;
+  font-weight: 500;
+}
+
+body[data-theme="light"] .nav-dropdown-item-icon {
+  background: rgba(124, 58, 237, 0.08);
+  color: var(--item-accent, #6d28d9);
+}
+
+body[data-theme="light"] .nav-dropdown-item:hover {
+  background: rgba(124, 58, 237, 0.08);
+}
+
+body[data-theme="light"] .nav-dropdown-item:hover .nav-dropdown-item-label {
+  color: var(--violet);
+}
+
+body[data-theme="light"] .nav-dropdown-item:hover .nav-dropdown-item-desc {
+  color: #0f172a;
+}
+
+body[data-theme="light"] .navbar-mobile-group-header {
+  color: #334155;
+  font-weight: 700;
+}
+
+body[data-theme="light"] .navbar-mobile-link {
+  color: #1e293b;
+  font-weight: 600;
+}
+
+body[data-theme="light"] .navbar-mobile-link:hover,
+body[data-theme="light"] .navbar-mobile-link.active {
+  color: var(--violet);
 }
 
 /* AI badge */
@@ -1000,6 +1050,17 @@ body[data-theme="light"] .nav-dropdown-panel::before {
   border: 1px solid rgba(16, 185, 129, 0.3);
   white-space: nowrap;
   flex-shrink: 0;
+}
+
+/* Global select options styling for high visibility */
+select option {
+  background: var(--bg2, #0e061a);
+  color: var(--text, #ffffff);
+}
+
+body[data-theme="light"] select option {
+  background: #ffffff;
+  color: #0f172a;
 }
 
 /* ── Mobile accordion groups ─────────────────────────────────────────────────── */

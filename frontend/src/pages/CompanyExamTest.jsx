@@ -622,7 +622,9 @@ function ResultScreen({ result, paper, onRetake, onStudy, onBack }) {
                   background: s.bg, border: `1px solid ${s.color}25`,
                   borderRadius: 14, padding: "14px 16px", textAlign: "center",
                 }}>
-                  <div style={{ fontSize: 18, marginBottom: 6 }}>{s.icon}</div>
+                  <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
+                    <AppIcon name={s.icon} size={20} color={s.color} />
+                  </div>
                   <div style={{ fontSize: 18, fontWeight: 900, color: s.color, fontFamily: "'Sora', sans-serif" }}>{pct}%</div>
                   <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2, fontWeight: 600 }}>
                     {sec.split(" ")[0]}

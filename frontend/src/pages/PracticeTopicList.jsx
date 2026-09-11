@@ -45,7 +45,7 @@ function PracticeTopicList() {
           {/* Page header */}
           <div className="practice-page-header">
             <div style={{ display: "flex", alignItems: "center", gap: 12, marginBottom: 8 }}>
-              <span style={{ fontSize: 28 }}>{category.icon}</span>
+              <AppIcon name={category.icon} size={28} color={category.color || "var(--primary)"} />
               <h1 className="practice-page-heading" style={{ margin: 0 }}>
                 {category.name} Questions and Answers
               </h1>

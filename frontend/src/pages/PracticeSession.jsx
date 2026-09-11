@@ -3,6 +3,7 @@ import { useParams, Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import FormattedExplanation from "../components/FormattedExplanation";
 import { getCategory, getQuestions } from "../data/practiceData";
+import { AppIcon } from "../components/common/AppIcon";
 
 // ── Option letter labels ──────────────────────────────────────────────────────
 const LABELS = ["A", "B", "C", "D"];
@@ -144,7 +145,7 @@ function PracticeSession() {
           {/* Header */}
           <div className="practice-page-header">
             <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 6 }}>
-              <span style={{ fontSize: 24 }}>{category.icon}</span>
+              <AppIcon name={category.icon} size={26} color={category.color || "var(--primary)"} />
               <h1 className="practice-page-heading" style={{ margin: 0 }}>{topicName}</h1>
             </div>
             <div className="practice-breadcrumb practice-breadcrumb-standalone">

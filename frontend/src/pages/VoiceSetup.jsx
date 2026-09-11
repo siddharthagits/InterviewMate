@@ -239,7 +239,7 @@ export default function VoiceSetup() {
                       boxShadow: sel ? `0 0 16px ${color || "#10b981"}25` : "none",
                     }}
                   >
-                    <span style={{ fontSize: 15 }}>{icon}</span>
+                    <AppIcon name={icon} size={16} />
                     <span>{value}</span>
                     {desc && <span style={{ fontSize: 11, opacity: 0.6 }}>({desc})</span>}
                   </button>

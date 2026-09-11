@@ -640,6 +640,37 @@ export function IconGrid({ size = 18, color = "currentColor", ...props }) {
   );
 }
 
+export function IconLayout({ size = 18, color = "currentColor", ...props }) {
+  return (
+    <SvgBase size={size} color={color} {...props}>
+      <rect x="3" y="3" width="18" height="18" rx="2" ry="2" />
+      <line x1="3" y1="9" x2="21" y2="9" />
+      <line x1="9" y1="21" x2="9" y2="9" />
+    </SvgBase>
+  );
+}
+
+export function IconTerminal({ size = 18, color = "currentColor", ...props }) {
+  return (
+    <SvgBase size={size} color={color} {...props}>
+      <polyline points="4 17 10 11 4 5" />
+      <line x1="12" y1="19" x2="20" y2="19" />
+    </SvgBase>
+  );
+}
+
+export function IconCoffee({ size = 18, color = "currentColor", ...props }) {
+  return (
+    <SvgBase size={size} color={color} {...props}>
+      <path d="M18 8h1a4 4 0 0 1 0 8h-1" />
+      <path d="M2 8h16v9a4 4 0 0 1-4 4H6a4 4 0 0 1-4-4V8z" />
+      <line x1="6" y1="1" x2="6" y2="4" />
+      <line x1="10" y1="1" x2="10" y2="4" />
+      <line x1="14" y1="1" x2="14" y2="4" />
+    </SvgBase>
+  );
+}
+
 export function IconGoogleLogo({ size = 18, ...props }) {
   return (
     <svg width={size} height={size} viewBox="0 0 24 24" style={{ display: "inline-block", verticalAlign: "middle", flexShrink: 0 }} {...props}>
@@ -734,6 +765,9 @@ const ICON_MAP = {
   briefcase: IconBriefcase,
   edit: IconEdit,
   grid: IconGrid,
+  layout: IconLayout,
+  terminal: IconTerminal,
+  coffee: IconCoffee,
   google: IconGoogleLogo,
 };
 

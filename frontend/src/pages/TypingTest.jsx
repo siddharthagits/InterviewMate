@@ -868,7 +868,9 @@ export default function TypingTest() {
               { icon: "bar-chart", title: "Track progress",  desc: "Live WPM and accuracy update as you type." },
             ].map(tip => (
               <div key={tip.title} className="glass" style={{ padding: "16px 18px" }}>
-                <div style={{ fontSize: 20, marginBottom: 6 }}>{tip.icon}</div>
+                <div style={{ display: "flex", alignItems: "center", marginBottom: 6 }}>
+                  <AppIcon name={tip.icon} size={20} color="var(--violet-light)" />
+                </div>
                 <div style={{ fontSize: 13, fontWeight: 700, marginBottom: 3, color: "var(--text-dim)" }}>{tip.title}</div>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.5 }}>{tip.desc}</div>
               </div>

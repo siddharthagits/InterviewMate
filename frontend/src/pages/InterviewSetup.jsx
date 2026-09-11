@@ -179,11 +179,15 @@ export default function InterviewSetup() {
                   onClick={() => select(value)}
                   type="button"
                 >
-                  <span style={{
-                    fontSize: 15,
-                    fontFamily: icon.length <= 3 ? "'JetBrains Mono', monospace" : undefined,
-                    fontWeight: 800,
-                  }}>{icon}</span>
+                  {icon && (icon.length <= 3 ? (
+                    <span style={{
+                      fontSize: 13,
+                      fontFamily: "'JetBrains Mono', monospace",
+                      fontWeight: 800,
+                    }}>{icon}</span>
+                  ) : (
+                    <AppIcon name={icon} size={16} />
+                  ))}
                   {value}
                 </button>
               ))}

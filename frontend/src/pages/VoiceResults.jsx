@@ -72,7 +72,7 @@ function MetricBar({ label, value, maxVal = 100, color, icon, desc }) {
     <div style={{ marginBottom:18 }}>
       <div style={{ display:"flex", justifyContent:"space-between", alignItems:"center", marginBottom:8 }}>
         <div style={{ display:"flex", alignItems:"center", gap:8 }}>
-          <span style={{ fontSize:16 }}>{icon}</span>
+          <AppIcon name={icon} size={16} color={color} />
           <span style={{ fontSize:13, fontWeight:600, color:"var(--text)" }}>{label}</span>
           {desc && <span style={{ fontSize:11, color:"var(--text-muted)" }}>· {desc}</span>}
         </div>
