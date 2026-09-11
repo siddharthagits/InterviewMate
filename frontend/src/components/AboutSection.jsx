@@ -50,19 +50,19 @@ const pillars = [
   },
   {
     icon: icons.brain,
-    color: "#06b6d4",
+    color: "#7c3aed",
     title: "Adaptive AI Evaluation",
     desc: "Instant multi-factor feedback that inspects code correctness, edge cases, algorithmic time/space trade-offs, and subjective explanation clarity.",
   },
   {
     icon: icons.building,
-    color: "#f59e0b",
+    color: "#7c3aed",
     title: "Company-Targeted Tracks",
     desc: "Curated exam environments tailored to the hiring patterns of leading technology companies and global engineering teams.",
   },
   {
     icon: icons.analytics,
-    color: "#10b981",
+    color: "#7c3aed",
     title: "In-Depth Performance Analytics",
     desc: "Comprehensive readiness scoring, granular topic breakdowns, and actionable career roadmaps to eliminate knowledge gaps.",
   },
@@ -74,6 +74,8 @@ const highlights = [
   "Extensive technical & behavioral banks",
   "Instant actionable critique & tips",
 ];
+
+import { IconTarget } from "./common/AppIcon";
 
 export default function AboutSection() {
   const nav = useNavigate();
@@ -101,8 +103,12 @@ export default function AboutSection() {
         
         {/* Header Badge & Title */}
         <div style={{ textAlign: "center", marginBottom: 52 }}>
-          <div className="glow-pill fade-up" style={{ marginBottom: 18 }}>
-            🎯 About InterviewMate
+          <div className="glow-pill fade-up" style={{ marginBottom: 18, display: "inline-flex", alignItems: "center", gap: 8, color: "#67e8f9" }}>
+            <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconTarget size={14} color="#67e8f9" /> About InterviewMate
+            </span>
+            <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h2
             className="fade-up"

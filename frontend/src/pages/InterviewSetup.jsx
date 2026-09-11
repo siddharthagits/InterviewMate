@@ -1,5 +1,6 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
 import ThemeToggle from "../components/ThemeToggle";
 
@@ -11,11 +12,11 @@ const STEPS = [
     label: "Job Role",
     subtitle: "What position are you interviewing for?",
     options: [
-      { value: "Software Engineer", icon: "⚙️" },
-      { value: "Frontend Developer", icon: "🎨" },
-      { value: "Backend Developer", icon: "🔧" },
-      { value: "Full Stack Developer", icon: "🔀" },
-      { value: "Data Analyst", icon: "📊" },
+      { value: "Software Engineer", icon: "code" },
+      { value: "Frontend Developer", icon: "layout" },
+      { value: "Backend Developer", icon: "terminal" },
+      { value: "Full Stack Developer", icon: "layers" },
+      { value: "Data Analyst", icon: "bar-chart" },
     ],
   },
   {
@@ -23,10 +24,10 @@ const STEPS = [
     label: "Experience Level",
     subtitle: "How much experience do you have?",
     options: [
-      { value: "Fresher", icon: "🌱" },
-      { value: "1-2 Years", icon: "🚀" },
-      { value: "3-5 Years", icon: "💼" },
-      { value: "5+ Years", icon: "🏆" },
+      { value: "Fresher", icon: "zap" },
+      { value: "1-2 Years", icon: "target" },
+      { value: "3-5 Years", icon: "briefcase" },
+      { value: "5+ Years", icon: "trophy" },
     ],
   },
   {
@@ -36,7 +37,7 @@ const STEPS = [
     options: [
       { value: "JavaScript", icon: "JS" },
       { value: "Python", icon: "Py" },
-      { value: "Java", icon: "☕" },
+      { value: "Java", icon: "coffee" },
       { value: "C++", icon: "C++" },
     ],
   },
@@ -45,9 +46,9 @@ const STEPS = [
     label: "Difficulty",
     subtitle: "Choose your challenge level.",
     options: [
-      { value: "Easy", icon: "🟢", color: "#10b981" },
-      { value: "Medium", icon: "🟡", color: "#f59e0b" },
-      { value: "Hard", icon: "🔴", color: "#ef4444" },
+      { value: "Easy", icon: "check", color: "#10b981" },
+      { value: "Medium", icon: "target", color: "#f59e0b" },
+      { value: "Hard", icon: "alert-triangle", color: "#ef4444" },
     ],
   },
   // Step 5 — Mode & Launch
@@ -95,9 +96,28 @@ export default function InterviewSetup() {
         overflow: "hidden",
       }}
     >
-      {/* Top right Theme Toggle */}
-      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
-        <ThemeToggle />
+      {/* Top navigation bar */}
+      <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 50, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 24px", pointerEvents: "none" }}>
+        <Link
+          to="/dashboard"
+          style={{
+            pointerEvents: "all",
+            display: "inline-flex", alignItems: "center", gap: 7,
+            fontSize: 13, fontWeight: 700, color: "var(--text-muted)",
+            textDecoration: "none",
+            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 99, padding: "6px 14px",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = "var(--violet-light)"; e.currentTarget.style.borderColor = "rgba(124,58,237,0.4)"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "var(--text-muted)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          Dashboard
+        </Link>
+        <div style={{ pointerEvents: "all" }}><ThemeToggle /></div>
       </div>
       {/* BG glow */}
       <div style={{
@@ -112,8 +132,10 @@ export default function InterviewSetup() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <div className="glow-pill" style={{ marginBottom: 16 }}>
-            Step {step + 1} of {STEPS.length}
+          <div className="glow-pill" style={{ marginBottom: 14 }}>
+            <span style={{ width: 18, height: 1.5, background: "var(--violet-light)", display: "inline-block", borderRadius: 2 }} />
+            <span>Step {step + 1} of {STEPS.length}</span>
+            <span style={{ width: 18, height: 1.5, background: "var(--violet-light)", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h1 style={{
             fontSize: "clamp(22px, 3.5vw, 32px)", fontWeight: 900,
@@ -210,7 +232,7 @@ export default function InterviewSetup() {
                 <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
                   <div>
                     <div style={{ fontWeight: 800, fontSize: 15, marginBottom: 4, display: "flex", alignItems: "center", gap: 8 }}>
-                      ⚡ Pressure Mode
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="zap" size={14} color="var(--gold)" /> Pressure Mode</span>
                       {form.pressureMode && (
                         <span style={{
                           fontSize: 10, padding: "2px 8px", borderRadius: 99,
@@ -272,7 +294,7 @@ export default function InterviewSetup() {
             type="button"
           >
             {isLast
-              ? "🚀 Launch Interview"
+              ? "Launch Interview"
               : `Next: ${STEPS[step + 1]?.label} →`}
           </button>
         </div>

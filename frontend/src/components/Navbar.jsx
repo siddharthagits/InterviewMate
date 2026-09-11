@@ -4,6 +4,7 @@ import ThemeToggle from "./ThemeToggle";
 import Sidebar from "./layout/Sidebar";
 import { useTheme } from "../context/ThemeContext";
 import { useAuth } from "../context/AuthContext";
+import { IconUser } from "./common/AppIcon";
 
 /* ─── SVG Icons ────────────────────────────────────────────────────────────── */
 const Icon = {
@@ -552,10 +553,11 @@ function Navbar() {
                 <Link
                   to="/profile"
                   className="btn btn-outline"
-                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12 }}
+                  style={{ width: "100%", justifyContent: "center", padding: "12px", fontSize: 14, borderRadius: 12, display: "flex", alignItems: "center", gap: 8 }}
                   onClick={() => setMobileMenuOpen(false)}
                 >
-                  👤 {user.name || user.email}
+                  <IconUser size={15} />
+                  <span>{user.name || user.email}</span>
                 </Link>
                 <Link
                   to="/dashboard"

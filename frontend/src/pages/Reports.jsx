@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useEffect, useState } from "react";
 import { Link } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -29,19 +30,18 @@ function Reports() {
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            background: "rgba(6,182,212,0.1)",
-            border: "1px solid rgba(6,182,212,0.25)",
-            borderRadius: 99,
-            padding: "4px 14px",
-            marginBottom: 12,
-            fontSize: 11,
+            marginBottom: 10,
+            fontSize: 12,
             color: "var(--cyan)",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
+            fontWeight: 800,
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
           }}
         >
-          📈 Performance Analytics
+          <span style={{ width: 18, height: 1.5, background: "var(--cyan)", display: "inline-block", borderRadius: 2 }} />
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <AppIcon name="bar-chart" size={13} color="var(--cyan)" /> Performance Analytics
+          </span>
         </div>
         <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-end", gap: 16 }}>
           <div>
@@ -73,6 +73,44 @@ function Reports() {
         </div>
       </div>
 
+      {!isLoggedIn && (
+        <div
+          className="glass"
+          style={{
+            padding: "16px 22px",
+            borderRadius: 16,
+            border: "1px solid rgba(6,182,212,0.3)",
+            background: "linear-gradient(135deg, rgba(6,182,212,0.08), rgba(124,58,237,0.04))",
+            marginBottom: 24,
+            display: "flex",
+            flexWrap: "wrap",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 14,
+          }}
+        >
+          <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
+            <AppIcon name="lock" size={24} color="var(--violet-light)" />
+            <div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: "var(--text)" }}>
+                Sign in to generate personalized analytics &amp; reports
+              </div>
+              <div style={{ fontSize: 12.5, color: "var(--text-muted)" }}>
+                Reports compile records from your completed tests. Sign in to start tracking your strengths and domain readiness.
+              </div>
+            </div>
+          </div>
+          <div style={{ display: "flex", gap: 10 }}>
+            <Link to="/login" className="btn btn-primary" style={{ padding: "8px 18px", fontSize: 13 }}>
+              Sign In →
+            </Link>
+            <Link to="/register" className="btn btn-outline" style={{ padding: "8px 16px", fontSize: 13 }}>
+              Register
+            </Link>
+          </div>
+        </div>
+      )}
+
       {/* Top 3 High Level Report Cards */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(260px, 1fr))", gap: 18, marginBottom: 28 }}>
         <div className="glass" style={{ padding: "22px 24px", borderRadius: 16 }}>
@@ -87,7 +125,7 @@ function Reports() {
 
         <div className="glass" style={{ padding: "22px 24px", borderRadius: 16 }}>
           <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Voice AI Speech Metric</div>
-          <div style={{ fontSize: 32, fontWeight: 900, color: "var(--cyan)", margin: "8px 0 4px", fontFamily: "'Sora', sans-serif" }}>
+          <div style={{ fontSize: 32, fontWeight: 900, color: "var(--violet-light)", margin: "8px 0 4px", fontFamily: "'Sora', sans-serif" }}>
             {stats.voiceClarity !== "—" ? stats.voiceClarity : "Nil"}
           </div>
           <div style={{ fontSize: 12.5, color: "var(--text-dim)" }}>
@@ -97,7 +135,7 @@ function Reports() {
 
         <div className="glass" style={{ padding: "22px 24px", borderRadius: 16 }}>
           <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Keyboard Benchmark</div>
-          <div style={{ fontSize: 32, fontWeight: 900, color: "#10b981", margin: "8px 0 4px", fontFamily: "'Sora', sans-serif" }}>
+          <div style={{ fontSize: 32, fontWeight: 900, color: "var(--violet-light)", margin: "8px 0 4px", fontFamily: "'Sora', sans-serif" }}>
             {stats.peakTypingWpm !== "—" ? stats.peakTypingWpm : "Nil"}
           </div>
           <div style={{ fontSize: 12.5, color: "var(--text-dim)" }}>
@@ -117,7 +155,7 @@ function Reports() {
 
         {!stats.hasData ? (
           <div style={{ padding: "36px 20px", textAlign: "center", background: "rgba(255,255,255,0.01)", borderRadius: 14, border: "1px dashed var(--glass-border)" }}>
-            <div style={{ fontSize: 32, marginBottom: 10 }}>📊</div>
+            <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}><AppIcon name="bar-chart" size={34} color="var(--violet-light)" /></div>
             <h4 style={{ fontSize: 16, fontWeight: 800, marginBottom: 6 }}>No Test Performance Data Yet</h4>
             <p style={{ fontSize: 13.5, color: "var(--text-muted)", maxWidth: 460, margin: "0 auto 20px auto" }}>
               Your domain assessment metrics start at Nil. Complete practice tests, mock interviews, or typing challenges to populate your dynamic report.

@@ -1,7 +1,9 @@
-import { useEffect, useState } from "react";
+import { AppIcon } from "../components/common/AppIcon";
+import { useEffect, useState, useCallback } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
-import { getStoredActivities } from "../utils/activityTracker";
+import { getStoredActivities, dbSessionToActivity } from "../utils/activityTracker";
+import { fetchInterviewSessions, deleteInterviewSession } from "../api/api";
 import { useAuth } from "../context/AuthContext";
 
 function perfColor(score) {
@@ -22,22 +24,101 @@ function formatTimeAgo(timestamp) {
   return `${days}d ago`;
 }
 
+// Loading skeleton card
+function SkeletonCard() {
+  return (
+    <div
+      className="glass"
+      style={{
+        display: "flex",
+        justifyContent: "space-between",
+        alignItems: "center",
+        gap: 16,
+        padding: "20px 24px",
+        borderRadius: 16,
+        border: "1px solid var(--glass-border)",
+        opacity: 0.5,
+        animation: "pulse 1.5s infinite",
+      }}
+    >
+      <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+        <div style={{ width: 48, height: 48, borderRadius: 14, background: "rgba(124,58,237,0.12)" }} />
+        <div>
+          <div style={{ width: 180, height: 14, background: "rgba(255,255,255,0.08)", borderRadius: 6, marginBottom: 8 }} />
+          <div style={{ width: 120, height: 11, background: "rgba(255,255,255,0.05)", borderRadius: 6 }} />
+        </div>
+      </div>
+      <div style={{ width: 56, height: 28, background: "rgba(255,255,255,0.08)", borderRadius: 8 }} />
+    </div>
+  );
+}
+
 function History() {
   const nav = useNavigate();
   const { user, isLoggedIn } = useAuth();
   const [activities, setActivities] = useState([]);
   const [activeFilter, setActiveFilter] = useState("all");
+  const [loading, setLoading] = useState(true);
+  const [deletingId, setDeletingId] = useState(null);
+
+  // Merge local activities + persistent sessions (deduplicated by id)
+  const loadAll = useCallback(async () => {
+    if (!isLoggedIn || !user?.id) {
+      setActivities([]);
+      setLoading(false);
+      return;
+    }
+    const local = getStoredActivities();
+
+    // Fetch DB sessions and merge
+    setLoading(true);
+    try {
+      const dbSessions = await fetchInterviewSessions(user.id);
+      const dbActivities = dbSessions.map(dbSessionToActivity);
+
+      // Deduplicate: DB entries take priority over localStorage duplicates
+      const dbIds = new Set(dbActivities.map((a) => a._dbId));
+
+      // Keep localStorage entries that are NOT a technical interview already in DB
+      const filteredLocal = local.filter((a) => {
+        if (a.type !== "technical") return true; // keep non-technical always
+        return dbIds.size === 0; // only keep local technical if DB returned nothing
+      });
+
+      const merged = [...dbActivities, ...filteredLocal].sort(
+        (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
+      );
+      setActivities(merged);
+    } catch {
+      setActivities(local);
+    } finally {
+      setLoading(false);
+    }
+  }, [isLoggedIn, user?.id]);
 
   useEffect(() => {
-    setActivities(getStoredActivities());
-    const handleUpdate = () => setActivities(getStoredActivities());
+    loadAll();
+    const handleUpdate = () => loadAll();
     window.addEventListener("im_activity_updated", handleUpdate);
     window.addEventListener("im_auth_changed", handleUpdate);
     return () => {
       window.removeEventListener("im_activity_updated", handleUpdate);
       window.removeEventListener("im_auth_changed", handleUpdate);
     };
-  }, [user]);
+  }, [loadAll]);
+
+  const handleDelete = async (act) => {
+    if (!act._dbId) return;
+    if (!window.confirm("Delete this session? This cannot be undone.")) return;
+    setDeletingId(act._dbId);
+    const ok = await deleteInterviewSession(act._dbId);
+    if (ok) {
+      setActivities((prev) => prev.filter((a) => a._dbId !== act._dbId));
+    } else {
+      alert("Could not delete session. Please try again.");
+    }
+    setDeletingId(null);
+  };
 
   const filtered = activities.filter((a) => {
     if (activeFilter === "all") return true;
@@ -52,40 +133,71 @@ function History() {
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            background: "rgba(124,58,237,0.1)",
-            border: "1px solid rgba(124,58,237,0.25)",
-            borderRadius: 99,
-            padding: "4px 14px",
-            marginBottom: 12,
-            fontSize: 11,
+            marginBottom: 10,
+            fontSize: 12,
             color: "var(--violet-light)",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
+            fontWeight: 800,
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
           }}
         >
-          ⏱️ Complete Session Logs
+          <span style={{ width: 18, height: 1.5, background: "var(--violet-light)", display: "inline-block", borderRadius: 2 }} />
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <AppIcon name="clock" size={13} color="var(--violet-light)" /> Complete Session Logs
+          </span>
         </div>
         <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 6, letterSpacing: "-0.5px" }}>
           Activity &amp; Test History
         </h1>
-        <p style={{ color: "var(--text-muted)", fontSize: 14 }}>
-          {isLoggedIn && user
-            ? `Comprehensive record of all tests, voice interviews, and practice sessions for ${user.name || user.email}.`
-            : "Comprehensive real-time records of all completed interviews and practice sessions."}
-        </p>
+        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 14, margin: 0 }}>
+            {isLoggedIn && user
+              ? `Comprehensive record of all tests, voice interviews, and practice sessions for ${user.name || user.email}.`
+              : "Comprehensive real-time records of completed interviews and practice sessions."}
+          </p>
+        </div>
       </div>
 
-      {/* Filter Tabs */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
+      {!isLoggedIn || !user ? (
+        <div
+          className="glass"
+          style={{
+            padding: "54px 32px",
+            textAlign: "center",
+            borderRadius: 20,
+            maxWidth: 620,
+            margin: "20px auto 40px auto",
+            border: "1px solid var(--glass-border)",
+          }}
+        >
+          <div style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}><AppIcon name="lock" size={48} color="var(--violet-light)" /></div>
+          <h2 style={{ fontSize: 22, fontWeight: 900, marginBottom: 8, letterSpacing: "-0.4px" }}>
+            Sign In Required to View History
+          </h2>
+          <p style={{ fontSize: 14, color: "var(--text-muted)", lineHeight: 1.6, maxWidth: 480, margin: "0 auto 24px auto" }}>
+            Guest mode has been disabled. All interview logs, test scores, and performance analytics are strictly tied to authenticated user accounts.
+          </p>
+          <div style={{ display: "flex", justifyContent: "center", gap: 12, flexWrap: "wrap" }}>
+            <Link to="/login" className="btn btn-primary" style={{ padding: "10px 24px", fontSize: 13.5 }}>
+              Sign In →
+            </Link>
+            <Link to="/register" className="btn btn-outline" style={{ padding: "10px 22px", fontSize: 13.5 }}>
+              Create Account
+            </Link>
+          </div>
+        </div>
+      ) : (
+        <>
+          {/* Filter Tabs */}
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
         {[
-          { id: "all", label: "All Records" },
-          { id: "technical", label: "💻 Technical" },
-          { id: "voice", label: "🎙️ Voice AI" },
-          { id: "company", label: "🏢 Company Exams" },
-          { id: "typing", label: "⌨️ Typing" },
-          { id: "subject", label: "📚 CS Bank" },
-          { id: "practice", label: "🧠 Practice" },
+          { id: "all", label: "All Records", icon: "grid" },
+          { id: "technical", label: "Technical", icon: "code" },
+          { id: "voice", label: "Voice AI", icon: "mic" },
+          { id: "company", label: "Company Exams", icon: "building" },
+          { id: "typing", label: "Typing", icon: "keyboard" },
+          { id: "subject", label: "CS Bank", icon: "book" },
+          { id: "practice", label: "Practice", icon: "brain" },
         ].map((tab) => (
           <button
             key={tab.id}
@@ -102,16 +214,25 @@ function History() {
               transition: "all 0.2s ease",
             }}
           >
-            {tab.label}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name={tab.icon} size={13} /> {tab.label}</span>
           </button>
         ))}
       </div>
 
       {/* History Items */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
-        {filtered.length === 0 ? (
+        {/* Loading skeleton */}
+        {loading && activities.length === 0 && (
+          <>
+            <SkeletonCard />
+            <SkeletonCard />
+            <SkeletonCard />
+          </>
+        )}
+
+        {!loading && filtered.length === 0 ? (
           <div className="glass" style={{ padding: "48px 30px", textAlign: "center", borderRadius: 20 }}>
-            <div style={{ fontSize: 36, marginBottom: 12 }}>📋</div>
+            <div style={{ marginBottom: 14, display: "flex", justifyContent: "center" }}><AppIcon name="clipboard" size={38} color="var(--violet-light)" /></div>
             <h3 style={{ fontSize: 18, fontWeight: 800, marginBottom: 6 }}>
               {activities.length === 0 ? "No Test History Recorded Yet (Nil)" : "No Activities Found for this Filter"}
             </h3>
@@ -135,6 +256,9 @@ function History() {
         ) : (
           filtered.map((act) => {
             const scoreCol = perfColor(act.score);
+            const isDbEntry = act._source === "db";
+            const isDeleting = deletingId === act._dbId;
+
             return (
               <div
                 key={act.id}
@@ -149,6 +273,7 @@ function History() {
                   borderRadius: 16,
                   border: "1px solid var(--glass-border)",
                   transition: "all 0.2s ease",
+                  opacity: isDeleting ? 0.5 : 1,
                 }}
               >
                 <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
@@ -165,11 +290,11 @@ function History() {
                       fontSize: 22,
                     }}
                   >
-                    {act.icon || "📄"}
+                    <AppIcon name={act.icon || "file"} size={22} color={act.color || "#7c3aed"} />
                   </div>
 
                   <div>
-                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 4, flexWrap: "wrap" }}>
                       <span style={{ fontSize: 16, fontWeight: 800, color: "var(--text)" }}>
                         {act.title}
                       </span>
@@ -189,7 +314,7 @@ function History() {
                     </div>
 
                     <div style={{ fontSize: 12.5, color: "var(--text-muted)", display: "flex", gap: 12, flexWrap: "wrap" }}>
-                      <span>🕒 {formatTimeAgo(act.timestamp)}</span>
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="clock" size={12} color="var(--text-muted)" /> {formatTimeAgo(act.timestamp)}</span>
                       {act.metrics &&
                         Object.entries(act.metrics).map(([k, v]) => (
                           <span key={k}>
@@ -200,7 +325,7 @@ function History() {
                   </div>
                 </div>
 
-                <div style={{ display: "flex", alignItems: "center", gap: 20 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <div style={{ textAlign: "right" }}>
                     <div style={{ fontSize: 22, fontWeight: 900, color: scoreCol, fontFamily: "'Sora', sans-serif" }}>
                       {act.score}%
@@ -224,14 +349,40 @@ function History() {
                   >
                     Practice Again →
                   </button>
+
+                  {/* Delete button — only for cloud sessions */}
+                  {isDbEntry && (
+                    <button
+                      onClick={() => handleDelete(act)}
+                      disabled={isDeleting}
+                      style={{
+                        padding: "8px 12px",
+                        borderRadius: 10,
+                        fontSize: 13,
+                        fontWeight: 700,
+                        cursor: isDeleting ? "not-allowed" : "pointer",
+                        border: "1px solid rgba(239,68,68,0.3)",
+                        background: "rgba(239,68,68,0.06)",
+                        color: "#ef4444",
+                        transition: "all 0.2s ease",
+                      }}
+                      title="Delete session"
+                    >
+                      {isDeleting ? "…" : <AppIcon name="trash" size={15} color="#ef4444" />}
+                    </button>
+                  )}
                 </div>
               </div>
             );
           })
         )}
       </div>
+      </>
+      )}
     </DashboardLayout>
   );
 }
 
 export default History;
+
+

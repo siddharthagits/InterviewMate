@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { useRef } from "react";
+import { IconZap } from "./common/AppIcon";
 
 // Inline SVG Icons
 const icons = {
@@ -134,8 +135,8 @@ function FeatureCard({ feat }) {
     card.style.transform = `perspective(800px) rotateX(${rotX}deg) rotateY(${rotY}deg) translateZ(4px)`;
     card.style.setProperty("--mx", `${mx}%`);
     card.style.setProperty("--my", `${my}%`);
-    card.style.borderColor = feat.colorBorder;
-    card.style.boxShadow = `0 20px 50px ${feat.color}20`;
+    card.style.borderColor = "var(--border-hover)";
+    card.style.boxShadow = "0 14px 36px rgba(0,0,0,0.12)";
   };
 
   const handleMouseLeave = () => {
@@ -158,28 +159,16 @@ function FeatureCard({ feat }) {
       tabIndex={0}
       onKeyDown={(e) => e.key === "Enter" && feat.route && nav(feat.route)}
     >
-      {/* Top gradient accent line */}
-      <div
-        style={{
-          position: "absolute",
-          top: 0, left: 0, right: 0,
-          height: 2,
-          background: feat.gradient,
-          borderRadius: "20px 20px 0 0",
-        }}
-      />
-
       {/* Icon box */}
       <div
         style={{
           width: 52, height: 52,
           borderRadius: 16,
-          background: feat.colorLight,
-          border: `1px solid ${feat.colorBorder}`,
+          background: "var(--bg2)",
+          border: "1px solid var(--glass-border)",
           display: "flex", alignItems: "center", justifyContent: "center",
-          color: feat.color,
+          color: "var(--primary)",
           marginBottom: 22,
-          boxShadow: `0 4px 16px ${feat.color}20`,
         }}
       >
         {feat.icon}
@@ -194,9 +183,9 @@ function FeatureCard({ feat }) {
           style={{
             fontSize: 10, fontWeight: 700,
             padding: "3px 10px", borderRadius: 99,
-            background: feat.colorLight,
-            color: feat.color,
-            border: `1px solid ${feat.colorBorder}`,
+            background: "var(--bg2)",
+            color: "var(--text-muted)",
+            border: "1px solid var(--glass-border)",
             flexShrink: 0, marginLeft: 12,
             letterSpacing: "0.06em", textTransform: "uppercase",
           }}
@@ -210,7 +199,7 @@ function FeatureCard({ feat }) {
       </p>
 
       {feat.route && (
-        <div style={{ fontSize: 12, fontWeight: 700, color: feat.color, display: "flex", alignItems: "center", gap: 6 }}>
+        <div style={{ fontSize: 12, fontWeight: 700, color: "var(--violet-light)", display: "flex", alignItems: "center", gap: 6 }}>
           Explore Feature <span>→</span>
         </div>
       )}
@@ -236,8 +225,12 @@ function Features() {
 
         {/* Header */}
         <div style={{ textAlign: "center", marginBottom: 54 }}>
-          <div className="glow-pill fade-up" style={{ marginBottom: 20 }}>
-            ⚡ Platform Features
+          <div className="glow-pill fade-up" style={{ marginBottom: 20, display: "inline-flex", alignItems: "center", gap: 8, color: "#f59e0b" }}>
+            <span style={{ width: 18, height: 1.5, background: "#f59e0b", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconZap size={14} color="#f59e0b" /> Platform Features
+            </span>
+            <span style={{ width: 18, height: 1.5, background: "#f59e0b", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h2
             className="fade-up"

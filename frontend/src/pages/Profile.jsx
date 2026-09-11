@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import DashboardLayout from "../components/layout/DashboardLayout";
@@ -40,19 +41,18 @@ function Profile() {
             display: "inline-flex",
             alignItems: "center",
             gap: 8,
-            background: "rgba(124,58,237,0.1)",
-            border: "1px solid rgba(124,58,237,0.25)",
-            borderRadius: 99,
-            padding: "4px 14px",
-            marginBottom: 12,
-            fontSize: 11,
+            marginBottom: 10,
+            fontSize: 12,
             color: "var(--violet-light)",
-            fontWeight: 700,
-            letterSpacing: "0.08em",
+            fontWeight: 800,
+            letterSpacing: "0.14em",
             textTransform: "uppercase",
           }}
         >
-          👤 User Account &amp; Credentials
+          <span style={{ width: 18, height: 1.5, background: "var(--violet-light)", display: "inline-block", borderRadius: 2 }} />
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <AppIcon name="user" size={13} color="var(--violet-light)" /> User Account &amp; Credentials
+          </span>
         </div>
         <h1 style={{ fontSize: 28, fontWeight: 900, marginBottom: 6, letterSpacing: "-0.5px" }}>
           User Profile
@@ -169,7 +169,7 @@ function Profile() {
 
               <div style={{ padding: "18px 20px", background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid var(--glass-border)" }}>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Overall Readiness Score</div>
-                <div style={{ fontSize: 26, fontWeight: 900, color: "var(--cyan)", marginTop: 6, fontFamily: "'Sora', sans-serif" }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: "var(--violet-light)", marginTop: 6, fontFamily: "'Sora', sans-serif" }}>
                   {stats.hasData ? `${stats.compositeScore}/100` : "Nil"}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 4 }}>
@@ -179,7 +179,7 @@ function Profile() {
 
               <div style={{ padding: "18px 20px", background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid var(--glass-border)" }}>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Peak Typing Speed</div>
-                <div style={{ fontSize: 26, fontWeight: 900, color: "#10b981", marginTop: 6, fontFamily: "'Sora', sans-serif" }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: "var(--violet-light)", marginTop: 6, fontFamily: "'Sora', sans-serif" }}>
                   {stats.peakTypingWpm !== "—" ? stats.peakTypingWpm : "Nil"}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 4 }}>
@@ -189,7 +189,7 @@ function Profile() {
 
               <div style={{ padding: "18px 20px", background: "rgba(255,255,255,0.02)", borderRadius: 14, border: "1px solid var(--glass-border)" }}>
                 <div style={{ fontSize: 12, color: "var(--text-muted)", fontWeight: 700, textTransform: "uppercase" }}>Voice AI Metric</div>
-                <div style={{ fontSize: 26, fontWeight: 900, color: "var(--gold)", marginTop: 6, fontFamily: "'Sora', sans-serif" }}>
+                <div style={{ fontSize: 26, fontWeight: 900, color: "var(--violet-light)", marginTop: 6, fontFamily: "'Sora', sans-serif" }}>
                   {stats.voiceClarity !== "—" ? stats.voiceClarity : "Nil"}
                 </div>
                 <div style={{ fontSize: 12, color: "var(--text-dim)", marginTop: 4 }}>
@@ -221,7 +221,7 @@ function Profile() {
                   color: "var(--red)",
                 }}
               >
-                🗑️ Reset My Account Test History
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="trash" size={14} color="var(--red)" /> Reset My Account Test History</span>
               </button>
 
               <button
@@ -233,7 +233,7 @@ function Profile() {
                 className="btn btn-outline"
                 style={{ padding: "10px 18px", borderRadius: 12, fontSize: 13, fontWeight: 700 }}
               >
-                {copied ? "✓ Copied Data to Clipboard!" : "📋 Export Account Data (JSON)"}
+                {copied ? <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="check" size={14} color="#10b981" /> Copied Data to Clipboard!</span> : <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="clipboard" size={14} /> Export Account Data (JSON)</span>}
               </button>
             </div>
           </div>
@@ -250,7 +250,7 @@ function Profile() {
             margin: "0 auto",
           }}
         >
-          <div style={{ fontSize: 48, marginBottom: 16 }}>🔒</div>
+          <div style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}><AppIcon name="lock" size={48} color="var(--violet-light)" /></div>
           <h2 style={{ fontSize: 24, fontWeight: 900, marginBottom: 8, letterSpacing: "-0.4px" }}>
             Not Logged In
           </h2>

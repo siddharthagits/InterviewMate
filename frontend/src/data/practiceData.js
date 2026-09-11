@@ -5,7 +5,7 @@ export const PRACTICE_CATEGORIES = [
   {
     id: "quantitative",
     name: "Quantitative Aptitude",
-    icon: "📐",
+    icon: "chart",
     color: "#7c3aed",
     gradient: "linear-gradient(135deg,#7c3aed,#5b21b6)",
     description: "Number systems, arithmetic, algebra, geometry, and data interpretation.",
@@ -44,7 +44,7 @@ export const PRACTICE_CATEGORIES = [
   {
     id: "verbal",
     name: "Verbal Ability",
-    icon: "📝",
+    icon: "book",
     color: "#06b6d4",
     gradient: "linear-gradient(135deg,#06b6d4,#0891b2)",
     description: "Grammar, vocabulary, reading comprehension, and sentence skills.",
@@ -66,7 +66,7 @@ export const PRACTICE_CATEGORIES = [
   {
     id: "logical",
     name: "Logical Reasoning",
-    icon: "🧠",
+    icon: "brain",
     color: "#10b981",
     gradient: "linear-gradient(135deg,#10b981,#059669)",
     description: "Statements, arguments, assumptions, conclusions and logic puzzles.",
@@ -86,7 +86,7 @@ export const PRACTICE_CATEGORIES = [
   {
     id: "verbal-reasoning",
     name: "Verbal Reasoning",
-    icon: "💬",
+    icon: "message",
     color: "#f59e0b",
     gradient: "linear-gradient(135deg,#f59e0b,#d97706)",
     description: "Analogies, classification, series completion and coding-decoding.",
@@ -104,7 +104,7 @@ export const PRACTICE_CATEGORIES = [
   {
     id: "nonverbal-reasoning",
     name: "Nonverbal Reasoning",
-    icon: "🔷",
+    icon: "grid",
     color: "#ec4899",
     gradient: "linear-gradient(135deg,#ec4899,#db2777)",
     description: "Pattern recognition, figure series, mirror images, and paper folding.",

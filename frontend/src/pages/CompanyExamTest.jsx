@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect } from "react";
 import { useParams, useNavigate, useSearchParams } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
@@ -8,14 +9,14 @@ import { logUserActivity } from "../utils/activityTracker";
 
 // ── Section colour map ────────────────────────────────────────────────────────
 const SECTION_COLORS = {
-  "Numerical Ability":  { color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  icon: "🔢" },
-  "Verbal Ability":     { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "📖" },
-  "Reasoning Ability":  { color: "#6366f1", bg: "rgba(99,102,241,0.1)",  icon: "🧩" },
-  "Programming Logic":  { color: "#ec4899", bg: "rgba(236,72,153,0.1)",  icon: "💻" },
+  "Numerical Ability":  { color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  icon: "bar-chart" },
+  "Verbal Ability":     { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "book" },
+  "Reasoning Ability":  { color: "#6366f1", bg: "rgba(99,102,241,0.1)",  icon: "brain" },
+  "Programming Logic":  { color: "#ec4899", bg: "rgba(236,72,153,0.1)",  icon: "code" },
 };
 
 function sectionStyle(sec) {
-  return SECTION_COLORS[sec] || { color: "#7c3aed", bg: "rgba(124,58,237,0.1)", icon: "❓" };
+  return SECTION_COLORS[sec] || { color: "#7c3aed", bg: "rgba(124,58,237,0.1)", icon: "help-circle" };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -85,7 +86,7 @@ function BrowseCard({ item, index, paper }) {
             textTransform: "uppercase", letterSpacing: "0.06em",
             display: "flex", alignItems: "center", gap: 5,
           }}>
-            {s.icon} {item.section}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name={s.icon} size={11} color={s.color} /> {item.section}</span>
           </span>
           {/* Year badge */}
           <span style={{
@@ -93,7 +94,7 @@ function BrowseCard({ item, index, paper }) {
             background: "rgba(59,130,246,0.12)", color: "#60a5fa",
             border: "1px solid rgba(59,130,246,0.3)",
           }}>
-            📅 TCS NQT {item.year}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="calendar" size={11} color="#60a5fa" /> TCS NQT {item.year}</span>
           </span>
         </div>
 
@@ -109,7 +110,7 @@ function BrowseCard({ item, index, paper }) {
             display: "flex", alignItems: "center", gap: 6,
           }}
         >
-          {hideAnswer ? "🙈 Answer Hidden — Click to Show" : "✅ Answer Visible — Click to Hide"}
+          {hideAnswer ? "Answer Hidden — Click to Show" : "Answer Visible — Click to Hide"}
         </button>
       </div>
 
@@ -162,7 +163,7 @@ function BrowseCard({ item, index, paper }) {
                   fontSize: 16, flexShrink: 0,
                   background: "rgba(16,185,129,0.2)", borderRadius: "50%",
                   width: 26, height: 26, display: "flex", alignItems: "center", justifyContent: "center",
-                }}>✓</span>
+                }}><AppIcon name="check" size={14} color="#10b981" /></span>
               )}
             </div>
           );
@@ -179,7 +180,7 @@ function BrowseCard({ item, index, paper }) {
           borderRadius: 10,
           display: "flex", alignItems: "center", gap: 10,
         }}>
-          <span style={{ fontSize: 16 }}>✅</span>
+          <AppIcon name="check-circle" size={16} color="#34d399" />
           <span style={{ fontSize: 13, fontWeight: 700, color: "#34d399" }}>
             Correct Answer:&nbsp;
             <span style={{ color: "var(--text)" }}>
@@ -204,7 +205,7 @@ function BrowseCard({ item, index, paper }) {
             padding: "12px 18px",
             display: "flex", alignItems: "center", gap: 8,
           }}>
-            <span style={{ fontSize: 17 }}>💡</span>
+            <AppIcon name="sparkles" size={16} color={s.color} />
             <span style={{ fontSize: 12, fontWeight: 800, color: s.color, textTransform: "uppercase", letterSpacing: "0.08em" }}>
               Step-by-Step Solution
             </span>
@@ -231,7 +232,7 @@ function BrowseCard({ item, index, paper }) {
               padding: "12px 18px",
               display: "flex", alignItems: "flex-start", gap: 10,
             }}>
-              <span style={{ fontSize: 16, flexShrink: 0 }}>🎯</span>
+              <AppIcon name="target" size={15} color="#f59e0b" />
               <p style={{ fontSize: 13, color: "#fbbf24", lineHeight: 1.65, margin: 0 }}>
                 <strong style={{ color: "#f59e0b" }}>TCS Exam Tip: </strong>{item.tip}
               </p>
@@ -251,7 +252,7 @@ function BrowseCard({ item, index, paper }) {
                 borderRadius: 10, padding: "14px 16px",
                 display: "flex", gap: 12,
               }}>
-                <span style={{ fontSize: 20, flexShrink: 0 }}>🤖</span>
+                <AppIcon name="bot" size={18} color="#10b981" />
                 <div>
                   <strong style={{ color: "#10b981", display: "block", marginBottom: 8, fontSize: 12, textTransform: "uppercase", letterSpacing: "0.06em" }}>
                     AI Deep Dive
@@ -276,7 +277,7 @@ function BrowseCard({ item, index, paper }) {
                   onMouseEnter={e => { if (!loadingAi) e.currentTarget.style.background = "rgba(124,58,237,0.2)"; }}
                   onMouseLeave={e => { e.currentTarget.style.background = "rgba(124,58,237,0.1)"; }}
                 >
-                  {loadingAi ? "⏳ Generating…" : "✨ AI Deep Dive"}
+                  {loadingAi ? "Generating…" : <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={13} /> AI Deep Dive</span>}
                 </button>
                 <button
                   onClick={openChatGPT}
@@ -289,7 +290,7 @@ function BrowseCard({ item, index, paper }) {
                   onMouseEnter={e => e.currentTarget.style.background = "rgba(16,163,127,0.18)"}
                   onMouseLeave={e => e.currentTarget.style.background = "rgba(16,163,127,0.08)"}
                 >
-                  💬 Ask ChatGPT ↗
+                  Ask ChatGPT ↗
                 </button>
               </div>
             )}
@@ -365,7 +366,7 @@ function MockTestRunner({ paper, onFinish }) {
               TCS NQT {paper.year} — Mock Test
             </div>
             <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
-              {s.icon} {q.section} · Q{currIdx + 1} of {paper.questions.length}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name={s.icon} size={11} color={s.color} /> {q.section}</span> · Q{currIdx + 1} of {paper.questions.length}
             </div>
           </div>
         </div>
@@ -377,7 +378,7 @@ function MockTestRunner({ paper, onFinish }) {
             borderRadius: 12, padding: "8px 18px",
             display: "flex", alignItems: "center", gap: 8,
           }}>
-            <span>⏱</span>
+            <AppIcon name="clock" size={16} color={low ? "#f87171" : "var(--text)"} />
             <span style={{
               fontSize: 16, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace",
               color: low ? "#f87171" : "var(--text)",
@@ -423,7 +424,7 @@ function MockTestRunner({ paper, onFinish }) {
               background: s.bg, color: s.color, border: `1px solid ${s.color}30`,
               display: "flex", alignItems: "center", gap: 5,
             }}>
-              {s.icon} {q.section}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name={s.icon} size={11} color={s.color} /> {q.section}</span>
             </span>
             <button
               onClick={() => setFlagged(f => ({ ...f, [currIdx]: !f[currIdx] }))}
@@ -434,7 +435,7 @@ function MockTestRunner({ paper, onFinish }) {
                 padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
               }}
             >
-              {flagged[currIdx] ? "🚩 Flagged" : "🏳 Flag"}
+              {flagged[currIdx] ? <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="flag" size={13} color="#f59e0b" /> Flagged</span> : <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="flag" size={13} color="var(--text-muted)" /> Flag</span>}
             </button>
           </div>
 
@@ -504,7 +505,7 @@ function MockTestRunner({ paper, onFinish }) {
             Question Palette
           </div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginBottom: 14, lineHeight: 1.6 }}>
-            ✅ {answered} answered · 🏳 {Object.values(flagged).filter(Boolean).length} flagged · ⬜ {paper.questions.length - answered} remaining
+            {answered} answered · {Object.values(flagged).filter(Boolean).length} flagged · {paper.questions.length - answered} remaining
           </div>
           <div style={{ display: "grid", gridTemplateColumns: "repeat(5, 1fr)", gap: 7 }}>
             {paper.questions.map((_, i) => {
@@ -542,7 +543,7 @@ function MockTestRunner({ paper, onFinish }) {
 
       <ConfirmModal
         open={confirmOpen}
-        icon="🏢"
+        icon="building"
         title="Submit Exam?"
         message={`You've answered ${answered} of ${paper.questions.length} questions. This action cannot be undone.`}
         confirmText="Submit Exam"
@@ -584,16 +585,16 @@ function ResultScreen({ result, paper, onRetake, onStudy, onBack }) {
           boxShadow: `0 24px 64px ${result.passed ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.1)"}`,
           marginBottom: 24,
         }}>
-          <div style={{ fontSize: 52, marginBottom: 12 }}>{result.passed ? "🎉" : ""}</div>
+          <div style={{ marginBottom: 14, display: "flex", justifyContent: "center" }}><AppIcon name={result.passed ? "trophy" : "alert-circle"} size={52} color={result.passed ? "#10b981" : "#ef4444"} /></div>
 
           <div style={{
-            display: "inline-block", padding: "5px 18px", borderRadius: 99, marginBottom: 18,
-            background: result.passed ? "rgba(16,185,129,0.12)" : "rgba(239,68,68,0.12)",
+            display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 14,
             color: result.passed ? "#34d399" : "#f87171",
-            border: `1px solid ${result.passed ? "#10b981" : "#ef4444"}`,
-            fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.08em",
+            fontSize: 12, fontWeight: 800, textTransform: "uppercase", letterSpacing: "0.14em",
           }}>
-            {result.passed ? `✓ Above Cutoff (${cutoffPercent}%)` : `✗ Below Cutoff (${cutoffPercent}%)`}
+            <span style={{ width: 18, height: 1.5, background: result.passed ? "#34d399" : "#f87171", display: "inline-block", borderRadius: 2 }} />
+            <span>{result.passed ? `Above Cutoff (${cutoffPercent}%)` : `Below Cutoff (${cutoffPercent}%)`}</span>
+            <span style={{ width: 18, height: 1.5, background: result.passed ? "#34d399" : "#f87171", display: "inline-block", borderRadius: 2 }} />
           </div>
 
           <div style={{
@@ -637,13 +638,13 @@ function ResultScreen({ result, paper, onRetake, onStudy, onBack }) {
           {/* Actions */}
           <div style={{ display: "flex", gap: 14, justifyContent: "center", flexWrap: "wrap" }}>
             <button onClick={onRetake} className="btn btn-primary" style={{ padding: "12px 26px" }}>
-              🔄 Retake Mock Test
+              Retake Mock Test
             </button>
             <button onClick={onStudy} className="btn btn-outline" style={{ padding: "12px 26px" }}>
-              📖 Study All Solutions
+              Study All Solutions
             </button>
             <button onClick={onBack} className="btn btn-outline" style={{ padding: "12px 26px", borderColor: "rgba(255,255,255,0.1)" }}>
-              📋 All Papers
+              All Papers
             </button>
           </div>
         </div>
@@ -671,7 +672,7 @@ export default function CompanyExamTest() {
   if (!paper) {
     return (
       <div style={{ minHeight: "100vh", background: "var(--bg)", color: "var(--text)", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 16 }}>
-        <div style={{ fontSize: 48 }}>📭</div>
+        <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}><AppIcon name="inbox" size={48} color="var(--text-muted)" /></div>
         <h2 style={{ fontFamily: "'Sora', sans-serif" }}>Paper not found</h2>
         <button className="btn btn-primary" onClick={() => navigate("/company-assessment")}>
           ← Back to TCS NQT Papers
@@ -699,7 +700,7 @@ export default function CompanyExamTest() {
               score: `${res.correct}/${totalQ}`,
               company: paper.company,
             },
-            icon: "🏢",
+            icon: "building",
             color: "#f59e0b",
             badge: pct >= 70 ? "Passed" : "Attempted",
           });
@@ -759,7 +760,7 @@ export default function CompanyExamTest() {
                 fontSize: 11, fontWeight: 700, color: "#3b82f6",
                 textTransform: "uppercase", letterSpacing: "0.07em",
               }}>
-                📋 TCS NQT PYQ — {paper.year}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="clipboard" size={12} color="#3b82f6" /> TCS NQT PYQ — {paper.year}</span>
               </div>
               <h1 style={{ fontSize: "clamp(22px,3vw,36px)", fontWeight: 900, fontFamily: "'Sora', sans-serif", letterSpacing: "-0.8px", marginBottom: 8 }}>
                 TCS NQT {paper.year} — Full Paper
@@ -772,7 +773,7 @@ export default function CompanyExamTest() {
                 background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)",
                 fontSize: 12, color: "#fbbf24", maxWidth: 620,
               }}>
-                💡 <strong>Pattern Insight:</strong> {paper.patternNote}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="sparkles" size={13} color="#fbbf24" /> <strong>Pattern Insight:</strong></span> {paper.patternNote}
               </div>
             </div>
 
@@ -782,11 +783,11 @@ export default function CompanyExamTest() {
               borderRadius: 18, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 12, minWidth: 240,
             }}>
               <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.8 }}>
-                ⏱ {durationMinutes} min &nbsp;·&nbsp; 📋 {paper.questions.length} Questions<br />
-                🎯 Cutoff: {cutoffPercent}% &nbsp;·&nbsp; 📅 Year: {paper.year}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="clock" size={12} /> {durationMinutes} min</span> &nbsp;·&nbsp; <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="clipboard" size={12} /> {paper.questions.length} Qs</span><br />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="target" size={12} /> Cutoff: {cutoffPercent}%</span> &nbsp;·&nbsp; <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="calendar" size={12} /> Year: {paper.year}</span>
               </div>
               <button onClick={() => setMode("test")} className="btn btn-gold" style={{ width: "100%", padding: "12px", fontSize: 14, fontWeight: 800 }}>
-                ⚡ Take Mock Test
+                Take Mock Test
               </button>
             </div>
           </div>
@@ -797,7 +798,7 @@ export default function CompanyExamTest() {
       <div style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "14px 40px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {sections.map(sec => {
-            const s = sec === "All" ? { color: "#3b82f6", icon: "📋" } : sectionStyle(sec);
+            const s = sec === "All" ? { color: "#3b82f6", icon: "clipboard" } : sectionStyle(sec);
             return (
               <button
                 key={sec}
@@ -810,7 +811,7 @@ export default function CompanyExamTest() {
                   transition: "all 0.15s", display: "flex", alignItems: "center", gap: 5,
                 }}
               >
-                {s.icon} {sec === "All" ? "All Sections" : sec.split(" ")[0]}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name={s.icon} size={12} /> {sec === "All" ? "All Sections" : sec.split(" ")[0]}</span>
               </button>
             );
           })}

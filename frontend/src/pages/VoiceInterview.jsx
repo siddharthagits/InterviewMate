@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect, useRef, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
@@ -86,7 +87,7 @@ function MicPulse({ active }) {
         position: "relative", zIndex: 1,
         cursor: "pointer",
       }}>
-        {active ? "🎙" : "🎤"}
+        <AppIcon name="mic" size={18} color="#fff" />
       </div>
     </div>
   );
@@ -121,7 +122,7 @@ function WpmBadge({ wpm }) {
       background: `${color}12`, border: `1px solid ${color}30`,
       fontSize: 12, fontWeight: 700, color,
     }}>
-      ⚡ {wpm > 0 ? `${wpm} wpm` : "—"} · {label}
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="zap" size={12} color="#f59e0b" /> {wpm > 0 ? `${wpm} wpm` : "—"} · {label}</span>
     </div>
   );
 }
@@ -339,7 +340,7 @@ export default function VoiceInterview() {
 
   if (!srSupported) return (
     <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:16, background:"var(--bg)", padding:32, textAlign:"center" }}>
-      <div style={{ fontSize:52 }}>🚫</div>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}><AppIcon name="alert-triangle" size={52} color="#ef4444" /></div>
       <h2 style={{ fontSize:22, fontWeight:800, fontFamily:"'Sora', sans-serif" }}>Browser Not Supported</h2>
       <p style={{ color:"var(--text-muted)", maxWidth:420, lineHeight:1.6 }}>
         Voice Interview requires the Web Speech API. Please use <strong>Google Chrome</strong> or <strong>Microsoft Edge</strong>.
@@ -376,21 +377,21 @@ export default function VoiceInterview() {
             fontSize:10, fontWeight:700, padding:"3px 10px", borderRadius:99,
             background:"rgba(16,185,129,0.12)", color:"#10b981",
             border:"1px solid rgba(16,185,129,0.3)", textTransform:"uppercase", letterSpacing:"0.07em",
-          }}>🎙 Voice</span>
+          display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="mic" size={11} color="var(--cyan)" /> Voice</span>
           <span style={{ fontSize:12, color:"var(--text-muted)" }}>
             {interviewData.role}
           </span>
         </div>
         <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
           <span style={{ fontSize:12, color:"var(--text-muted)" }}>
-            ✅ {answeredCount}/{questions.length}
+            {answeredCount}/{questions.length} Answered
           </span>
           <span style={{
             fontFamily:"'JetBrains Mono', monospace", fontSize:13, fontWeight:700,
             padding:"5px 10px", borderRadius:8,
             background:"rgba(255,255,255,0.04)", color:"var(--text-muted)",
           }}>
-            ⏱ {fmtSecs(totalSecs)}
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="clock" size={12} /> {fmtSecs(totalSecs)}</span>
           </span>
           <ThemeToggle />
           <button
@@ -445,7 +446,7 @@ export default function VoiceInterview() {
                   background:"linear-gradient(135deg, #06b6d4, #7c3aed)",
                   display:"flex", alignItems:"center", justifyContent:"center", fontSize:16,
                   boxShadow:"0 4px 16px rgba(6,182,212,0.4)",
-                }}>🤖</div>
+                display: "flex", alignItems: "center", justifyContent: "center" }}><AppIcon name="bot" size={24} color="#06b6d4" /></div>
                 <div>
                   <div style={{ fontWeight:700, fontSize:14 }}>AI Interviewer</div>
                   <div style={{ fontSize:11, color:"var(--text-muted)" }}>Powered by Gemini AI</div>
@@ -458,7 +459,7 @@ export default function VoiceInterview() {
                 border: `1px solid ${status === "speaking" ? "rgba(6,182,212,0.3)" : "rgba(255,255,255,0.06)"}`,
                 transition:"all 0.3s",
               }}>
-                {status === "speaking" ? "🔊 Speaking…" : status === "idle" ? "⏸ Waiting" : status === "listening" ? "👂 Listening" : "⏳ Processing"}
+                {status === "speaking" ? "Speaking…" : status === "idle" ? "Waiting" : status === "listening" ? "Listening" : "Processing"}
               </div>
             </div>
 
@@ -480,7 +481,7 @@ export default function VoiceInterview() {
                   opacity:(status === "speaking" || submitting) ? 0.4 : 1,
                   transition:"all 0.2s",
                 }}
-              >🔁 Replay</button>
+              ><span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="rotate-ccw" size={12} /> Replay</span></button>
             </div>
           </div>
 
@@ -494,7 +495,7 @@ export default function VoiceInterview() {
               <div style={{
                 fontSize:10, fontWeight:700, color:"#06b6d4",
                 textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:14,
-              }}>📋 Current Question</div>
+              display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="clipboard" size={13} /> Current Question</div>
               <p style={{
                 fontSize:"clamp(14px, 2vw, 17px)", fontWeight:600,
                 lineHeight:1.65, color:"var(--text)", letterSpacing:"-0.1px",
@@ -575,11 +576,11 @@ export default function VoiceInterview() {
             <UserWave active={status === "listening"} />
 
             <p style={{ fontSize:13, color:"var(--text-muted)", textAlign:"center", maxWidth:280 }}>
-              {status === "speaking"   && "🔊 Listen first, then click the mic to answer."}
+              {status === "speaking"   && "Listen first, then click the mic to answer."}
               {status === "idle"       && !qSpoken && "Preparing question…"}
               {status === "idle"       && qSpoken  && "Click the mic to start speaking."}
-              {status === "listening"  && "🎙 Listening… click Stop when done."}
-              {status === "processing" && "⏳ Evaluating…"}
+              {status === "listening"  && "Listening… click Stop when done."}
+              {status === "processing" && "Evaluating…"}
             </p>
 
             {/* Live metrics */}
@@ -592,7 +593,7 @@ export default function VoiceInterview() {
                   color: fillerCount > 3 ? "#ef4444" : fillerCount > 0 ? "#f59e0b" : "#10b981",
                   border: `1px solid ${fillerCount > 3 ? "rgba(239,68,68,0.3)" : fillerCount > 0 ? "rgba(245,158,11,0.3)" : "rgba(16,185,129,0.3)"}`,
                 }}>
-                  💬 {fillerCount} filler{fillerCount !== 1 ? "s" : ""}
+                  {fillerCount} filler{fillerCount !== 1 ? "s" : ""}
                 </div>
               </div>
             )}
@@ -609,7 +610,7 @@ export default function VoiceInterview() {
                     color:"#fff", border:"none", minWidth:150,
                     boxShadow:"0 4px 20px rgba(16,185,129,0.4)",
                   }}
-                >🎙 Start Speaking</button>
+                ><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="mic" size={15} /> Start Speaking</span></button>
               ) : (
                 <button
                   className="btn"
@@ -620,10 +621,10 @@ export default function VoiceInterview() {
                     color:"#fff", border:"none",
                     boxShadow:"0 4px 20px rgba(239,68,68,0.4)",
                   }}
-                >⏹ Stop Recording</button>
+                ><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="square" size={15} /> Stop Recording</span></button>
               )}
               {displayText && status !== "listening" && (
-                <button className="btn btn-outline" onClick={clearAnswer} style={{ fontSize:13 }}>🗑 Clear</button>
+                <button className="btn btn-outline" onClick={clearAnswer} style={{ fontSize:13 }}>Clear</button>
               )}
             </div>
           </div>
@@ -639,7 +640,7 @@ export default function VoiceInterview() {
               textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10,
               display:"flex", justifyContent:"space-between", alignItems:"center",
             }}>
-              <span>📝 Your Answer</span>
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="file" size={13} /> Your Answer</span>
               {displayText && (
                 <span style={{ fontWeight:500, fontSize:10 }}>
                   {displayText.trim().split(/\s+/).filter(Boolean).length} words
@@ -677,7 +678,7 @@ export default function VoiceInterview() {
                 boxShadow:"0 4px 20px rgba(124,58,237,0.35)",
               }}
             >
-              {submitting ? "Evaluating…" : isLast ? "Submit ✓" : "Next Question →"}
+              {submitting ? "Evaluating…" : isLast ? "Submit" : "Next Question →"}
             </button>
           </div>
         </div>
@@ -692,7 +693,7 @@ export default function VoiceInterview() {
           background:"rgba(16,185,129,0.04)", border:"1px solid rgba(16,185,129,0.12)",
           fontSize:12, color:"var(--text-muted)", lineHeight:1.8,
         }}>
-          <strong style={{ color:"#10b981" }}>💡 Tips:</strong>
+          <strong style={{ color:"#10b981" }}>Tips:</strong>
           {" "}Speak clearly in a quiet room · Click mic after AI finishes · Filler words are highlighted in orange · Re-record any answer by clicking mic again
         </div>
       </div>
@@ -700,7 +701,7 @@ export default function VoiceInterview() {
 
       <ConfirmModal
         open={confirmOpen}
-        icon="🎤"
+        icon="mic"
         title="End Voice Session?"
         message={`You've answered ${answers.filter(a => a && a.trim()).length} of ${questions.length} questions. Your session will be evaluated and you cannot go back.`}
         confirmText="Submit Session"

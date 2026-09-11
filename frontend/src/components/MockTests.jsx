@@ -1,5 +1,6 @@
 import { useNavigate } from "react-router-dom";
 import { mockTestList } from "../data/mockTestData";
+import AppIcon, { IconTarget, IconCheckCircle, IconHelpCircle, IconClock } from "./common/AppIcon";
 
 function MockTests() {
   const navigate = useNavigate();
@@ -24,7 +25,8 @@ function MockTests() {
             borderRadius: 99, padding: "6px 18px", marginBottom: 20,
             fontSize: 13, color: "#67e8f9", fontWeight: 600, letterSpacing: "0.04em"
           }}>
-            🎯 FREE MOCK TESTS
+            <IconTarget size={14} color="#67e8f9" />
+            <span>FREE MOCK TESTS</span>
           </div>
           <h2 style={{ fontSize: "clamp(28px,4vw,46px)", fontWeight: 900, lineHeight: 1.15, marginBottom: 14 }}>
             Practice with{" "}
@@ -69,8 +71,18 @@ function MockTests() {
 
         {/* Bottom CTA */}
         <div style={{ textAlign: "center", marginTop: 48 }}>
-          <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 4 }}>
-            ✅ No sign-up required &nbsp;·&nbsp; ✅ Instant result &nbsp;·&nbsp; ✅ Detailed explanation
+          <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 4, display: "flex", justifyContent: "center", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconCheckCircle size={14} color="#10b981" /> No sign-up required
+            </span>
+            <span>·</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconCheckCircle size={14} color="#10b981" /> Instant result
+            </span>
+            <span>·</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <IconCheckCircle size={14} color="#10b981" /> Detailed explanation
+            </span>
           </p>
         </div>
       </div>
@@ -79,140 +91,107 @@ function MockTests() {
 }
 
 function MockTestCard({ test, onStart }) {
-  const difficultyColor =
-    test.difficulty.includes("Hard") ? "#ef4444" :
-    test.difficulty.includes("Medium") ? "#f59e0b" : "#10b981";
-
   return (
     <div
-      className="mock-test-card"
+      className="glass"
       style={{
         background: "var(--card)",
-        border: `1px solid ${test.colorBorder}`,
+        border: "1px solid var(--glass-border)",
         borderRadius: 20,
-        padding: "28px 24px",
+        padding: "26px 24px",
         display: "flex",
         flexDirection: "column",
-        gap: 0,
-        cursor: "pointer",
-        transition: "all 0.28s ease",
+        justifyContent: "space-between",
         position: "relative",
+        transition: "transform 0.25s ease, box-shadow 0.25s ease, border-color 0.25s ease",
         overflow: "hidden",
       }}
       onMouseEnter={e => {
-        e.currentTarget.style.transform = "translateY(-6px)";
-        e.currentTarget.style.boxShadow = `0 20px 60px ${test.color}22, 0 0 0 1px ${test.colorBorder}`;
+        e.currentTarget.style.transform = "translateY(-4px)";
+        e.currentTarget.style.borderColor = "var(--border-hover)";
+        e.currentTarget.style.boxShadow = "0 16px 40px rgba(0,0,0,0.12)";
       }}
       onMouseLeave={e => {
         e.currentTarget.style.transform = "translateY(0)";
+        e.currentTarget.style.borderColor = "var(--glass-border)";
         e.currentTarget.style.boxShadow = "none";
       }}
     >
-      {/* Glow top accent */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 3,
-        background: test.gradient, borderRadius: "20px 20px 0 0",
-      }} />
-
-      {/* Background glow blob */}
-      <div style={{
-        position: "absolute", top: -30, right: -30,
-        width: 120, height: 120,
-        background: test.colorLight,
-        borderRadius: "50%", filter: "blur(40px)", pointerEvents: "none",
-      }} />
-
-      {/* Icon + Title */}
-      <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 18, marginTop: 8 }}>
-        <div style={{
-          width: 52, height: 52, borderRadius: 14, flexShrink: 0,
-          background: test.colorLight,
-          border: `1px solid ${test.colorBorder}`,
-          display: "flex", alignItems: "center", justifyContent: "center",
-          fontSize: 24,
-        }}>
-          {test.icon}
+      <div>
+        {/* Icon + Title */}
+        <div style={{ display: "flex", alignItems: "flex-start", gap: 14, marginBottom: 16, marginTop: 4 }}>
+          <div style={{
+            width: 48, height: 48, borderRadius: 14, flexShrink: 0,
+            background: "var(--bg2)",
+            border: "1px solid var(--glass-border)",
+            display: "flex", alignItems: "center", justifyContent: "center",
+            color: "var(--primary)",
+          }}>
+            <AppIcon name={test.icon} size={22} />
+          </div>
+          <div>
+            <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 4, color: "var(--text)" }}>{test.title}</h3>
+            <p style={{ fontSize: 12.5, color: "var(--text-muted)", lineHeight: 1.4, margin: 0 }}>{test.subtitle}</p>
+          </div>
         </div>
-        <div>
-          <h3 style={{ fontSize: 17, fontWeight: 800, marginBottom: 3, color: "var(--text)" }}>{test.title}</h3>
-          <p style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.4 }}>{test.subtitle}</p>
+
+        {/* Topic Tags */}
+        <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
+          {test.tags.map(tag => (
+            <span key={tag} style={{
+              fontSize: 11, fontWeight: 600, padding: "3px 10px",
+              borderRadius: 99,
+              background: "var(--bg2)",
+              color: "var(--text-muted)",
+              border: "1px solid var(--glass-border)",
+            }}>{tag}</span>
+          ))}
         </div>
       </div>
 
-      {/* Topic Tags */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 6, marginBottom: 20 }}>
-        {test.tags.map(tag => (
-          <span key={tag} style={{
-            fontSize: 11, fontWeight: 600, padding: "3px 10px",
-            borderRadius: 99, letterSpacing: "0.03em",
-            background: test.colorLight,
-            color: test.color,
-            border: `1px solid ${test.colorBorder}`,
-          }}>{tag}</span>
-        ))}
-      </div>
+      <div>
+        {/* Divider */}
+        <div style={{ height: 1, background: "var(--glass-border)", marginBottom: 16 }} />
 
-      {/* Divider */}
-      <div style={{ height: 1, background: "rgba(255,255,255,0.06)", marginBottom: 18 }} />
-
-      {/* Meta Row */}
-      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 8, fontSize: 13 }}>
-        <div style={{ display: "flex", gap: 16 }}>
-          <span style={{ color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 14 }}>❓</span> {test.totalQuestions} Qs
-          </span>
-          <span style={{ color: "var(--text-muted)", display: "flex", alignItems: "center", gap: 5 }}>
-            <span style={{ fontSize: 14 }}>⏱</span> {test.duration} min
-          </span>
+        {/* Meta Row */}
+        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6, fontSize: 12.5 }}>
+          <div style={{ display: "flex", gap: 14 }}>
+            <span style={{ color: "var(--text-muted)", display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <IconHelpCircle size={14} /> {test.totalQuestions} Qs
+            </span>
+            <span style={{ color: "var(--text-muted)", display: "inline-flex", alignItems: "center", gap: 5 }}>
+              <IconClock size={14} /> {test.duration} min
+            </span>
+          </div>
+          <span style={{
+            fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99,
+            background: "var(--bg2)",
+            color: "var(--text-muted)",
+            border: "1px solid var(--glass-border)",
+          }}>{test.difficulty}</span>
         </div>
-        <span style={{
-          fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99,
-          background: `${difficultyColor}18`,
-          color: difficultyColor,
-          border: `1px solid ${difficultyColor}44`,
-        }}>{test.difficulty}</span>
+
+        {/* CTA Button */}
+        <button
+          onClick={onStart}
+          className="btn btn-primary"
+          style={{
+            width: "100%",
+            padding: "12px 0",
+            borderRadius: 12,
+            fontSize: 13.5,
+            fontWeight: 700,
+            cursor: "pointer",
+            marginTop: 14,
+            display: "inline-flex",
+            alignItems: "center",
+            justifyContent: "center",
+            gap: 6,
+          }}
+        >
+          Start Mock Test →
+        </button>
       </div>
-
-
-
-      {/* CTA Button */}
-      <button
-        onClick={onStart}
-        style={{
-          width: "100%",
-          padding: "12px 0",
-          borderRadius: 12,
-          border: "none",
-          background: test.gradient,
-          color: "#fff",
-          fontWeight: 700,
-          fontSize: 14,
-          cursor: "pointer",
-          transition: "all 0.2s",
-          letterSpacing: "0.02em",
-          boxShadow: `0 4px 20px ${test.color}44`,
-          marginTop: "auto",
-        }}
-        onMouseEnter={e => {
-          e.currentTarget.style.opacity = "0.9";
-          e.currentTarget.style.transform = "scale(1.02)";
-        }}
-        onMouseLeave={e => {
-          e.currentTarget.style.opacity = "1";
-          e.currentTarget.style.transform = "scale(1)";
-        }}
-      >
-        Start Test ▶
-      </button>
-
-      {/* Free label */}
-      <div style={{
-        position: "absolute", top: 16, right: 16,
-        background: "rgba(16,185,129,0.15)",
-        border: "1px solid rgba(16,185,129,0.35)",
-        color: "#34d399", fontSize: 10, fontWeight: 700,
-        padding: "2px 8px", borderRadius: 99, letterSpacing: "0.06em",
-      }}>FREE</div>
     </div>
   );
 }

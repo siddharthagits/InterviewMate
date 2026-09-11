@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect, useCallback } from "react";
 import { useParams, useNavigate, Link } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
@@ -23,10 +24,10 @@ function perfColor(pct) {
   return "#ef4444";
 }
 function perfLabel(pct) {
-  if (pct >= 80) return "Excellent 🏆";
-  if (pct >= 60) return "Good 👍";
-  if (pct >= 40) return "Average 📈";
-  return "Needs Practice 💪";
+  if (pct >= 80) return "Excellent";
+  if (pct >= 60) return "Good";
+  if (pct >= 40) return "Average";
+  return "Needs Practice";
 }
 
 // ── Animated score ring ───────────────────────────────────────────────────────
@@ -96,8 +97,8 @@ function BrowseMode({ subject }) {
           />
           <span style={{
             position: "absolute", left: 12, top: "50%",
-            transform: "translateY(-50%)", fontSize: 14, color: "var(--text-muted)",
-          }}>🔍</span>
+            transform: "translateY(-50%)", display: "flex", alignItems: "center", color: "var(--text-muted)",
+          }}><AppIcon name="search" size={14} color="var(--text-muted)" /></span>
         </div>
 
         <div style={{ display: "flex", gap: 6, flexWrap: "wrap" }}>
@@ -127,12 +128,135 @@ function BrowseMode({ subject }) {
 
       {filtered.length === 0 && (
         <div style={{ textAlign: "center", padding: "52px 0", color: "var(--text-muted)" }}>
-          <div style={{ fontSize: 28, marginBottom: 8 }}>🔍</div>
+          <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}><AppIcon name="search" size={28} color="var(--text-muted)" /></div>
           <div>No topics match "<strong>{search}</strong>"</div>
         </div>
       )}
     </div>
   );
+}
+
+// ── MarkdownBlock — renders raw AI markdown as proper readable JSX ─────────────
+function MarkdownBlock({ text }) {
+  if (!text) return null;
+
+  // Inline formatting: **bold**, *italic*, `code`
+  function parseInline(str) {
+    const parts = [];
+    // Split on **bold**, *italic*, `code`
+    const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`)/g;
+    let last = 0, m;
+    while ((m = re.exec(str)) !== null) {
+      if (m.index > last) parts.push(str.slice(last, m.index));
+      if (m[2] !== undefined) parts.push(<strong key={m.index}>{m[2]}</strong>);
+      else if (m[3] !== undefined) parts.push(<em key={m.index}>{m[3]}</em>);
+      else if (m[4] !== undefined) parts.push(
+        <code key={m.index} style={{
+          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.9em",
+          background: "rgba(124,58,237,0.12)", color: "#c4b5fd",
+          padding: "1px 6px", borderRadius: 4,
+        }}>{m[4]}</code>
+      );
+      last = m.index + m[0].length;
+    }
+    if (last < str.length) parts.push(str.slice(last));
+    return parts;
+  }
+
+  const lines = text.split("\n");
+  const elements = [];
+  let i = 0;
+
+  while (i < lines.length) {
+    const line = lines[i].trimEnd();
+
+    // Skip blank lines between blocks (just add spacing)
+    if (line.trim() === "") { i++; continue; }
+
+    // Numbered list: starts with "1." "2." etc.
+    if (/^\d+\.\s/.test(line)) {
+      const listItems = [];
+      while (i < lines.length && /^\d+\.\s/.test(lines[i].trimEnd())) {
+        const content = lines[i].replace(/^\d+\.\s/, "").trimEnd();
+        listItems.push(
+          <li key={i} style={{ marginBottom: 5, lineHeight: 1.65 }}>
+            {parseInline(content)}
+          </li>
+        );
+        i++;
+      }
+      elements.push(
+        <ol key={`ol-${i}`} style={{ paddingLeft: 22, margin: "8px 0 10px" }}>
+          {listItems}
+        </ol>
+      );
+      continue;
+    }
+
+    // Bullet list: starts with "- " or "* " or "• "
+    if (/^[-*•]\s/.test(line)) {
+      const listItems = [];
+      while (i < lines.length && /^[-*•]\s/.test(lines[i].trimEnd())) {
+        const content = lines[i].replace(/^[-*•]\s/, "").trimEnd();
+        listItems.push(
+          <li key={i} style={{ marginBottom: 5, lineHeight: 1.65 }}>
+            {parseInline(content)}
+          </li>
+        );
+        i++;
+      }
+      elements.push(
+        <ul key={`ul-${i}`} style={{ paddingLeft: 22, margin: "8px 0 10px", listStyleType: "disc" }}>
+          {listItems}
+        </ul>
+      );
+      continue;
+    }
+
+    // Heading: starts with ### or ## or #
+    const headingMatch = line.match(/^(#{1,3})\s+(.*)/);
+    if (headingMatch) {
+      const level = headingMatch[1].length;
+      const content = headingMatch[2];
+      const fontSize = level === 1 ? 17 : level === 2 ? 15.5 : 14.5;
+      elements.push(
+        <div key={i} style={{
+          fontSize, fontWeight: 800, color: "var(--text)",
+          fontFamily: "'Sora', sans-serif",
+          marginTop: 14, marginBottom: 4, letterSpacing: "-0.2px",
+        }}>
+          {parseInline(content)}
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Bold-only line acting as a heading (e.g. "**The Superpower:**")
+    if (/^\*\*[^*]+\*\*/.test(line) && line.replace(/^\*\*[^*]+\*\*[:\s]*/, "").trim() === "") {
+      const content = line.replace(/\*\*/g, "").replace(/:$/, "");
+      elements.push(
+        <div key={i} style={{
+          fontSize: 14.5, fontWeight: 800, color: "var(--text)",
+          marginTop: 14, marginBottom: 3,
+        }}>
+          {content}
+        </div>
+      );
+      i++;
+      continue;
+    }
+
+    // Regular paragraph
+    elements.push(
+      <p key={i} style={{ margin: "0 0 8px", lineHeight: 1.72, fontSize: 13.5 }}>
+        {parseInline(line)}
+      </p>
+    );
+    i++;
+  }
+
+  return <div style={{ color: "var(--text)" }}>{elements}</div>;
 }
 
 // ── Topic Row — fully visible, no dropdown ────────────────────────────────────
@@ -219,17 +343,46 @@ function TopicRow({ topic, subject, index }) {
         {/* AI Dive In Area */}
         <div style={{ marginTop: 12 }}>
           {aiExplanation ? (
-            <div style={{
-              fontSize: 13, color: "var(--text)", background: "rgba(16,185,129,0.05)",
-              border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "12px 16px",
-              lineHeight: 1.6, display: "flex", gap: 12,
-            }}>
-              <span style={{ fontSize: 18 }}>🤖</span>
-              <div style={{ whiteSpace: "pre-wrap", wordBreak: "break-word" }}>
-                <strong style={{ color: "#10b981", display: "block", marginBottom: 6 }}>AI Dive In:</strong>
-                {aiExplanation}
+            <>
+              <div style={{
+                background: "rgba(16,185,129,0.04)",
+                border: "1px solid rgba(16,185,129,0.18)", borderRadius: 10, padding: "16px 18px",
+                marginBottom: 10,
+              }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 12 }}>
+                  <AppIcon name="bot" size={18} color="#10b981" />
+                  <strong style={{ color: "#10b981", fontSize: 13, fontWeight: 800, letterSpacing: "-0.2px" }}>AI Dive In</strong>
+                </div>
+                <MarkdownBlock text={aiExplanation} />
               </div>
-            </div>
+              {/* Action buttons shown AFTER explanation loads */}
+              <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                <button
+                  onClick={() => setAiExplanation("")}
+                  style={{
+                    background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.1)",
+                    color: "var(--text-muted)", fontSize: 11, fontWeight: 600, padding: "5px 12px",
+                    borderRadius: 6, cursor: "pointer",
+                    display: "inline-flex", alignItems: "center", gap: 5, transition: "all 0.2s",
+                  }}
+                >
+                  ← Back
+                </button>
+                <button
+                  onClick={handleChatGPTOpen}
+                  style={{
+                    background: "rgba(16, 163, 127, 0.1)", border: "1px solid rgba(16, 163, 127, 0.3)",
+                    color: "#10a37f", fontSize: 11, fontWeight: 600, padding: "5px 12px",
+                    borderRadius: 6, cursor: "pointer",
+                    display: "inline-flex", alignItems: "center", gap: 6, transition: "all 0.2s",
+                  }}
+                  onMouseEnter={e => e.currentTarget.style.background = "rgba(16, 163, 127, 0.2)"}
+                  onMouseLeave={e => e.currentTarget.style.background = "rgba(16, 163, 127, 0.1)"}
+                >
+                  Ask ChatGPT ↗
+                </button>
+              </div>
+            </>
           ) : (
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
               <button 
@@ -242,7 +395,7 @@ function TopicRow({ topic, subject, index }) {
                   display: "inline-flex", alignItems: "center", gap: 6, transition: "all 0.2s",
                 }}
               >
-                {loadingAi ? "⏳ Generating..." : "✨ AI Dive In"}
+                {loadingAi ? "Generating..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={13} /> AI Dive In</span>}
               </button>
               <button 
                 onClick={handleChatGPTOpen}
@@ -260,6 +413,7 @@ function TopicRow({ topic, subject, index }) {
             </div>
           )}
         </div>
+
       </div>
     </div>
   );
@@ -405,13 +559,13 @@ function TestRunner({ questions, subject, onFinish }) {
           disabled={answers[idx] === undefined && !isLast}
           style={{ flex: 1, fontSize: 14 }}
         >
-          {isLast ? "Submit Test ✓" : "Next →"}
+          {isLast ? "Submit Test" : "Next →"}
         </button>
       </div>
 
       <ConfirmModal
         open={confirmOpen}
-        icon="📋"
+        icon="clipboard"
         title="Submit Test?"
         message={`You've answered ${Object.keys(answers).length} of ${questions.length} questions. Once submitted you cannot change your answers.`}
         confirmText="Submit Now"
@@ -473,8 +627,8 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
         </div>
 
         <div style={{ display: "flex", gap: 12, marginTop: 20, justifyContent: "center" }}>
-          <button className="btn btn-outline" onClick={onRetake} style={{ fontSize: 13 }}>🔄 Retake Test</button>
-          <button className="btn btn-primary" onClick={onBrowse} style={{ fontSize: 13 }}>📖 Browse Mode</button>
+          <button className="btn btn-outline" onClick={onRetake} style={{ fontSize: 13 }}>Retake Test</button>
+          <button className="btn btn-primary" onClick={onBrowse} style={{ fontSize: 13 }}>Browse Mode</button>
         </div>
       </div>
 
@@ -504,7 +658,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 12, fontWeight: 800, marginTop: 1,
                   }}>
-                    {unanswered ? "?" : isCorrect ? "✓" : "✗"}
+                    {unanswered ? "?" : isCorrect ? "OK" : "X"}
                   </span>
                   <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", lineHeight: 1.5, margin: 0 }}>{q.q}</p>
                 </div>
@@ -525,7 +679,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                         <span style={{ fontWeight: 700, flexShrink: 0 }}>{["A","B","C","D"][oi]}.</span>
                         <span style={{ flex: 1 }}>{opt}</span>
                         <span style={{ flexShrink: 0, fontSize: 11 }}>
-                          {isCorr && isUser ? "✓ Your answer" : isCorr ? "✓ Correct" : "← Your answer"}
+                          {isCorr && isUser ? "Correct (Your answer)" : isCorr ? "Correct" : "Your answer"}
                         </span>
                       </div>
                     );
@@ -536,7 +690,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                       background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)",
                       color: "#6ee7b7",
                     }}>
-                      ✓ Correct: {q.options[q.correct]}
+                      Correct: {q.options[q.correct]}
                     </div>
                   )}
                 </div>
@@ -559,7 +713,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                       border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "12px 16px",
                       lineHeight: 1.6, marginTop: 10, display: "flex", gap: 12,
                     }}>
-                      <span style={{ fontSize: 18 }}>🤖</span>
+                      <AppIcon name="bot" size={18} color="#10b981" />
                       <div>
                         <strong style={{ color: "#10b981", display: "block", marginBottom: 6 }}>AI Explanation:</strong>
                         {aiExplanations[q.id]}
@@ -577,7 +731,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                           display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s",
                         }}
                       >
-                        {loadingAi[q.id] ? "⏳ Generating..." : "✨ Explain with AI"}
+                        {loadingAi[q.id] ? "Generating..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={13} /> Explain with AI</span>}
                       </button>
                       <button 
                         onClick={() => {
@@ -643,7 +797,7 @@ function TestConfig({ subject, allQuestions, onStart }) {
           Question Order
         </div>
         <div style={{ display: "flex", gap: 10 }}>
-          {[["random", "🎲 Random"], ["sequential", "📋 Sequential"]].map(([val, label]) => (
+          {[["random", "Random", "shuffle"], ["sequential", "Sequential", "list"]].map(([val, label, iconName]) => (
             <button key={val} onClick={() => setMode(val)} style={{
               padding: "10px 22px", borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: "pointer",
               border: `1px solid ${mode === val ? subject.color : "rgba(255,255,255,0.08)"}`,
@@ -651,7 +805,7 @@ function TestConfig({ subject, allQuestions, onStart }) {
               color: mode === val ? subject.color : "var(--text-muted)",
               transition: "all 0.2s",
             }}>
-              {label}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name={iconName} size={14} /> {label}</span>
             </button>
           ))}
         </div>
@@ -663,9 +817,9 @@ function TestConfig({ subject, allQuestions, onStart }) {
         borderRadius: 12, padding: "14px 18px", marginBottom: 24,
         display: "flex", gap: 24, fontSize: 13, color: "var(--text-muted)",
       }}>
-        <span>📋 <strong style={{ color: "var(--text)" }}>{count}</strong> questions</span>
-        <span>⏱ ~<strong style={{ color: "var(--text)" }}>{Math.ceil(count * 1)}</strong> minutes</span>
-        <span>🎯 <strong style={{ color: "var(--text)" }}>1 min</strong> per question</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="clipboard" size={13} /> <strong style={{ color: "var(--text)" }}>{count}</strong> questions</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="clock" size={13} /> ~<strong style={{ color: "var(--text)" }}>{Math.ceil(count * 1)}</strong> minutes</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="target" size={13} /> <strong style={{ color: "var(--text)" }}>1 min</strong> per question</span>
       </div>
 
       <button
@@ -677,7 +831,7 @@ function TestConfig({ subject, allQuestions, onStart }) {
           boxShadow: `0 4px 24px ${subject.color}35`,
         }}
       >
-        🚀 Start Test
+        Start Test
       </button>
     </div>
   );
@@ -719,7 +873,7 @@ export default function SubjectTest() {
           score: `${result.score}/${total}`,
           subject: subject.shortName || subject.name,
         },
-        icon: subject.icon || "📚",
+        icon: subject.icon || "book",
         color: subject.color || "#ec4899",
         badge: pct >= 70 ? "Mastered" : "Completed",
       });
@@ -734,7 +888,7 @@ export default function SubjectTest() {
   if (!subject) {
     return (
       <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 16 }}>
-        <div style={{ fontSize: 36 }}>🔍</div>
+        <div style={{ marginBottom: 12, display: "flex", justifyContent: "center" }}><AppIcon name="search" size={36} color="var(--text-muted)" /></div>
         <p style={{ color: "var(--text-muted)" }}>Subject not found</p>
         <Link to="/question-bank" className="btn btn-primary" style={{ fontSize: 13 }}>← All Subjects</Link>
       </div>
@@ -775,7 +929,7 @@ export default function SubjectTest() {
               background: `${subject.color}20`, border: `1px solid ${subject.color}35`,
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0,
             }}>
-              {subject.icon}
+              <AppIcon name={subject.icon} size={28} color={subject.color} />
             </div>
             <div>
               <h1 style={{
@@ -811,8 +965,8 @@ export default function SubjectTest() {
           borderRadius: 14, padding: 4, marginBottom: 28, width: "fit-content",
         }}>
           {[
-            { id: "browse", label: "📖 Browse Mode", desc: "Study Q&A" },
-            { id: "test",   label: "🎯 Test Mode",   desc: "Timed Quiz" },
+            { id: "browse", label: "Browse Mode", icon: "book", desc: "Study Q&A" },
+            { id: "test",   label: "Test Mode",   icon: "target", desc: "Timed Quiz" },
           ].map(t => (
             <button key={t.id} onClick={() => { setTab(t.id); if (t.id === "test") setTestState("config"); }} style={{
               padding: "10px 22px", borderRadius: 10, fontSize: 13, fontWeight: 700, cursor: "pointer",
@@ -822,7 +976,7 @@ export default function SubjectTest() {
               transition: "all 0.2s",
               boxShadow: tab === t.id ? `0 4px 16px ${subject.color}30` : "none",
             }}>
-              {t.label}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name={t.icon} size={14} /> {t.label}</span>
             </button>
           ))}
         </div>

@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { Link } from "react-router-dom";
 import { useEffect, useRef } from "react";
 import Navbar from "../components/Navbar";
@@ -48,10 +49,10 @@ function FeatureCard({ icon, title, desc, color, delay }) {
         width: 48, height: 48, borderRadius: 14,
         background: `${color}15`, border: `1px solid ${color}30`,
         display: "flex", alignItems: "center", justifyContent: "center",
-        fontSize: 22, marginBottom: 16,
+        marginBottom: 16,
         boxShadow: `0 4px 16px ${color}20`,
       }}>
-        {icon}
+        {typeof icon === "string" ? <AppIcon name={icon} size={22} color={color} /> : icon}
       </div>
       <h3 style={{ fontSize: 15, fontWeight: 700, marginBottom: 8, color: "var(--text)" }}>{title}</h3>
       <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7 }}>{desc}</p>
@@ -126,13 +127,12 @@ export default function VoiceLanding() {
           filter: "blur(60px)", pointerEvents: "none",
         }} />
 
-        {/* Badge */}
+        {/* Borderless Eyebrow */}
         <div style={{
-          display: "inline-flex", alignItems: "center", gap: 8,
-          background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)",
-          borderRadius: 99, padding: "6px 18px", marginBottom: 28,
-          fontSize: 12, fontWeight: 700, color: "#10b981",
-          letterSpacing: "0.08em", textTransform: "uppercase",
+          display: "inline-flex", alignItems: "center", gap: 10,
+          marginBottom: 24,
+          fontSize: 12.5, fontWeight: 800, color: "#10b981",
+          letterSpacing: "0.16em", textTransform: "uppercase",
           animation: "fadeUp 0.5s ease both",
         }}>
           <span style={{
@@ -140,7 +140,7 @@ export default function VoiceLanding() {
             animation: "pulseRing 1.5s ease-out infinite",
             display: "inline-block",
           }} />
-          🎙 AI Voice Interview — Now Live
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="mic" size={14} color="var(--cyan)" /> AI Voice Interview — Now Live</span>
         </div>
 
         {/* Headline */}
@@ -189,7 +189,7 @@ export default function VoiceLanding() {
               boxShadow: "0 6px 30px rgba(16,185,129,0.45)",
             }}
           >
-            🎙 Start Voice Interview
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 8 }}><AppIcon name="mic" size={16} /> Start Voice Interview</span>
           </Link>
           <Link
             to="/setup"
@@ -205,43 +205,63 @@ export default function VoiceLanding() {
           marginTop: 24, fontSize: 12, color: "var(--text-muted)", opacity: 0.7,
           animation: "fadeUp 0.5s ease 0.4s both",
         }}>
-          🌐 Best on <strong>Chrome</strong> or <strong>Edge</strong> · Requires microphone access
+          Best on <strong>Chrome</strong> or <strong>Edge</strong> · Requires microphone access
         </p>
       </div>
 
       {/* ── FEATURES ── */}
       <div style={{ maxWidth: 1100, margin: "0 auto", padding: "0 24px 80px" }}>
 
-        <div style={{ textAlign: "center", marginBottom: 56 }}>
+        <div style={{ textAlign: "center", marginBottom: 54 }}>
           <div style={{
-            display: "inline-block",
-            background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.2)",
-            borderRadius: 99, padding: "5px 16px", marginBottom: 16,
-            fontSize: 11, fontWeight: 700, color: "#10b981",
-            textTransform: "uppercase", letterSpacing: "0.08em",
+            fontSize: 12.5,
+            fontWeight: 800,
+            letterSpacing: "0.18em",
+            textTransform: "uppercase",
+            color: "#10b981",
+            marginBottom: 12,
+            display: "inline-flex",
+            alignItems: "center",
+            gap: 10,
           }}>
-            What Makes It Different
+            <span style={{ width: 24, height: 1.5, background: "linear-gradient(90deg, transparent, #10b981)", display: "inline-block" }} />
+            <span>What Makes It Different</span>
+            <span style={{ width: 24, height: 1.5, background: "linear-gradient(90deg, #10b981, transparent)", display: "inline-block" }} />
           </div>
           <h2 style={{
-            fontSize: "clamp(24px, 3.5vw, 38px)", fontWeight: 900,
-            letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif",
+            fontSize: "clamp(26px, 4vw, 42px)",
+            fontWeight: 900,
+            letterSpacing: "-0.8px",
+            fontFamily: "'Sora', sans-serif",
+            color: "var(--text)",
+            margin: "0 0 14px 0",
+            lineHeight: 1.2,
           }}>
             Beyond Multiple Choice
           </h2>
+          <p style={{
+            fontSize: 15,
+            color: "var(--text-muted)",
+            maxWidth: 520,
+            margin: "0 auto",
+            lineHeight: 1.65,
+          }}>
+            Real-time vocal intelligence that analyzes filler words, speech tempo, and conversational clarity.
+          </p>
         </div>
 
         <div style={{ display: "flex", gap: 18, flexWrap: "wrap" }}>
-          <FeatureCard icon="🎙" title="Real-Time Transcription" color="#10b981" delay={0}
+          <FeatureCard icon="mic" title="Real-Time Transcription" color="#10b981" delay={0}
             desc="Watch your words appear on screen as you speak. No typing required — just talk naturally." />
-          <FeatureCard icon="📊" title="Filler Word Detection" color="#f59e0b" delay={0.1}
+          <FeatureCard icon="bar-chart" title="Filler Word Detection" color="#10b981" delay={0.1}
             desc='Counts "um", "uh", "like", and other fillers live, helping you speak more confidently.' />
-          <FeatureCard icon="⚡" title="Speaking Pace Tracker" color="#7c3aed" delay={0.2}
+          <FeatureCard icon="zap" title="Speaking Pace Tracker" color="#10b981" delay={0.2}
             desc="Measures your words per minute in real-time. Ideal zone shown — too fast or slow gets flagged." />
-          <FeatureCard icon="🏆" title="Communication Score" color="#06b6d4" delay={0.3}
+          <FeatureCard icon="trophy" title="Communication Score" color="#10b981" delay={0.3}
             desc="After each session, get a full communication breakdown: Clarity, Confidence, Pacing, Coverage." />
-          <FeatureCard icon="🤖" title="AI-Powered Feedback" color="#ec4899" delay={0.4}
+          <FeatureCard icon="bot" title="AI-Powered Feedback" color="#10b981" delay={0.4}
             desc="Gemini evaluates your spoken answers against ideal responses and tells you exactly what was missed." />
-          <FeatureCard icon="🔁" title="Replay Any Question" color="#10b981" delay={0.5}
+          <FeatureCard icon="rotate-ccw" title="Replay Any Question" color="#10b981" delay={0.5}
             desc="Didn't catch the question? Hit replay and the AI reads it again. Take your time." />
         </div>
 
@@ -253,26 +273,36 @@ export default function VoiceLanding() {
         }}>
           <div>
             <div style={{
-              display: "inline-block",
-              background: "rgba(124,58,237,0.08)", border: "1px solid rgba(124,58,237,0.2)",
-              borderRadius: 99, padding: "5px 16px", marginBottom: 20,
-              fontSize: 11, fontWeight: 700, color: "#c4b5fd",
-              textTransform: "uppercase", letterSpacing: "0.08em",
+              fontSize: 12,
+              fontWeight: 800,
+              letterSpacing: "0.18em",
+              textTransform: "uppercase",
+              color: "var(--violet-light)",
+              marginBottom: 12,
+              display: "inline-flex",
+              alignItems: "center",
+              gap: 8,
             }}>
-              How It Works
+              <span style={{ width: 20, height: 1.5, background: "var(--violet-light)", display: "inline-block", borderRadius: 2 }} />
+              <span>How It Works</span>
             </div>
             <h2 style={{
-              fontSize: "clamp(22px, 3vw, 34px)", fontWeight: 900, marginBottom: 40,
-              letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif",
+              fontSize: "clamp(24px, 3.2vw, 36px)",
+              fontWeight: 900,
+              marginBottom: 36,
+              letterSpacing: "-0.8px",
+              fontFamily: "'Sora', sans-serif",
+              color: "var(--text)",
+              lineHeight: 1.2,
             }}>
               Three steps to a<br/>better interview
             </h2>
             <div style={{ display: "flex", flexDirection: "column", gap: 28 }}>
               <StepCard num="1" title="Configure Your Session" color="#10b981"
                 desc="Choose your role, experience level, and how many questions you want." />
-              <StepCard num="2" title="Speak Your Answers" color="#06b6d4"
+              <StepCard num="2" title="Speak Your Answers" color="#10b981"
                 desc="The AI reads each question aloud. Click the mic, speak, stop. That's it." />
-              <StepCard num="3" title="Get Your Score" color="#7c3aed"
+              <StepCard num="3" title="Get Your Score" color="#10b981"
                 desc="Receive a detailed communication score with per-question breakdown and improvement tips." />
             </div>
 
@@ -287,7 +317,7 @@ export default function VoiceLanding() {
                 boxShadow: "0 4px 24px rgba(16,185,129,0.4)",
               }}
             >
-              🚀 Begin Your Session
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="zap" size={15} /> Begin Your Session</span>
             </Link>
           </div>
 
@@ -307,7 +337,7 @@ export default function VoiceLanding() {
               <span style={{
                 fontSize: 10, fontWeight: 700, color: "#10b981",
                 textTransform: "uppercase", letterSpacing: "0.08em",
-              }}>🤖 AI Speaking…</span>
+              display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="bot" size={14} color="#06b6d4" /> AI Speaking…</span>
               <EqBars count={16} color="#10b981" height={36} />
               <p style={{
                 fontSize: 13, color: "var(--text-muted)", textAlign: "center",
@@ -325,7 +355,7 @@ export default function VoiceLanding() {
               <div style={{
                 fontSize: 10, fontWeight: 700, color: "#c4b5fd",
                 textTransform: "uppercase", letterSpacing: "0.08em", marginBottom: 10,
-              }}>📝 Your Answer</div>
+              }}>Your Answer</div>
               <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.7 }}>
                 "At my last job, we needed to migrate to TypeScript in just two weeks. I started with the official docs and built small prototypes…"
                 <span style={{
@@ -338,11 +368,11 @@ export default function VoiceLanding() {
                 <span style={{
                   fontSize: 11, padding: "3px 10px", borderRadius: 99,
                   background: "rgba(16,185,129,0.1)", color: "#10b981", border: "1px solid rgba(16,185,129,0.2)",
-                }}>⚡ 138 wpm</span>
+                display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="zap" size={11} color="#f59e0b" /> 138 wpm</span>
                 <span style={{
                   fontSize: 11, padding: "3px 10px", borderRadius: 99,
                   background: "rgba(245,158,11,0.1)", color: "#f59e0b", border: "1px solid rgba(245,158,11,0.2)",
-                }}>💬 0 fillers</span>
+                display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="message-square" size={11} color="#10b981" /> 0 fillers</span>
               </div>
             </div>
           </div>

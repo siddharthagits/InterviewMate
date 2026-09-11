@@ -1,4 +1,5 @@
 import { useEffect, useState } from "react";
+import { IconClock } from "../common/AppIcon";
 
 // Parse "10 Minutes" → 600 seconds
 function parseDurationSeconds(duration) {
@@ -47,7 +48,10 @@ function Timer({ duration, onTimeUp }) {
           : "bg-red-100 text-red-600"
       }`}
     >
-      ⏱ {minutes}:{seconds.toString().padStart(2, "0")}
+      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+        <IconClock size={16} />
+        <span>{minutes}:{seconds.toString().padStart(2, "0")}</span>
+      </span>
     </div>
   );
 }

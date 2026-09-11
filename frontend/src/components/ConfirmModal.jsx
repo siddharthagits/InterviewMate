@@ -1,18 +1,9 @@
 import { useEffect } from "react";
+import { useTheme } from "../context/ThemeContext";
+import AppIcon, { IconAlertTriangle, IconAlertCircle } from "./common/AppIcon";
 
 /**
  * ConfirmModal — A beautiful, animated confirmation dialog.
- *
- * Props:
- *   open       {boolean}  — whether the modal is visible
- *   title      {string}   — modal heading
- *   message    {string}   — body text / sub-heading
- *   confirmText {string}  — label for the confirm (danger) button
- *   cancelText  {string}  — label for the cancel button
- *   onConfirm  {fn}       — called when user clicks confirm
- *   onCancel   {fn}       — called when user clicks cancel or presses Escape
- *   icon       {string}   — optional emoji/icon to show above the title
- *   danger     {boolean}  — if true, confirm button is red; default: gold/amber
  */
 export default function ConfirmModal({
   open,
@@ -22,9 +13,12 @@ export default function ConfirmModal({
   cancelText = "Cancel",
   onConfirm,
   onCancel,
-  icon = "🚀",
+  icon = null,
   danger = false,
 }) {
+  const { theme } = useTheme?.() || {};
+  const isLight = theme === "light";
+
   /* Close on Escape */
   useEffect(() => {
     if (!open) return;
@@ -51,7 +45,7 @@ export default function ConfirmModal({
           position: "fixed",
           inset: 0,
           zIndex: 9000,
-          background: "rgba(4,8,15,0.75)",
+          background: isLight ? "rgba(15, 23, 42, 0.55)" : "rgba(4,8,15,0.75)",
           backdropFilter: "blur(6px)",
           WebkitBackdropFilter: "blur(6px)",
           animation: "cm-fade-in 0.18s ease",
@@ -77,26 +71,35 @@ export default function ConfirmModal({
         <div
           style={{
             pointerEvents: "auto",
-            background: "rgba(8,13,26,0.97)",
-            border: "1px solid rgba(124,58,237,0.3)",
+            background: isLight ? "#ffffff" : "rgba(8,13,26,0.97)",
+            border: isLight ? "1px solid rgba(124,58,237,0.25)" : "1px solid rgba(124,58,237,0.3)",
             borderRadius: 24,
             padding: "36px 32px 28px",
             width: "100%",
             maxWidth: 420,
-            boxShadow:
-              "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,58,237,0.15), inset 0 1px 0 rgba(255,255,255,0.04)",
+            boxShadow: isLight
+              ? "0 30px 70px rgba(0,0,0,0.12), 0 0 30px rgba(124,58,237,0.12)"
+              : "0 32px 80px rgba(0,0,0,0.6), 0 0 0 1px rgba(124,58,237,0.15), inset 0 1px 0 rgba(255,255,255,0.04)",
             animation: "cm-slide-up 0.22s cubic-bezier(0.34,1.56,0.64,1)",
             textAlign: "center",
           }}
         >
           {/* Icon */}
           <div style={{
-            fontSize: 44,
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
             marginBottom: 14,
-            filter: "drop-shadow(0 0 18px rgba(124,58,237,0.5))",
+            filter: danger ? "drop-shadow(0 0 18px rgba(239,68,68,0.4))" : "drop-shadow(0 0 18px rgba(124,58,237,0.5))",
             animation: "cm-bounce 0.4s ease 0.1s both",
           }}>
-            {icon}
+            {typeof icon === "string" ? (
+              <AppIcon name={icon} size={38} color={danger ? "#ef4444" : "#a78bfa"} />
+            ) : icon ? (
+              icon
+            ) : (
+              <IconAlertCircle size={38} color={danger ? "#ef4444" : "#a78bfa"} />
+            )}
           </div>
 
           {/* Title */}
@@ -105,7 +108,7 @@ export default function ConfirmModal({
             style={{
               fontSize: 20,
               fontWeight: 800,
-              color: "var(--text)",
+              color: isLight ? "#0f172a" : "#f1f5f9",
               fontFamily: "'Sora', sans-serif",
               letterSpacing: "-0.3px",
               marginBottom: 10,
@@ -118,7 +121,7 @@ export default function ConfirmModal({
           {message && (
             <p style={{
               fontSize: 14,
-              color: "var(--text-muted)",
+              color: isLight ? "#475569" : "var(--text-muted)",
               lineHeight: 1.65,
               marginBottom: 28,
             }}>
@@ -129,7 +132,7 @@ export default function ConfirmModal({
           {/* Divider */}
           <div style={{
             height: 1,
-            background: "rgba(255,255,255,0.05)",
+            background: isLight ? "rgba(0,0,0,0.08)" : "rgba(255,255,255,0.05)",
             margin: "0 -4px 24px",
           }} />
 
@@ -143,9 +146,9 @@ export default function ConfirmModal({
                 flex: 1,
                 padding: "12px 0",
                 borderRadius: 12,
-                border: "1px solid rgba(255,255,255,0.1)",
-                background: "rgba(255,255,255,0.04)",
-                color: "var(--text-muted)",
+                border: isLight ? "1px solid rgba(203,213,225,0.9)" : "1px solid rgba(255,255,255,0.1)",
+                background: isLight ? "rgba(241,245,249,0.9)" : "rgba(255,255,255,0.04)",
+                color: isLight ? "#334155" : "var(--text-muted)",
                 fontSize: 14,
                 fontWeight: 600,
                 cursor: "pointer",
@@ -153,14 +156,12 @@ export default function ConfirmModal({
                 fontFamily: "inherit",
               }}
               onMouseEnter={e => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.08)";
-                e.currentTarget.style.color = "var(--text)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.2)";
+                e.currentTarget.style.background = isLight ? "rgba(226,232,240,0.9)" : "rgba(255,255,255,0.08)";
+                e.currentTarget.style.color = isLight ? "#0f172a" : "var(--text)";
               }}
               onMouseLeave={e => {
-                e.currentTarget.style.background = "rgba(255,255,255,0.04)";
-                e.currentTarget.style.color = "var(--text-muted)";
-                e.currentTarget.style.borderColor = "rgba(255,255,255,0.1)";
+                e.currentTarget.style.background = isLight ? "rgba(241,245,249,0.9)" : "rgba(255,255,255,0.04)";
+                e.currentTarget.style.color = isLight ? "#334155" : "var(--text-muted)";
               }}
             >
               {cancelText}

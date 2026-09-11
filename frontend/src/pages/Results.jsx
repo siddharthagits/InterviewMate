@@ -1,15 +1,18 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
+import { useAuth } from "../context/AuthContext";
 import ThemeToggle from "../components/ThemeToggle";
 import { logUserActivity } from "../utils/activityTracker";
+import { saveInterviewSession } from "../api/api";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 function perfLabel(score) {
-  if (score >= 85) return ["Excellent 🏆", "#10b981"];
-  if (score >= 70) return ["Good 👍",       "#7c3aed"];
-  if (score >= 55) return ["Average 📈",    "#f59e0b"];
-  return             ["Needs Work 💪",      "#ef4444"];
+  if (score >= 85) return ["Excellent", "#10b981"];
+  if (score >= 70) return ["Good",       "#7c3aed"];
+  if (score >= 55) return ["Average",    "#f59e0b"];
+  return             ["Needs Work",      "#ef4444"];
 }
 
 // ── Animated SVG Score Ring ───────────────────────────────────────────────────
@@ -82,9 +85,9 @@ function ResultsTab({ result, interviewData }) {
       {/* Stats row */}
       <div style={{ display: "grid", gridTemplateColumns: "repeat(3,1fr)", gap: 12, marginBottom: 20 }}>
         {[
-          ["MCQ",  `${result.mcq_correct ?? "—"}/${result.mcq_total ?? 25}`,  "#7c3aed"],
-          ["Code", `${result.code_correct ?? "—"}/${result.code_total ?? 5}`,  "#f59e0b"],
-          ["Text", `${result.text_score ?? "—"}/100`,                          "#10b981"],
+          ["MCQ",  `${result.mcq_correct ?? "—"}/${result.mcq_total ?? 25}`,  "var(--violet-light)"],
+          ["Code", `${result.code_correct ?? "—"}/${result.code_total ?? 5}`,  "var(--violet-light)"],
+          ["Text", `${result.text_score ?? "—"}/100`,                          "var(--violet-light)"],
         ].map(([label, val, color]) => (
           <div key={label} className="stat-card" style={{ textAlign: "center", padding: "14px 8px" }}>
             <div style={{ fontSize: 18, fontWeight: 900, color, fontFamily: "'Sora', sans-serif" }}>{val}</div>
@@ -110,7 +113,7 @@ function ResultsTab({ result, interviewData }) {
       {result.strengths?.length > 0 && (
         <div style={{ marginBottom: 14 }}>
           <h3 style={{ fontWeight: 700, color: "#10b981", marginBottom: 8, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-            ✅ Strengths
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="check-circle" size={14} color="#10b981" /> Strengths</span>
           </h3>
           {result.strengths.map((s, i) => (
             <div key={i} style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "8px 14px", fontSize: 13, color: "var(--text-dim)", marginBottom: 5 }}>
@@ -124,7 +127,7 @@ function ResultsTab({ result, interviewData }) {
       {result.improvements?.length > 0 && (
         <div style={{ marginBottom: 4 }}>
           <h3 style={{ fontWeight: 700, color: "#f59e0b", marginBottom: 8, fontSize: 13, display: "flex", alignItems: "center", gap: 6 }}>
-            📈 Areas to Improve
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="alert-triangle" size={14} color="#f59e0b" /> Areas to Improve</span>
           </h3>
           {result.improvements.map((s, i) => (
             <div key={i} style={{ background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)", borderRadius: 8, padding: "8px 14px", fontSize: 13, color: "var(--text-dim)", marginBottom: 5 }}>
@@ -230,8 +233,8 @@ function PerQuestionTab({ result, questions, userAnswers }) {
                     <div key={oi} style={{ padding: "9px 14px", borderRadius: 9, border: `1px solid ${bdr}`, background: bg, color: clr, fontSize: 13, display: "flex", gap: 10 }}>
                       <span style={{ fontWeight: 700, flexShrink: 0 }}>{["A","B","C","D"][oi]}.</span>
                       <span style={{ flex: 1 }}>{opt}</span>
-                      {isCorr && !isUser && <span style={{ fontSize: 11 }}>✓ Correct</span>}
-                      {isUser && isCorr  && <span style={{ fontSize: 11 }}>✓ Your answer</span>}
+                      {isCorr && !isUser && <span style={{ fontSize: 11, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="check" size={12} color="#10b981" /> Correct</span>}
+                      {isUser && isCorr  && <span style={{ fontSize: 11, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="check" size={12} color="#10b981" /> Your answer</span>}
                       {isUser && !isCorr && <span style={{ fontSize: 11 }}>← Your answer</span>}
                     </div>
                   );
@@ -260,7 +263,7 @@ function PerQuestionTab({ result, questions, userAnswers }) {
                 borderRadius: 10, padding: "14px 16px", display: "flex", flexDirection: "column", gap: 10,
               }}>
                 <div style={{ fontSize: 12, fontWeight: 700, color: "var(--violet-light)", textTransform: "uppercase", letterSpacing: "0.07em", display: "flex", alignItems: "center", gap: 6 }}>
-                  🤖 AI Feedback
+                  <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="bot" size={14} color="#10b981" /> AI Feedback</span>
                 </div>
 
                 {fb.why_weak && (
@@ -271,14 +274,14 @@ function PerQuestionTab({ result, questions, userAnswers }) {
 
                 {fb.ideal_answer && (
                   <div style={{ background: "rgba(16,185,129,0.06)", border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "10px 12px" }}>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", marginBottom: 4 }}>💡 IDEAL ANSWER</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#10b981", marginBottom: 4, display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={12} color="#10b981" /> IDEAL ANSWER</div>
                     <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65, margin: 0 }}>{fb.ideal_answer}</p>
                   </div>
                 )}
 
                 {fb.missed_keywords && fb.missed_keywords.length > 0 && (
                   <div>
-                    <div style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", marginBottom: 6 }}>🔑 MISSED CONCEPTS</div>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: "#f59e0b", marginBottom: 6, display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="alert-circle" size={12} color="#f59e0b" /> MISSED CONCEPTS</div>
                     <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
                       {fb.missed_keywords.map((kw, ki) => (
                         <span key={ki} style={{
@@ -299,7 +302,7 @@ function PerQuestionTab({ result, questions, userAnswers }) {
                 marginTop: 12, background: "rgba(124,58,237,0.04)", border: "1px solid rgba(124,58,237,0.15)",
                 borderRadius: 8, padding: "10px 14px",
               }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--violet-light)", marginBottom: 4 }}>💡 Explanation</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: "var(--violet-light)", marginBottom: 4, display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="info" size={12} color="var(--violet-light)" /> Explanation</div>
                 <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.55, margin: 0 }}>{q.explanation}</p>
               </div>
             )}
@@ -446,7 +449,7 @@ function ReadinessTab({ result, interviewData }) {
       {readiness.roadmap && readiness.roadmap.length > 0 && (
         <div>
           <div style={{ fontSize: 13, fontWeight: 700, color: "var(--text-dim)", marginBottom: 12, textTransform: "uppercase", letterSpacing: "0.08em" }}>
-            🗺️ Your Improvement Roadmap
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="target" size={14} color="var(--violet-light)" /> Your Improvement Roadmap</span>
           </div>
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {readiness.roadmap.map((item, i) => (
@@ -480,32 +483,50 @@ function ReadinessTab({ result, interviewData }) {
 function ResultsPage() {
   const [tab, setTab] = useState("results");
   const { interviewData, result: ctx, questions, userAnswers } = useInterview();
+  const { user, isLoggedIn } = useAuth();
   const result = ctx ?? { score: 0 };
   const score  = result.score ?? 0;
   const [label, color] = perfLabel(score);
-
   useEffect(() => {
     if (ctx && ctx.score !== undefined) {
-      logUserActivity({
-        type: "technical",
-        title: `${interviewData?.role || "Technical"} Mock Interview`,
-        category: "Technical Interview",
-        score: score,
-        metrics: {
-          role: interviewData?.role || "Software Engineer",
-          questions: `${questions?.length || 0} Qs`,
-        },
-        icon: "💻",
-        color: "#7c3aed",
-        badge: score >= 75 ? "Passed" : "Completed",
-      });
+      if (isLoggedIn && user?.id) {
+        // 1. Only persist to localStorage if authenticated
+        logUserActivity({
+          type: "technical",
+          title: `${interviewData?.role || "Technical"} Mock Interview`,
+          category: "Technical Interview",
+          score: score,
+          metrics: {
+            role: interviewData?.role || "Software Engineer",
+            questions: `${questions?.length || 0} Qs`,
+          },
+          icon: "code",
+          color: "#7c3aed",
+          badge: score >= 75 ? "Passed" : "Completed",
+        });
+
+        // 2. Also persist to MongoDB (cloud)
+        saveInterviewSession({
+          user_id: user.id,
+          interview_data: interviewData || {},
+          answers: (userAnswers || []).map((a) => ({
+            question_id: a.question_id,
+            question_type: a.question_type,
+            selected: a.selected ?? null,
+            text: a.text ?? null,
+            correct: a.correct ?? null,
+            question_text: a.question_text ?? null,
+          })),
+          evaluation: ctx,
+        });
+      }
     }
-  }, [ctx]);
+  }, [ctx, isLoggedIn, user]);
 
   const TABS = [
-    { id: "results",    label: "📊 Results" },
-    { id: "perquestion", label: "🤖 AI Review" },
-    { id: "readiness",  label: "🎯 Readiness" },
+    { id: "results",    label: "Results",     icon: "bar-chart" },
+    { id: "perquestion", label: "AI Review",  icon: "bot" },
+    { id: "readiness",  label: "Readiness",   icon: "target" },
   ];
 
   const actionBtns = (
@@ -529,12 +550,37 @@ function ResultsPage() {
           background: "linear-gradient(135deg, rgba(124,58,237,0.9), rgba(91,33,182,0.9))",
           borderRadius: "20px 20px 0 0", padding: "28px 36px",
           position: "relative", overflow: "hidden",
-          boxShadow: "0 8px 40px rgba(124,58,237,0.3)",
         }}>
           <div style={{ position: "absolute", top: 0, right: 0, bottom: 0, left: 0, background: "radial-gradient(ellipse at 80% 20%, rgba(6,182,212,0.2) 0%, transparent 60%)", pointerEvents: "none" }} />
           <div style={{ position: "relative" }}>
-            <div style={{ fontSize: 11, fontWeight: 700, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "0.1em", marginBottom: 6 }}>
-              Interview Complete 🎉
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", gap: 12, marginBottom: 8, flexWrap: "wrap" }}>
+              <div style={{
+                display: "inline-flex", alignItems: "center", gap: 8,
+                fontSize: 12, fontWeight: 800, color: "#c4b5fd",
+                letterSpacing: "0.16em", textTransform: "uppercase",
+              }}>
+                <span style={{ width: 18, height: 1.5, background: "#c4b5fd", display: "inline-block", borderRadius: 2 }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+                  <AppIcon name="check-circle" size={13} color="#34d399" /> Technical Interview Complete
+                </span>
+              </div>
+              {!isLoggedIn && (
+                <Link
+                  to="/login"
+                  style={{
+                    fontSize: 11.5,
+                    fontWeight: 700,
+                    color: "rgba(255,255,255,0.9)",
+                    textDecoration: "none",
+                    display: "inline-flex",
+                    alignItems: "center",
+                    gap: 6,
+                    letterSpacing: "0.02em",
+                  }}
+                >
+                  <AppIcon name="lock" size={12} color="rgba(255,255,255,0.7)" /> Sign in to save history →
+                </Link>
+              )}
             </div>
             <h1 style={{ fontSize: 26, fontWeight: 900, color: "#fff", fontFamily: "'Sora', sans-serif", letterSpacing: "-0.5px", marginBottom: 4 }}>
               {interviewData?.role || "Your Results"}
@@ -548,8 +594,41 @@ function ResultsPage() {
           </div>
         </div>
 
+        {/* Not Logged In Callout */}
+        {!isLoggedIn && (
+          <div
+            style={{
+              padding: "12px 18px",
+              background: "rgba(124,58,237,0.08)",
+              borderLeft: "3px solid var(--violet)",
+              borderRight: "1px solid var(--glass-border)",
+              borderTop: "none",
+              borderBottom: "1px solid var(--glass-border)",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              gap: 12,
+              flexWrap: "wrap",
+            }}
+          >
+            <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: 13, color: "var(--text)" }}>
+              <AppIcon name="lock" size={13} />
+              <span>
+                <strong>Unsaved Session:</strong> You are not logged in. History is only recorded for registered accounts.
+              </span>
+            </div>
+            <Link
+              to="/login"
+              className="btn btn-primary"
+              style={{ padding: "6px 14px", fontSize: 12 }}
+            >
+              Sign In to Save →
+            </Link>
+          </div>
+        )}
+
         {/* Glass content card */}
-        <div className="glass" style={{ borderRadius: "0 0 20px 20px", borderTop: "none", overflow: "hidden" }}>
+        <div className="glass" style={{ borderRadius: isLoggedIn ? "0 0 20px 20px" : "0 0 20px 20px", borderTop: "none", overflow: "hidden" }}>
           {/* Tabs */}
           <div style={{ display: "flex", borderBottom: "1px solid rgba(255,255,255,0.05)", padding: "0 8px" }}>
             {TABS.map(t => (
@@ -560,7 +639,13 @@ function ResultsPage() {
                 color: tab === t.id ? "var(--violet-light)" : "var(--text-muted)",
                 transition: "color 0.2s",
                 whiteSpace: "nowrap",
-              }}>{t.label}</button>
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}>
+                <AppIcon name={t.icon} size={14} color={tab === t.id ? "var(--violet-light)" : "var(--text-muted)"} />
+                {t.label}
+              </button>
             ))}
           </div>
 

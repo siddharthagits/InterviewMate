@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { PRACTICE_CATEGORIES } from "../data/practiceData";
+import AppIcon, { IconX } from "../components/common/AppIcon";
 
 // ── Sidebar Quick Links panel ─────────────────────────────────────────────────
 function QuickLinks() {
@@ -104,9 +105,9 @@ function CategorySection({ category, filter }) {
 
   return (
     <div className="practice-category-section">
-      <Link to={`/practice/${category.id}`} className="practice-category-title">
-        <span style={{ marginRight: 8 }}>{category.icon}</span>
-        {category.name} Questions and Answers
+      <Link to={`/practice/${category.id}`} className="practice-category-title" style={{ display: "inline-flex", alignItems: "center", gap: 8 }}>
+        <AppIcon name={category.icon} size={20} color={category.color} />
+        <span>{category.name} Questions and Answers</span>
       </Link>
       <div className="practice-breadcrumb" style={{ marginBottom: 16 }}>
         <Link to="/">Home</Link>
@@ -162,7 +163,9 @@ function PracticeCorner() {
                 onChange={e => setFilter(e.target.value)}
               />
               {filter && (
-                <button onClick={() => setFilter("")} className="practice-filter-clear" aria-label="Clear filter">✕</button>
+                <button onClick={() => setFilter("")} className="practice-filter-clear" aria-label="Clear filter" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                  <IconX size={12} />
+                </button>
               )}
             </div>
           </div>

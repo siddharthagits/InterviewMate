@@ -28,7 +28,7 @@ function AnswerBox({ saveAnswer, isLast = false, disabled = false }) {
         disabled={disabled}
         className="mt-4 bg-blue-600 text-white px-6 py-3 rounded-lg hover:bg-blue-700 transition disabled:opacity-50 disabled:cursor-not-allowed"
       >
-        {isLast ? "Submit Interview ✓" : "Next Question →"}
+        {isLast ? "Submit Interview" : "Next Question →"}
       </button>
     </div>
   );

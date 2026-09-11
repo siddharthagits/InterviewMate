@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -5,10 +6,10 @@ import { TCS_NQT_YEARS } from "../data/companyQuestions";
 
 // ── Section colour map ────────────────────────────────────────────────────────
 const SECTION_COLORS = {
-  "Numerical Ability":  { color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  icon: "🔢" },
-  "Verbal Ability":     { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "📖" },
-  "Reasoning Ability":  { color: "#6366f1", bg: "rgba(99,102,241,0.1)",  icon: "🧩" },
-  "Programming Logic":  { color: "#ec4899", bg: "rgba(236,72,153,0.1)",  icon: "💻" },
+  "Numerical Ability":  { color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  icon: "bar-chart" },
+  "Verbal Ability":     { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "book" },
+  "Reasoning Ability":  { color: "#6366f1", bg: "rgba(99,102,241,0.1)",  icon: "brain" },
+  "Programming Logic":  { color: "#ec4899", bg: "rgba(236,72,153,0.1)",  icon: "code" },
 };
 
 // ── Year Card ─────────────────────────────────────────────────────────────────
@@ -30,54 +31,35 @@ function YearCard({ paper, onBrowse, onTest }) {
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       style={{
-        background: hovered ? "rgba(59,130,246,0.06)" : "var(--card)",
-        border: `1px solid ${hovered ? "#3b82f680" : "rgba(255,255,255,0.07)"}`,
+        background: "var(--card)",
+        border: `1px solid ${hovered ? "var(--border-hover)" : "var(--glass-border)"}`,
         borderRadius: 22,
         padding: "28px 26px",
         transition: "all 0.25s cubic-bezier(0.4,0,0.2,1)",
-        transform: hovered ? "translateY(-6px)" : "none",
-        boxShadow: hovered ? "0 24px 60px rgba(59,130,246,0.15)" : "0 2px 10px rgba(0,0,0,0.2)",
+        transform: hovered ? "translateY(-5px)" : "none",
+        boxShadow: hovered ? "0 14px 36px rgba(0,0,0,0.12)" : "0 2px 10px rgba(0,0,0,0.06)",
         position: "relative",
         overflow: "hidden",
         display: "flex", flexDirection: "column", gap: 20,
       }}
     >
-      {/* Top accent line */}
-      <div style={{
-        position: "absolute", top: 0, left: 0, right: 0, height: 3,
-        background: paper.gradient,
-        borderRadius: "22px 22px 0 0",
-        opacity: hovered ? 1 : 0.4,
-        transition: "opacity 0.25s",
-      }} />
-
-      {/* Glow blob */}
-      {hovered && (
-        <div style={{
-          position: "absolute", top: -30, right: -30,
-          width: 140, height: 140, borderRadius: "50%",
-          background: "radial-gradient(circle, rgba(59,130,246,0.15), transparent 70%)",
-          pointerEvents: "none",
-        }} />
-      )}
-
       {/* Header row */}
       <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", gap: 12 }}>
         <div>
           {/* Year badge */}
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(59,130,246,0.12)", border: "1px solid rgba(59,130,246,0.3)",
+            background: "var(--bg2)", border: "1px solid var(--glass-border)",
             borderRadius: 99, padding: "4px 14px", marginBottom: 10,
           }}>
-            <span style={{ fontSize: 15 }}>📋</span>
-            <span style={{ fontSize: 13, fontWeight: 800, color: "#3b82f6", letterSpacing: "0.04em" }}>
+            <AppIcon name="clipboard" size={14} color="var(--violet-light)" />
+            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", letterSpacing: "0.04em" }}>
               {paper.year}
             </span>
           </div>
           <h3 style={{
             fontSize: 22, fontWeight: 900, fontFamily: "'Sora', sans-serif",
-            color: hovered ? "#3b82f6" : "var(--text)",
+            color: hovered ? "var(--violet-light)" : "var(--text)",
             letterSpacing: "-0.4px", lineHeight: 1.2,
             transition: "color 0.25s",
           }}>
@@ -89,13 +71,12 @@ function YearCard({ paper, onBrowse, onTest }) {
         </div>
 
         <div style={{
-          background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.25)",
+          background: "var(--bg2)", border: "1px solid var(--glass-border)",
           borderRadius: 14, padding: "10px 14px", textAlign: "center", flexShrink: 0,
         }}>
           <div style={{
             fontSize: 24, fontWeight: 900, fontFamily: "'Sora', sans-serif",
-            background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
-            WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
+            color: "var(--text)",
           }}>
             {totalQuestions}
           </div>
@@ -115,27 +96,27 @@ function YearCard({ paper, onBrowse, onTest }) {
       {/* Section breakdown */}
       <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {Object.entries(sectionCounts).map(([sec, count]) => {
-          const s = SECTION_COLORS[sec] || { color: "#7c3aed", bg: "rgba(124,58,237,0.1)", icon: "❓" };
+          const s = SECTION_COLORS[sec] || { icon: "help-circle" };
           return (
             <span key={sec} style={{
               fontSize: 10, fontWeight: 700, padding: "4px 10px", borderRadius: 99,
-              background: s.bg, color: s.color,
-              border: `1px solid ${s.color}30`,
+              background: "var(--bg2)", color: "var(--text-muted)",
+              border: "1px solid var(--glass-border)",
               display: "flex", alignItems: "center", gap: 4,
             }}>
-              {s.icon} {sec.split(" ")[0]} ({count})
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name={s.icon} size={11} color="var(--text-muted)" /> {sec.split(" ")[0]} ({count})</span>
             </span>
           );
         })}
       </div>
 
       {/* Tags */}
-      <div style={{ display: "flex", flexWrap: "wrap", gap: 5 }}>
+      <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
         {tags.slice(0, 4).map(tag => (
           <span key={tag} style={{
-            fontSize: 10, padding: "2px 8px", borderRadius: 6,
-            background: "rgba(255,255,255,0.04)", color: "var(--text-muted)",
-            border: "1px solid rgba(255,255,255,0.08)", fontWeight: 600,
+            fontSize: 10, padding: "3px 9px", borderRadius: 99,
+            background: "var(--bg2)", color: "var(--text-muted)",
+            border: "1px solid var(--glass-border)", fontWeight: 600,
           }}>
             {tag}
           </span>
@@ -145,12 +126,12 @@ function YearCard({ paper, onBrowse, onTest }) {
       {/* Meta row */}
       <div style={{
         display: "flex", gap: 16, fontSize: 12, color: "var(--text-muted)",
-        paddingTop: 12, borderTop: `1px solid ${hovered ? "rgba(59,130,246,0.15)" : "rgba(255,255,255,0.05)"}`,
+        paddingTop: 12, borderTop: "1px solid var(--glass-border)",
         transition: "border-color 0.25s",
       }}>
-        <span>⏱ {durationMinutes} min</span>
-        <span>🎯 Cutoff: {cutoffPercent}%</span>
-        <span style={{ marginLeft: "auto", color: "#3b82f6", fontWeight: 700, opacity: hovered ? 1 : 0, transition: "opacity 0.2s" }}>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="clock" size={12} /> {durationMinutes} min</span>
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="target" size={12} /> Cutoff: {cutoffPercent}%</span>
+        <span style={{ marginLeft: "auto", color: "var(--violet-light)", fontWeight: 700, opacity: hovered ? 1 : 0, transition: "opacity 0.2s" }}>
           View Paper →
         </span>
       </div>
@@ -162,19 +143,14 @@ function YearCard({ paper, onBrowse, onTest }) {
           className="btn btn-primary"
           style={{ padding: "10px 8px", fontSize: 12, fontWeight: 800 }}
         >
-          📖 Browse & Study
+          Browse & Study
         </button>
         <button
           onClick={() => onTest(paper)}
-          style={{
-            background: "rgba(245,158,11,0.1)", border: "1px solid rgba(245,158,11,0.35)",
-            borderRadius: 12, color: "#f59e0b", fontSize: 12, fontWeight: 700,
-            cursor: "pointer", padding: "10px 8px", transition: "all 0.15s",
-          }}
-          onMouseEnter={e => { e.currentTarget.style.background = "rgba(245,158,11,0.2)"; }}
-          onMouseLeave={e => { e.currentTarget.style.background = "rgba(245,158,11,0.1)"; }}
+          className="btn btn-outline"
+          style={{ padding: "10px 8px", fontSize: 12, fontWeight: 700 }}
         >
-          ⚡ Take Mock Test
+          Take Mock Test
         </button>
       </div>
     </div>
@@ -185,10 +161,10 @@ function YearCard({ paper, onBrowse, onTest }) {
 function StatsStrip() {
   const totalQs = TCS_NQT_YEARS.reduce((s, y) => s + (y.totalQuestions ?? y.questions?.length ?? 0), 0);
   const stats = [
-    { val: "5", label: "Year Papers", icon: "📅" },
-    { val: totalQs + "+", label: "PYQ Questions", icon: "❓" },
-    { val: "4", label: "Sections", icon: "📂" },
-    { val: "100%", label: "Free Access", icon: "🆓" },
+    { val: "5", label: "Year Papers", icon: "calendar" },
+    { val: totalQs + "+", label: "PYQ Questions", icon: "help-circle" },
+    { val: "4", label: "Sections", icon: "folder" },
+    { val: "100%", label: "Free Access", icon: "check-circle" },
   ];
   return (
     <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
@@ -197,7 +173,7 @@ function StatsStrip() {
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 14, padding: "14px 20px", textAlign: "center", flex: "1 1 90px",
         }}>
-          <div style={{ fontSize: 18, marginBottom: 4 }}>{icon}</div>
+          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center" }}><AppIcon name={icon} size={20} color="#3b82f6" /></div>
           <div style={{
             fontSize: 20, fontWeight: 900, fontFamily: "'Sora', sans-serif",
             background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
@@ -220,25 +196,25 @@ function PatternGuide() {
   ];
   return (
     <div style={{
-      background: "rgba(59,130,246,0.04)", border: "1px solid rgba(59,130,246,0.15)",
+      background: "var(--card)", border: "1px solid var(--glass-border)",
       borderRadius: 18, padding: "24px 28px",
     }}>
       <h3 style={{ fontSize: 15, fontWeight: 800, color: "var(--text)", marginBottom: 16, fontFamily: "'Sora', sans-serif" }}>
-        📐 TCS NQT Exam Pattern
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="target" size={16} color="var(--violet-light)" /> TCS NQT Exam Pattern</span>
       </h3>
       <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
         {sections.map(s => (
           <div key={s.title} style={{
-            background: s.bg, border: `1px solid ${s.color}25`,
+            background: "var(--bg2)", border: "1px solid var(--glass-border)",
             borderRadius: 12, padding: "14px 16px",
           }}>
             <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 6 }}>
-              <span style={{ fontSize: 18 }}>{s.icon}</span>
-              <span style={{ fontSize: 12, fontWeight: 800, color: s.color }}>{s.title}</span>
+              <AppIcon name={s.icon} size={16} color="var(--violet-light)" />
+              <span style={{ fontSize: 12, fontWeight: 800, color: "var(--text)" }}>{s.title}</span>
               <span style={{
                 marginLeft: "auto", fontSize: 10, fontWeight: 700,
-                color: s.color, background: `${s.color}20`,
-                padding: "2px 7px", borderRadius: 99, border: `1px solid ${s.color}30`,
+                color: "var(--text-muted)", background: "var(--card)",
+                padding: "2px 8px", borderRadius: 99, border: "1px solid var(--glass-border)",
               }}>~{s.qs} Qs</span>
             </div>
             <p style={{ fontSize: 11, color: "var(--text-muted)", lineHeight: 1.5, margin: 0 }}>{s.desc}</p>
@@ -246,11 +222,11 @@ function PatternGuide() {
         ))}
       </div>
       <div style={{
-        marginTop: 16, padding: "10px 16px", borderRadius: 10,
-        background: "rgba(245,158,11,0.08)", border: "1px solid rgba(245,158,11,0.2)",
-        fontSize: 12, color: "#fbbf24", lineHeight: 1.6,
+        marginTop: 16, padding: "12px 18px", borderRadius: 12,
+        background: "var(--bg2)", border: "1px solid var(--glass-border)",
+        fontSize: 12.5, color: "var(--text)", lineHeight: 1.6,
       }}>
-        💡 <strong>Pro Tip:</strong> TCS NQT cutoff is typically <strong>65–70%</strong>. Time management is key — skip hard questions and return later. Programming Logic section is the differentiator for Ninja role.
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="sparkles" size={14} color="var(--violet-light)" /> <strong>Pro Tip:</strong></span> TCS NQT cutoff is typically <strong>65–70%</strong>. Time management is key — skip hard questions and return later. Programming Logic section is the differentiator for Ninja role.
       </div>
     </div>
   );
@@ -305,15 +281,15 @@ export default function CompanyAssessment() {
 
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", flexWrap: "wrap", gap: 32 }}>
             <div style={{ maxWidth: 620 }}>
-              {/* Pill */}
+              {/* Borderless Eyebrow */}
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
-                background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)",
-                borderRadius: 99, padding: "6px 16px", marginBottom: 18,
-                fontSize: 11, fontWeight: 700, color: "#3b82f6",
-                textTransform: "uppercase", letterSpacing: "0.08em",
+                marginBottom: 14,
+                fontSize: 12, fontWeight: 800, color: "#3b82f6",
+                textTransform: "uppercase", letterSpacing: "0.14em",
               }}>
-                🏆 TCS NQT Previous Year Questions
+                <span style={{ width: 18, height: 1.5, background: "#3b82f6", display: "inline-block", borderRadius: 2 }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="award" size={14} color="#3b82f6" /> TCS NQT Previous Year Questions</span>
               </div>
 
               <h1 style={{
@@ -344,7 +320,7 @@ export default function CompanyAssessment() {
               <div style={{
                 fontSize: 56, marginBottom: 10,
                 filter: "drop-shadow(0 0 20px rgba(59,130,246,0.4))",
-              }}>🏢</div>
+              }}><AppIcon name="building" size={48} color="#3b82f6" /></div>
               <div style={{
                 fontSize: 32, fontWeight: 900, fontFamily: "'Sora', sans-serif",
                 background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
@@ -355,10 +331,11 @@ export default function CompanyAssessment() {
                 Tata Consultancy Services
               </div>
               <div style={{
-                marginTop: 12, padding: "5px 14px", borderRadius: 99,
-                background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)",
-                fontSize: 11, color: "#10b981", fontWeight: 700,
+                marginTop: 12,
+                fontSize: 11, color: "#10b981", fontWeight: 800, letterSpacing: "0.14em", textTransform: "uppercase",
+                display: "inline-flex", alignItems: "center", gap: 6, justifyContent: "center",
               }}>
+                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#10b981", display: "inline-block" }} />
                 NQT / Ninja Certified
               </div>
             </div>
@@ -382,7 +359,7 @@ export default function CompanyAssessment() {
                 transition: "all 0.15s",
               }}
             >
-              {sec === "All" ? "📋 All Sections" : (SECTION_COLORS[sec]?.icon + " " + sec.split(" ")[0])}
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name={sec === "All" ? "clipboard" : SECTION_COLORS[sec]?.icon} size={12} /> {sec === "All" ? "All Sections" : sec.split(" ")[0]}</span>
             </button>
           ))}
         </div>
@@ -399,7 +376,7 @@ export default function CompanyAssessment() {
         {/* Year cards grid */}
         <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, fontFamily: "'Sora', sans-serif", color: "var(--text)" }}>
-            📅 Year-wise Papers
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="calendar" size={18} color="#3b82f6" /> Year-wise Papers</span>
           </h2>
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
             {TCS_NQT_YEARS.length} papers • Latest first
@@ -428,7 +405,7 @@ export default function CompanyAssessment() {
           background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.12)",
           display: "flex", gap: 16, alignItems: "flex-start",
         }}>
-          <span style={{ fontSize: 24, flexShrink: 0 }}>📌</span>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(59,130,246,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><AppIcon name="info" size={18} color="#3b82f6" /></div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
               How to use these PYQs effectively

@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import AppIcon, { IconSparkles } from "./common/AppIcon";
 
 export default function DashboardShowcase() {
   const nav = useNavigate();
@@ -7,19 +8,23 @@ export default function DashboardShowcase() {
   const [activeTab, setActiveTab] = useState("overview");
 
   const previewLinks = [
-    { id: "overview", label: "Dashboard", icon: "📊" },
-    { id: "voice", label: "Voice Interview", icon: "🎙️", badge: "AI", route: "/voice" },
-    { id: "companies", label: "Company Tests", icon: "🏢", route: "/company-assessment" },
-    { id: "typing", label: "Typing Test", icon: "⌨️", route: "/typing-test" },
-    { id: "practice", label: "Practice Corner", icon: "🧠", route: "/practice" },
-    { id: "questions", label: "Question Bank", icon: "📚", route: "/question-bank" },
+    { id: "overview", label: "Dashboard", icon: "chart" },
+    { id: "voice", label: "Voice Interview", icon: "mic", badge: "AI", route: "/voice" },
+    { id: "companies", label: "Company Tests", icon: "building", route: "/company-assessment" },
+    { id: "typing", label: "Typing Test", icon: "keyboard", route: "/typing-test" },
+    { id: "practice", label: "Practice Corner", icon: "brain", route: "/practice" },
+    { id: "questions", label: "Question Bank", icon: "book", route: "/question-bank" },
   ];
 
   return (
     <section className="showcase-section" style={{ position: "relative", padding: "40px 20px 80px", maxWidth: 1180, margin: "0 auto" }}>
       <div style={{ textAlign: "center", marginBottom: 36 }}>
-        <div className="glow-pill fade-up" style={{ marginBottom: 16 }}>
-          ✨ Experience the New Dashboard
+        <div className="glow-pill fade-up" style={{ marginBottom: 16, display: "inline-flex", alignItems: "center", gap: 8, color: "#67e8f9" }}>
+          <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
+          <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+            <IconSparkles size={14} color="#67e8f9" /> Experience the New Dashboard
+          </span>
+          <span style={{ width: 18, height: 1.5, background: "#67e8f9", display: "inline-block", borderRadius: 2 }} />
         </div>
         <h2
           className="fade-up"
@@ -180,7 +185,7 @@ export default function DashboardShowcase() {
                   }}
                   title={item.label}
                 >
-                  <span style={{ fontSize: 16 }}>{item.icon}</span>
+                  <AppIcon name={item.icon} size={16} color={active ? "var(--violet-light)" : "var(--text-muted)"} />
                   {sidebarOpen && (
                     <span style={{ fontSize: 13, fontWeight: 600, flex: 1, whiteSpace: "nowrap" }}>
                       {item.label}
@@ -220,7 +225,7 @@ export default function DashboardShowcase() {
                 }}
               >
                 <div style={{ fontWeight: 700, color: "var(--violet-light)" }}>Interactive Preview</div>
-                <div>Click arrow to collapse ➔</div>
+                <div>Click arrow to collapse →</div>
               </div>
             </div>
           )}
@@ -312,7 +317,7 @@ export default function DashboardShowcase() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 20 }}>🎙️</span>
+                <AppIcon name="mic" size={22} color="var(--violet-light)" />
                 <span style={{ fontSize: 10, fontWeight: 700, color: "var(--violet-light)", background: "rgba(124,58,237,0.15)", padding: "2px 8px", borderRadius: 8 }}>
                   VOICE AI
                 </span>
@@ -333,7 +338,7 @@ export default function DashboardShowcase() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 20 }}>🏢</span>
+                <AppIcon name="building" size={22} color="var(--gold-light)" />
                 <span style={{ fontSize: 10, fontWeight: 700, color: "var(--gold-light)", background: "rgba(245,158,11,0.15)", padding: "2px 8px", borderRadius: 8 }}>
                   TEST TRACKS
                 </span>
@@ -354,7 +359,7 @@ export default function DashboardShowcase() {
               }}
             >
               <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 8 }}>
-                <span style={{ fontSize: 20 }}>⌨️</span>
+                <AppIcon name="keyboard" size={22} color="var(--cyan)" />
                 <span style={{ fontSize: 10, fontWeight: 700, color: "var(--cyan)", background: "rgba(6,182,212,0.15)", padding: "2px 8px", borderRadius: 8 }}>
                   SPEED TEST
                 </span>

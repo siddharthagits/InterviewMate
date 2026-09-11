@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect, useCallback, useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
@@ -52,7 +53,7 @@ function TimerBadge({ secs, pressureMode, qType }) {
         border: `1px solid ${color}50`,
         animation: crit ? "pulse-glow 0.6s ease-in-out infinite" : "none",
       }}>
-        {pressureMode ? "⚡" : "⏱"} {m}:{String(s).padStart(2, "0")}
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name={pressureMode ? "zap" : "clock"} size={14} color={pressureMode ? "var(--gold)" : "var(--cyan)"} /> {m}:{String(s).padStart(2, "0")}</span>
       </div>
     </div>
   );
@@ -308,11 +309,29 @@ export default function Interview() {
                 background: "rgba(239,68,68,0.12)", color: "#ef4444",
                 border: "1px solid rgba(239,68,68,0.3)", textTransform: "uppercase", letterSpacing: "0.07em",
               }}>
-                ⚡ Pressure Mode
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="zap" size={14} color="var(--gold)" /> Pressure Mode</span>
               </span>
             )}
           </div>
-          <div style={{ display: "flex", alignItems: "center", gap: 16 }}>
+          <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+            <button
+              onClick={() => {
+                if (window.confirm("Exit this interview? Your current progress will be lost.")) {
+                  navigate("/setup");
+                }
+              }}
+              style={{
+                padding: "6px 14px", borderRadius: 99, fontSize: 12, fontWeight: 700,
+                cursor: "pointer",
+                border: "1px solid rgba(239,68,68,0.25)",
+                background: "rgba(239,68,68,0.06)", color: "#ef4444",
+                transition: "all 0.2s",
+              }}
+              onMouseEnter={e => e.currentTarget.style.background = "rgba(239,68,68,0.14)"}
+              onMouseLeave={e => e.currentTarget.style.background = "rgba(239,68,68,0.06)"}
+            >
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="x" size={13} /> Exit</span>
+            </button>
             <ThemeToggle />
             <TimerBadge
               secs={displaySecs}
@@ -328,7 +347,7 @@ export default function Interview() {
             borderRadius: 12, padding: "12px 18px", marginBottom: 20,
             color: "#ef4444", fontWeight: 600, display: "flex", alignItems: "center", gap: 8,
           }}>
-            ⏰ {pressureMode ? "Session time's up!" : "Time's up!"} Submitting your answers…
+            {pressureMode ? "Session time's up!" : "Time's up!"} Submitting your answers…
           </div>
         )}
 
@@ -451,7 +470,7 @@ export default function Interview() {
                       disabled={!canProceed() || submitting || timedOut}
                       style={{ minWidth: 130 }}
                     >
-                      {submitting ? "Submitting…" : isLast ? "Submit ✓" : "Next →"}
+                      {submitting ? "Submitting…" : isLast ? "Submit" : "Next →"}
                     </button>
                   </div>
                 </div>
@@ -531,7 +550,7 @@ export default function Interview() {
                 background: "rgba(239,68,68,0.06)", border: "1px solid rgba(239,68,68,0.2)",
                 fontSize: 11, color: "#ef4444", lineHeight: 1.6,
               }}>
-                ⚡ <strong>Pressure Mode</strong><br />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="zap" size={13} color="var(--gold)" /> <strong>Pressure Mode</strong></span><br />
                 Questions auto-advance on timeout. Navigation disabled.
               </div>
             )}
@@ -556,7 +575,7 @@ export default function Interview() {
 
       <ConfirmModal
         open={confirmOpen}
-        icon="📝"
+        icon="file"
         title="Submit Interview?"
         message={`You've answered ${Object.values(answers).filter(a => a && (a.selected !== null || (a.text && a.text.trim()))).length} of ${questions.length} questions. Once submitted you cannot go back.`}
         confirmText="Yes, Submit"

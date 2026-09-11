@@ -1,11 +1,15 @@
 // Activity & Performance Tracker for InterviewMate WebApp
 // Stores and retrieves ONLY REAL user activities scoped to the authenticated user.
-// Before a user logs in or before any tests are taken, all metrics are strictly NIL.
-
-const GUEST_KEY = "im_guest_activities";
+// Guest mode has been removed: history and activity tracking are ONLY created when logged in by user.
+// Unauthenticated sessions never create, persist, or display activity history.
 
 function getStorageKey() {
   try {
+    // Proactively clean up legacy guest activity data if present
+    if (localStorage.getItem("im_guest_activities")) {
+      localStorage.removeItem("im_guest_activities");
+    }
+
     const rawUser = localStorage.getItem("im_auth_user");
     if (rawUser) {
       const user = JSON.parse(rawUser);
@@ -16,12 +20,14 @@ function getStorageKey() {
   } catch {
     // fallback
   }
-  return GUEST_KEY;
+  // Return null if no user is authenticated (No guest mode)
+  return null;
 }
 
 export function getStoredActivities() {
   try {
     const key = getStorageKey();
+    if (!key) return [];
     const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
@@ -35,6 +41,9 @@ export function logUserActivity(activity) {
   try {
     if (!activity || !activity.type) return null;
     const key = getStorageKey();
+    // Guest mode removed: do NOT create or log activity if user is not authenticated
+    if (!key) return null;
+
     const current = getStoredActivities();
     const newEntry = {
       id: "act-" + Date.now() + "-" + Math.floor(Math.random() * 1000),
@@ -55,6 +64,7 @@ export function logUserActivity(activity) {
 export function clearActivityHistory() {
   try {
     const key = getStorageKey();
+    if (!key) return;
     localStorage.removeItem(key);
     window.dispatchEvent(new Event("im_activity_updated"));
   } catch (err) {
@@ -162,3 +172,41 @@ export function calculateOverallStats(activities = []) {
     streakDays: uniqueDays.size,
   };
 }
+
+/**
+ * Convert a MongoDB InterviewSessionResponse object into the same shape
+ * as a localStorage activity entry so History and Dashboard can treat both
+ * data sources uniformly.
+ *
+ * @param {Object} dbSession  - InterviewSessionResponse from the backend
+ * @returns {Object}           Activity-shaped object
+ */
+export function dbSessionToActivity(dbSession) {
+  const idata = dbSession.interview_data || {};
+  const evaluation = dbSession.evaluation || {};
+  const score = evaluation.score ?? 0;
+
+  return {
+    // Mark as coming from DB so UI can show cloud badge and delete button
+    _source: "db",
+    _dbId: dbSession.id,
+
+    id: "db-" + dbSession.id,
+    type: "technical",
+    title: `${idata.role || "Technical"} Mock Interview`,
+    category: idata.company ? `${idata.company} Style` : "Technical Interview",
+    score,
+    badge: score >= 75 ? "Passed" : "Completed",
+    icon: "code",
+    color: "#7c3aed",
+    // Convert ISO string from backend to ms timestamp for formatTimeAgo()
+    timestamp: dbSession.created_at ? new Date(dbSession.created_at).getTime() : Date.now(),
+    metrics: {
+      role: idata.role || "Software Engineer",
+      difficulty: idata.difficulty || "",
+      language: idata.language || "",
+      questions: `${(dbSession.answers || []).length} Qs`,
+    },
+  };
+}
+

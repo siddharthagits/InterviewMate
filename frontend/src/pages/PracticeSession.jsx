@@ -64,7 +64,12 @@ function QuestionCard({ q, idx }) {
                 </span>
               )}
               {state === "wrong" && (
-                <span className="ib-opt-wrong-badge">✕</span>
+                <span className="ib-opt-wrong-badge">
+                  <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                  </svg>
+                </span>
               )}
             </button>
           );

@@ -1,11 +1,15 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect, useRef } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import ThemeToggle from "../components/ThemeToggle";
 import { mockTests } from "../data/mockTestData";
 import ConfirmModal from "../components/ConfirmModal";
 import { logUserActivity } from "../utils/activityTracker";
+import { useTheme } from "../context/ThemeContext";
 
 function MockTestPage() {
+  const { theme } = useTheme?.() || {};
+  const isLight = theme === "light";
   const { category } = useParams();
   const navigate = useNavigate();
   const test = mockTests[category];
@@ -51,7 +55,7 @@ function MockTestPage() {
     return (
       <div style={{ display: "flex", alignItems: "center", justifyContent: "center", minHeight: "100vh", background: "var(--bg)", color: "var(--text)" }}>
         <div style={{ textAlign: "center" }}>
-          <div style={{ fontSize: 64, marginBottom: 16 }}>❌</div>
+          <div style={{ marginBottom: 16, display: "flex", justifyContent: "center" }}><AppIcon name="alert-circle" size={54} color="#ef4444" /></div>
           <h2>Test not found</h2>
           <button className="btn btn-primary" style={{ marginTop: 24 }} onClick={() => navigate("/")}>Go Home</button>
         </div>
@@ -97,7 +101,7 @@ function MockTestPage() {
           accuracy: `${pct}%`,
           attempted: `${Object.keys(answers).length}/${questions.length}`,
         },
-        icon: "🧠",
+        icon: "brain",
         color: "#6366f1",
         badge: `${pct}% Score`,
       });
@@ -180,7 +184,7 @@ function MockTestPage() {
           <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 20 }}>
             <div>
               <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 4 }}>
-                <span style={{ fontSize: 22 }}>{test.icon}</span>
+                <AppIcon name={test.icon} size={20} color="var(--primary)" />
                 <span style={{ fontWeight: 800, fontSize: 15, color: "var(--text)" }}>{test.title}</span>
               </div>
               <div style={{ fontSize: 12, color: "var(--text-muted)" }}>{total} Questions · {test.duration} min</div>
@@ -190,10 +194,11 @@ function MockTestPage() {
                 onClick={() => setSidebarOpen(false)}
                 style={{
                   background: "rgba(255,255,255,0.08)", border: "none", color: "#fff",
-                  width: 32, height: 32, borderRadius: 8, cursor: "pointer", fontSize: 14,
+                  width: 32, height: 32, borderRadius: 8, cursor: "pointer",
+                  display: "flex", alignItems: "center", justifyContent: "center",
                 }}
               >
-                ✕
+                <AppIcon name="x" size={16} />
               </button>
             )}
           </div>
@@ -236,8 +241,8 @@ function MockTestPage() {
                   style={{
                     width: "100%", aspectRatio: "1",
                     borderRadius: 8,
-                    border: `2px solid ${isCurrent ? test.color : sc.border}`,
-                    background: isCurrent ? test.colorLight : sc.bg,
+                    border: `2px solid ${isCurrent ? "var(--violet)" : sc.border}`,
+                    background: isCurrent ? "rgba(124,58,237,0.18)" : sc.bg,
                     color: status === "answered" ? "#fff" : "var(--text-muted)",
                     fontSize: 12, fontWeight: 700,
                     cursor: "pointer",
@@ -264,7 +269,7 @@ function MockTestPage() {
                 boxShadow: "0 4px 20px rgba(99,102,241,0.4)",
               }}
             >
-              Submit Test ✔
+              Submit Test
             </button>
           </div>
         )}
@@ -288,7 +293,7 @@ function MockTestPage() {
               onClick={() => setSidebarOpen(v => !v)}
               style={{ background: "rgba(255,255,255,0.06)", border: "1px solid rgba(255,255,255,0.1)", color: "#fff", borderRadius: 8, padding: "6px 10px", cursor: "pointer", fontSize: 16 }}
             >
-              ☰ Palette
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="grid" size={14} /> Palette</span>
             </button>
             <div>
               <div style={{ fontSize: 15, fontWeight: 800, color: "var(--text)" }}>{test.title}</div>
@@ -304,7 +309,7 @@ function MockTestPage() {
               border: `1px solid ${timerColor}55`,
               borderRadius: 10, padding: "6px 14px",
             }}>
-              <span style={{ fontSize: 16 }}>⏱</span>
+              <AppIcon name="clock" size={16} color={timerColor} />
               <span style={{ fontSize: 16, fontWeight: 800, fontFamily: "'JetBrains Mono', monospace", color: timerColor }}>
                 {formatTime(timeLeft)}
               </span>
@@ -313,14 +318,14 @@ function MockTestPage() {
             <ThemeToggle />
 
             <button onClick={() => navigate("/")} style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.12)", color: "var(--text-muted)", borderRadius: 8, padding: "6px 12px", cursor: "pointer", fontSize: 12 }}>
-              ✕ Exit
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="x" size={13} /> Exit</span>
             </button>
           </div>
         </div>
 
         {/* Question Progress */}
         <div style={{ height: 3, background: "rgba(255,255,255,0.06)", flexShrink: 0 }}>
-          <div style={{ height: "100%", width: `${((currentQ + 1) / total) * 100}%`, background: test.gradient, transition: "width 0.3s" }} />
+          <div style={{ height: "100%", width: `${((currentQ + 1) / total) * 100}%`, background: "linear-gradient(90deg, var(--violet), var(--cyan))", transition: "width 0.3s" }} />
         </div>
 
         {/* Question Body */}
@@ -330,12 +335,12 @@ function MockTestPage() {
           <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 16 }}>
             <span style={{
               fontSize: 12, fontWeight: 700, padding: "4px 14px", borderRadius: 99,
-              background: test.colorLight, color: test.color, border: `1px solid ${test.colorBorder}`,
+              background: "var(--bg2)", color: "var(--text)", border: "1px solid var(--glass-border)",
             }}>
               Question {currentQ + 1} / {total}
             </span>
             {answers[q.id] !== undefined && (
-              <span style={{ fontSize: 12, color: "#10b981", fontWeight: 600 }}>✔ Answered</span>
+              <span style={{ fontSize: 12, color: "#10b981", fontWeight: 600, display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="check" size={13} color="#10b981" /> Answered</span>
             )}
           </div>
 
@@ -377,7 +382,7 @@ function MockTestPage() {
 
               if (isCorrect) { borderColor = "#10b981"; bg = "rgba(16,185,129,0.12)"; textColor = "#6ee7b7"; }
               else if (isWrong) { borderColor = "#ef4444"; bg = "rgba(239,68,68,0.1)"; textColor = "#fca5a5"; }
-              else if (isSelected) { borderColor = test.color; bg = test.colorLight; textColor = test.color; }
+              else if (isSelected) { borderColor = "var(--violet-light)"; bg = "rgba(124,58,237,0.12)"; textColor = "var(--text)"; }
 
               return (
                 <button
@@ -395,7 +400,7 @@ function MockTestPage() {
                 >
                   <span style={{
                     width: 26, height: 26, borderRadius: "50%", flexShrink: 0,
-                    background: isSelected ? test.color : "rgba(255,255,255,0.06)",
+                    background: isSelected ? "var(--violet-light)" : "var(--bg2)",
                     color: isSelected ? "#fff" : "var(--text-muted)",
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 12, fontWeight: 700, marginTop: 1,
@@ -415,7 +420,7 @@ function MockTestPage() {
               background: "rgba(99,102,241,0.08)", border: "1px solid rgba(99,102,241,0.25)",
               borderRadius: 12,
             }}>
-              <div style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc", marginBottom: 6 }}>💡 EXPLANATION</div>
+              <div style={{ fontSize: 12, fontWeight: 700, color: "#a5b4fc", marginBottom: 6, display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="sparkles" size={13} color="#a5b4fc" /> EXPLANATION</div>
               <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65, margin: 0 }}>{q.explanation}</p>
             </div>
           )}
@@ -451,15 +456,13 @@ function MockTestPage() {
 
             <button
               onClick={() => currentQ < total - 1 ? goToQuestion(currentQ + 1) : (!submitted ? setConfirmOpen(true) : null)}
+              className="btn btn-primary"
               style={{
                 padding: "10px 22px", borderRadius: 10,
-                border: "none",
-                background: test.gradient, color: "#fff",
                 cursor: "pointer", fontSize: 13, fontWeight: 700,
-                boxShadow: `0 4px 16px ${test.color}44`,
               }}
             >
-              {currentQ < total - 1 ? "Next →" : submitted ? "Review Done" : "Submit ✔"}
+              {currentQ < total - 1 ? "Next →" : submitted ? "Review Done" : "Submit Test"}
             </button>
           </div>
         </div>
@@ -474,36 +477,37 @@ function MockTestPage() {
           padding: 16, overflowY: "auto",
         }}>
           <div style={{
-            background: "#0d1526", border: "1px solid rgba(99,102,241,0.3)",
+            background: isLight ? "#ffffff" : "#0d1526",
+            border: isLight ? "1px solid rgba(99,102,241,0.25)" : "1px solid rgba(99,102,241,0.3)",
             borderRadius: 24, padding: "32px 24px", maxWidth: 480, width: "100%",
             textAlign: "center",
-            boxShadow: "0 40px 100px rgba(0,0,0,0.6)",
+            boxShadow: isLight ? "0 30px 70px rgba(0,0,0,0.15), 0 0 30px rgba(99,102,241,0.12)" : "0 40px 100px rgba(0,0,0,0.6)",
           }}>
             {/* Score Ring */}
             <div style={{
               width: 120, height: 120, borderRadius: "50%", margin: "0 auto 20px",
-              background: `conic-gradient(${scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444"} ${scorePercent * 3.6}deg, rgba(255,255,255,0.06) 0deg)`,
+              background: `conic-gradient(${scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444"} ${scorePercent * 3.6}deg, ${isLight ? "rgba(0,0,0,0.06)" : "rgba(255,255,255,0.06)"} 0deg)`,
               display: "flex", alignItems: "center", justifyContent: "center",
               position: "relative",
             }}>
               <div style={{
                 position: "absolute", inset: 8, borderRadius: "50%",
-                background: "#0d1526",
+                background: isLight ? "#ffffff" : "#0d1526",
                 display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center",
               }}>
                 <div style={{ fontSize: 24, fontWeight: 900, color: scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444" }}>{scorePercent}%</div>
-                <div style={{ fontSize: 10, color: "var(--text-muted)" }}>Score</div>
+                <div style={{ fontSize: 10, color: isLight ? "#64748b" : "var(--text-muted)", fontWeight: 600 }}>Score</div>
               </div>
             </div>
 
-            <div style={{ fontSize: 28, marginBottom: 6 }}>
-              {scorePercent >= 80 ? "🏆" : scorePercent >= 60 ? "🎉" : scorePercent >= 40 ? "👍" : "💪"}
+            <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}>
+              <AppIcon name={scorePercent >= 60 ? "trophy" : scorePercent >= 40 ? "check-circle" : "target"} size={36} color={scorePercent >= 60 ? "#10b981" : scorePercent >= 40 ? "#f59e0b" : "#ef4444"} />
             </div>
-            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 4 }}>
+            <h2 style={{ fontSize: 22, fontWeight: 800, marginBottom: 6, color: isLight ? "#0f172a" : "#f1f5f9" }}>
               {scorePercent >= 80 ? "Excellent!" : scorePercent >= 60 ? "Well Done!" : scorePercent >= 40 ? "Good Effort!" : "Keep Practicing!"}
             </h2>
-            <p style={{ color: "var(--text-muted)", fontSize: 14, marginBottom: 24 }}>
-              You scored <strong style={{ color: "var(--text)" }}>{score}/{total}</strong> correct answers
+            <p style={{ color: isLight ? "#475569" : "var(--text-muted)", fontSize: 14, marginBottom: 24 }}>
+              You scored <strong style={{ color: isLight ? "#0f172a" : "var(--text)" }}>{score}/{total}</strong> correct answers
             </p>
 
             {/* Stats grid */}
@@ -513,9 +517,13 @@ function MockTestPage() {
                 { label: "Wrong", value: attempted - score, color: "#ef4444" },
                 { label: "Skipped", value: total - attempted, color: "#f59e0b" },
               ].map(({ label, value, color }) => (
-                <div key={label} style={{ background: "rgba(255,255,255,0.04)", borderRadius: 10, padding: "10px 4px", border: `1px solid ${color}33` }}>
+                <div key={label} style={{
+                  background: isLight ? "rgba(241, 245, 249, 0.85)" : "rgba(255,255,255,0.04)",
+                  borderRadius: 10, padding: "10px 4px",
+                  border: isLight ? `1px solid ${color}44` : `1px solid ${color}33`,
+                }}>
                   <div style={{ fontSize: 18, fontWeight: 800, color }}>{value}</div>
-                  <div style={{ fontSize: 10, color: "var(--text-muted)", marginTop: 2 }}>{label}</div>
+                  <div style={{ fontSize: 10, color: isLight ? "#64748b" : "var(--text-muted)", marginTop: 2, fontWeight: 600 }}>{label}</div>
                 </div>
               ))}
             </div>
@@ -525,9 +533,11 @@ function MockTestPage() {
                 onClick={() => { setShowResult(false); setCurrentQ(0); }}
                 style={{
                   padding: "10px 20px", borderRadius: 10,
-                  border: "1px solid rgba(255,255,255,0.15)",
-                  background: "rgba(255,255,255,0.05)", color: "var(--text)",
-                  cursor: "pointer", fontWeight: 600, fontSize: 13, flex: "1 1 auto",
+                  border: isLight ? "1px solid rgba(203, 213, 225, 0.9)" : "1px solid rgba(255,255,255,0.15)",
+                  background: isLight ? "rgba(241, 245, 249, 0.9)" : "rgba(255,255,255,0.05)",
+                  color: isLight ? "#1e293b" : "#f1f5f9",
+                  cursor: "pointer", fontWeight: 700, fontSize: 13, flex: "1 1 auto",
+                  transition: "all 0.2s",
                 }}
               >
                 Review Answers
@@ -551,7 +561,7 @@ function MockTestPage() {
 
       <ConfirmModal
         open={confirmOpen}
-        icon="✅"
+        icon="check"
         title="Submit Test?"
         message={`You've answered ${attempted} of ${total} questions. Once submitted you cannot change your answers.`}
         confirmText="Yes, Submit"

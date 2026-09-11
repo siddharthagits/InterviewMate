@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect, useRef, useCallback, useLayoutEffect } from "react";
 import DashboardLayout from "../components/layout/DashboardLayout";
 import { logUserActivity } from "../utils/activityTracker";
@@ -606,7 +607,7 @@ export default function TypingTest() {
             accuracy: `${stats.accuracy}%`,
             raw: `${stats.rawWpm} WPM`,
           },
-          icon: "⌨️",
+          icon: "keyboard",
           color: "#10b981",
           badge: `${stats.wpm} WPM`,
         });
@@ -679,7 +680,11 @@ export default function TypingTest() {
       <DashboardLayout>
         <div className="fade-up" style={{ maxWidth: 860, margin: "0 auto", padding: "0 12px" }}>
           <div style={{ textAlign: "center", marginBottom: 36 }}>
-            <div className="typing-badge" style={{ marginBottom: 16 }}>⌨️ Test Complete</div>
+            <div className="typing-badge" style={{ marginBottom: 14 }}>
+              <span style={{ width: 18, height: 1.5, background: "#10b981", display: "inline-block", borderRadius: 2 }} />
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="check-circle" size={13} color="#10b981" /> Test Complete</span>
+              <span style={{ width: 18, height: 1.5, background: "#10b981", display: "inline-block", borderRadius: 2 }} />
+            </div>
             <h1 style={{ fontSize: "clamp(24px, 4vw, 36px)", fontWeight: 900, letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif", marginBottom: 8 }}>
               Your Results
             </h1>
@@ -689,17 +694,17 @@ export default function TypingTest() {
           </div>
 
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(130px, 1fr))", gap: 14, marginBottom: 28 }}>
-            <ResultCard label="WPM"      value={stats.wpm}             sub="words/min"   color={stats.wpm >= 80 ? "var(--green)" : stats.wpm >= 50 ? "var(--violet-light)" : "var(--gold)"} />
-            <ResultCard label="Accuracy" value={`${stats.accuracy}%`}  sub={`${stats.correctWords} words`} color={stats.accuracy >= 98 ? "var(--green)" : stats.accuracy >= 90 ? "var(--violet-light)" : "var(--gold)"} />
+            <ResultCard label="WPM"      value={stats.wpm}             sub="words/min"   color="var(--cyan)" />
+            <ResultCard label="Accuracy" value={`${stats.accuracy}%`}  sub={`${stats.correctWords} words`} color="var(--cyan)" />
             <ResultCard label="Raw WPM"  value={stats.rawWpm}          sub="raw speed"    color="var(--cyan)" />
-            <ResultCard label="Errors"   value={stats.incorrectChars}  sub="mistakes"    color={stats.incorrectChars === 0 ? "var(--green)" : "var(--red)"} />
+            <ResultCard label="Errors"   value={stats.incorrectChars}  sub="mistakes"    color="var(--cyan)" />
           </div>
 
           <div className="glass" style={{ padding: "16px 22px", marginBottom: 28, display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 12 }}>
             <div>
               <div style={{ fontSize: 12, color: "var(--text-muted)", marginBottom: 2 }}>Performance</div>
               <div style={{ fontSize: 18, fontWeight: 800, fontFamily: "'Sora', sans-serif" }}>
-                {stats.wpm >= 100 ? "🚀 Speed Demon" : stats.wpm >= 80 ? "⚡ Fast Typist" : stats.wpm >= 60 ? "✅ Above Average" : stats.wpm >= 40 ? "👍 Average" : "💪 Keep Practicing"}
+                {stats.wpm >= 100 ? "Speed Demon" : stats.wpm >= 80 ? "Fast Typist" : stats.wpm >= 60 ? "Above Average" : stats.wpm >= 40 ? "Average" : "Keep Practicing"}
               </div>
             </div>
             <div style={{ textAlign: "right" }}>
@@ -737,7 +742,10 @@ export default function TypingTest() {
       <div style={{ maxWidth: 1050, margin: "0 auto", padding: "0 8px" }}>
 
         <div style={{ marginBottom: 24 }}>
-          <div className="typing-badge" style={{ marginBottom: 10 }}>⌨️ Typing Speed Test</div>
+          <div className="typing-badge" style={{ marginBottom: 10 }}>
+            <span style={{ width: 18, height: 1.5, background: "var(--cyan)", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="keyboard" size={14} color="var(--cyan)" /> Typing Speed Test</span>
+          </div>
           <h1 style={{ fontSize: "clamp(22px, 3.5vw, 28px)", fontWeight: 900, letterSpacing: "-0.5px", fontFamily: "'Sora', sans-serif" }}>
             How fast do you type?
           </h1>
@@ -752,11 +760,11 @@ export default function TypingTest() {
             {MODES.map(m => (
               <button key={m} className={`typing-seg${mode === m ? " active" : ""}`}
                 onClick={() => handleSetMode(m)} disabled={started && !finished}>
-                {m === "words" ? "📝 Words" :
-                 m === "punctuation" ? "🔣 Punctuation" :
-                 m === "numbers" ? "🔢 Numbers" :
-                 m === "quotes" ? "💬 Quotes" :
-                 m === "phrases" ? "✍️ Phrases" : "💻 Code"}
+                {m === "words" ? "Words" :
+                 m === "punctuation" ? "Punctuation" :
+                 m === "numbers" ? "Numbers" :
+                 m === "quotes" ? "Quotes" :
+                 m === "phrases" ? "Phrases" : "Code"}
               </button>
             ))}
           </div>
@@ -798,7 +806,7 @@ export default function TypingTest() {
               className="typing-mobile-tap-hint"
               style={{ cursor: "pointer", border: "1px solid rgba(6,182,212,0.35)", background: "rgba(6,182,212,0.12)" }}
             >
-              📱 Tap here to open keyboard & start typing
+              Tap here to open keyboard & start typing
             </button>
           </div>
         )}
@@ -855,9 +863,9 @@ export default function TypingTest() {
         {!started && (
           <div style={{ marginTop: 32, display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 12 }}>
             {[
-              { icon: "🎯", title: "Accuracy first",  desc: "Focus on typing correctly — speed will follow naturally." },
-              { icon: "🔄", title: "Reset anytime",   desc: "Press Tab or Esc at any point to restart with new words." },
-              { icon: "📈", title: "Track progress",  desc: "Live WPM and accuracy update as you type." },
+              { icon: "target", title: "Accuracy first",  desc: "Focus on typing correctly — speed will follow naturally." },
+              { icon: "rotate-ccw", title: "Reset anytime",   desc: "Press Tab or Esc at any point to restart with new words." },
+              { icon: "bar-chart", title: "Track progress",  desc: "Live WPM and accuracy update as you type." },
             ].map(tip => (
               <div key={tip.title} className="glass" style={{ padding: "16px 18px" }}>
                 <div style={{ fontSize: 20, marginBottom: 6 }}>{tip.icon}</div>

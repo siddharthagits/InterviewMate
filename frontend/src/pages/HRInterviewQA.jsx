@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useMemo, useRef, useEffect } from "react";
 import { Link } from "react-router-dom";
 import Navbar from "../components/Navbar";
@@ -277,28 +278,28 @@ function HRSidebar({ activeCategory, onCategoryChange, stats }) {
         </div>
         <div className="hr-quick-links">
           <Link to="/setup" className="hr-ql-link">
-            🎙️ Start AI Interview
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="bot" size={14} /> Start AI Interview</span>
           </Link>
           <Link to="/voice" className="hr-ql-link">
-            🔊 Voice Interview
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="mic" size={14} /> Voice Interview</span>
           </Link>
           <Link to="/mock-tests" className="hr-ql-link">
-            📝 Mock Tests
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="target" size={14} /> Mock Tests</span>
           </Link>
           <Link to="/question-bank" className="hr-ql-link">
-            📚 Question Bank
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="book" size={14} /> Question Bank</span>
           </Link>
           <Link to="/practice" className="hr-ql-link">
-            🏋️ Practice Corner
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="brain" size={14} /> Practice Corner</span>
           </Link>
           <Link to="/company-assessment" className="hr-ql-link">
-            🏢 Company Tests
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="building" size={14} /> Company Tests</span>
           </Link>
         </div>
       </div>
 
       <div className="hr-sidebar-card hr-pro-tip-card">
-        <div className="hr-pro-tip-icon">💡</div>
+        <div className="hr-pro-tip-icon"><AppIcon name="sparkles" size={18} color="#fbbf24" /></div>
         <div className="hr-pro-tip-text">
           <strong>Pro Tip:</strong> Use our{" "}
           <Link to="/voice" style={{ color: "#7c3aed" }}>
@@ -360,7 +361,13 @@ export default function HRInterviewQA() {
       {/* Hero Banner */}
       <div className="hr-hero-banner">
         <div className="hr-hero-inner">
-          <div className="hr-hero-badge">HR Interview Prep</div>
+          <div className="hr-hero-badge">
+            <span style={{ width: 18, height: 1.5, background: "#c4b5fd", display: "inline-block", borderRadius: 2 }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+              <AppIcon name="user" size={13} color="#c4b5fd" /> HR Interview Prep
+            </span>
+            <span style={{ width: 18, height: 1.5, background: "#c4b5fd", display: "inline-block", borderRadius: 2 }} />
+          </div>
           <h1 className="hr-hero-title">
             HR Interview Questions{" "}
             <span className="hr-hero-title-accent">&amp; Answers</span>
@@ -402,7 +409,7 @@ export default function HRInterviewQA() {
                 onClick={() => setSearchQuery("")}
                 aria-label="Clear search"
               >
-                ✕
+                <AppIcon name="x" size={13} />
               </button>
             )}
           </div>
@@ -502,7 +509,7 @@ export default function HRInterviewQA() {
             </div>
           ) : (
             <div className="hr-empty-state">
-              <div className="hr-empty-icon">🔍</div>
+              <div className="hr-empty-icon" style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}><AppIcon name="search" size={36} color="var(--text-muted)" /></div>
               <h3>No questions found</h3>
               <p>Try adjusting your search or changing the category filter.</p>
               <button

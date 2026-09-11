@@ -101,10 +101,12 @@ function Hero() {
         }}
       />
 
-      {/* Badge pill */}
-      <div className="glow-pill fade-up" style={{ marginBottom: 28 }}>
-        <IconStar />
-        Next-Gen AI Interview &amp; Assessment Ecosystem
+      {/* Borderless Eyebrow */}
+      <div className="glow-pill fade-up" style={{ marginBottom: 28, display: "inline-flex", alignItems: "center", gap: 8 }}>
+        <span style={{ width: 18, height: 1.5, background: "var(--violet-light)", display: "inline-block", borderRadius: 2 }} />
+        <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}>
+          <IconStar /> Next-Gen AI Interview &amp; Assessment Ecosystem
+        </span>
       </div>
 
       {/* Main Heading */}

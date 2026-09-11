@@ -1,5 +1,6 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect, useRef } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
 import ThemeToggle from "../components/ThemeToggle";
 
@@ -9,12 +10,12 @@ const STEPS = [
     label: "Job Role",
     subtitle: "What position are you interviewing for?",
     options: [
-      { value: "Software Engineer",   icon: "⚙️" },
-      { value: "Frontend Developer",  icon: "🎨" },
-      { value: "Backend Developer",   icon: "🔧" },
-      { value: "Full Stack Developer",icon: "🔀" },
-      { value: "Data Analyst",        icon: "📊" },
-      { value: "DevOps Engineer",     icon: "🚀" },
+      { value: "Software Engineer",   icon: "code" },
+      { value: "Frontend Developer",  icon: "layout" },
+      { value: "Backend Developer",   icon: "terminal" },
+      { value: "Full Stack Developer",icon: "layers" },
+      { value: "Data Analyst",        icon: "bar-chart" },
+      { value: "DevOps Engineer",     icon: "zap" },
     ],
   },
   {
@@ -22,9 +23,9 @@ const STEPS = [
     label: "Number of Questions",
     subtitle: "How many questions would you like?",
     options: [
-      { value: "5",  icon: "⚡", desc: "~5 min" },
-      { value: "8",  icon: "🔥", desc: "~8 min" },
-      { value: "10", icon: "💪", desc: "~12 min" },
+      { value: "5",  icon: "clock", desc: "~5 min" },
+      { value: "8",  icon: "target", desc: "~8 min" },
+      { value: "10", icon: "trophy", desc: "~12 min" },
     ],
   },
   { name: "_miccheck", label: "Mic Check", subtitle: "Let's make sure your microphone is working.", isMicCheck: true },
@@ -53,7 +54,7 @@ function MicRing({ active }) {
         transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
         position: "relative", zIndex: 1,
       }}>
-        {active ? "🎙" : "🎤"}
+        <AppIcon name="mic" size={18} color="#fff" />
       </div>
     </div>
   );
@@ -125,9 +126,28 @@ export default function VoiceSetup() {
       minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center",
       padding: "40px 20px", background: "var(--bg)", position: "relative", overflow: "hidden",
     }}>
-      {/* Top right Theme Toggle */}
-      <div style={{ position: "fixed", top: 20, right: 24, zIndex: 50 }}>
-        <ThemeToggle />
+      {/* Top navigation bar */}
+      <div style={{ position: "fixed", top: 16, left: 0, right: 0, zIndex: 50, display: "flex", justifyContent: "space-between", alignItems: "center", padding: "0 24px", pointerEvents: "none" }}>
+        <Link
+          to="/voice"
+          style={{
+            pointerEvents: "all",
+            display: "inline-flex", alignItems: "center", gap: 7,
+            fontSize: 13, fontWeight: 700, color: "var(--text-muted)",
+            textDecoration: "none",
+            background: "rgba(255,255,255,0.04)", border: "1px solid rgba(255,255,255,0.08)",
+            borderRadius: 99, padding: "6px 14px",
+            transition: "all 0.2s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.color = "#10b981"; e.currentTarget.style.borderColor = "rgba(16,185,129,0.4)"; }}
+          onMouseLeave={e => { e.currentTarget.style.color = "var(--text-muted)"; e.currentTarget.style.borderColor = "rgba(255,255,255,0.08)"; }}
+        >
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+          Back
+        </Link>
+        <div style={{ pointerEvents: "all" }}><ThemeToggle /></div>
       </div>
 
       <style>{`
@@ -155,12 +175,13 @@ export default function VoiceSetup() {
         <div style={{ textAlign: "center", marginBottom: 28 }}>
           <div style={{
             display: "inline-flex", alignItems: "center", gap: 8,
-            background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.25)",
-            borderRadius: 99, padding: "5px 16px", marginBottom: 14,
-            fontSize: 11, fontWeight: 700, color: "#10b981",
-            letterSpacing: "0.08em", textTransform: "uppercase",
+            marginBottom: 12,
+            fontSize: 12, fontWeight: 800, color: "#10b981",
+            letterSpacing: "0.14em", textTransform: "uppercase",
           }}>
-            Step {step + 1} of {STEPS.length}
+            <span style={{ width: 18, height: 1.5, background: "#10b981", display: "inline-block", borderRadius: 2 }} />
+            <span>Step {step + 1} of {STEPS.length}</span>
+            <span style={{ width: 18, height: 1.5, background: "#10b981", display: "inline-block", borderRadius: 2 }} />
           </div>
           <h1 style={{
             fontSize: "clamp(20px, 3vw, 30px)", fontWeight: 900,
@@ -236,7 +257,7 @@ export default function VoiceSetup() {
                   padding: "20px 24px", borderRadius: 14, textAlign: "center",
                   background: "rgba(239,68,68,0.08)", border: "1px solid rgba(239,68,68,0.25)",
                 }}>
-                  <div style={{ fontSize: 32, marginBottom: 8 }}>🚫</div>
+                  <div style={{ marginBottom: 8, display: "flex", justifyContent: "center" }}><AppIcon name="alert-triangle" size={32} color="#ef4444" /></div>
                   <div style={{ fontWeight: 700, color: "#ef4444", marginBottom: 6 }}>Microphone not detected</div>
                   <div style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.6 }}>
                     Your browser may not support speech recognition,<br/>or mic permission was denied.
@@ -249,8 +270,8 @@ export default function VoiceSetup() {
 
                   <div style={{ textAlign: "center" }}>
                     {micState === "idle"    && <p style={{ color: "var(--text-muted)", fontSize: 14 }}>Click the button below and say something.</p>}
-                    {micState === "listening" && <p style={{ color: "#10b981", fontSize: 14, fontWeight: 600 }}>🎙 Listening — speak now…</p>}
-                    {micState === "success"  && <p style={{ color: "#10b981", fontSize: 14, fontWeight: 600 }}>✅ Mic is working perfectly!</p>}
+                    {micState === "listening" && <p style={{ color: "#10b981", fontSize: 14, fontWeight: 600 }}>Listening — speak now…</p>}
+                    {micState === "success"  && <p style={{ color: "#10b981", fontSize: 14, fontWeight: 600 }}>Mic is working perfectly!</p>}
                   </div>
 
                   {micText && (
@@ -278,7 +299,7 @@ export default function VoiceSetup() {
                           : "0 4px 20px rgba(16,185,129,0.4)",
                       }}
                     >
-                      {micState === "listening" ? "⏹ Stop" : "🎤 Test Microphone"}
+                      {micState === "listening" ? "Stop" : "Test Microphone"}
                     </button>
                   ) : (
                     <div style={{
@@ -286,7 +307,7 @@ export default function VoiceSetup() {
                       background: "rgba(16,185,129,0.1)", border: "1px solid rgba(16,185,129,0.3)",
                       fontSize: 13, color: "#10b981", fontWeight: 700,
                     }}>
-                      ✅ Ready to start your interview!
+                      <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="check-circle" size={14} color="#10b981" /> Ready to start your interview!</span>
                     </div>
                   )}
                 </>
@@ -323,7 +344,7 @@ export default function VoiceSetup() {
             type="button"
           >
             {isLast
-              ? "🎙 Begin Voice Interview"
+              ? "Begin Voice Interview"
               : `Next: ${STEPS[step + 1]?.label} →`}
           </button>
         </div>

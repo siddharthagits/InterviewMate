@@ -58,6 +58,12 @@ def serialize_session(session: dict) -> dict:
 
 @router.post("/interview-sessions", response_model=InterviewSessionResponse, status_code=201)
 async def save_interview_session(data: InterviewSessionCreate):
+    if not data.user_id:
+        raise HTTPException(
+            status_code=401,
+            detail="User authentication required to save session history"
+        )
+
     session = data.model_dump()
     session["created_at"] = datetime.now(timezone.utc)
 
@@ -75,7 +81,11 @@ async def list_interview_sessions(
     user_id: str | None = Query(default=None),
     limit: int = Query(default=20, ge=1, le=100),
 ):
-    query = {"user_id": user_id} if user_id else {}
+    if not user_id:
+        # History is only available for authenticated users
+        return []
+
+    query = {"user_id": user_id}
 
     try:
         cursor = get_database().interview_sessions.find(query).sort("created_at", -1).limit(limit)
@@ -100,3 +110,18 @@ async def get_interview_session(session_id: str):
         raise HTTPException(status_code=404, detail="Interview session not found")
 
     return serialize_session(session)
+
+
+@router.delete("/interview-sessions/{session_id}", status_code=204)
+async def delete_interview_session(session_id: str):
+    """Permanently delete a single interview session by its MongoDB ObjectId."""
+    if not ObjectId.is_valid(session_id):
+        raise HTTPException(status_code=400, detail="Invalid interview session ID")
+
+    try:
+        result = await get_database().interview_sessions.delete_one({"_id": ObjectId(session_id)})
+    except RuntimeError as error:
+        raise HTTPException(status_code=503, detail=str(error)) from error
+
+    if result.deleted_count == 0:
+        raise HTTPException(status_code=404, detail="Interview session not found")

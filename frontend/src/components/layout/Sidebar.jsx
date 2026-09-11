@@ -123,6 +123,8 @@ const navGroups = [
   },
 ];
 
+import { IconUser, IconX } from "../common/AppIcon";
+
 /* ── Sidebar component ──────────────────────────────────────────────────────── */
 function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
   const { pathname } = useLocation();
@@ -131,7 +133,7 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
     ? user.name.charAt(0).toUpperCase()
     : user?.email
       ? user.email.charAt(0).toUpperCase()
-      : "G";
+      : <IconUser size={15} color="var(--violet-light)" />;
 
   const isActive = (link) =>
     link.matchPrefix
@@ -171,7 +173,9 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
           )}
         </Link>
         {isMobile && (
-          <button type="button" className="sidebar-close-btn" onClick={onClose} aria-label="Close sidebar">✕</button>
+          <button type="button" className="sidebar-close-btn" onClick={onClose} aria-label="Close sidebar">
+            <IconX size={16} />
+          </button>
         )}
       </div>
 
@@ -269,7 +273,7 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
       {(isOpen || isMobile) ? (
         <div style={{ marginTop: "auto", paddingTop: 18 }}>
           <Link
-            to="/profile"
+            to={isLoggedIn ? "/profile" : "/login"}
             onClick={onClose}
             style={{
               textDecoration: "none",
@@ -285,18 +289,19 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
           >
             <div style={{
               width: 32, height: 32, borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--violet), var(--cyan))",
+              background: isLoggedIn ? "linear-gradient(135deg, var(--violet), var(--cyan))" : "rgba(124,58,237,0.15)",
+              border: isLoggedIn ? "none" : "1px solid rgba(124,58,237,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13, fontWeight: 900, color: "#fff", flexShrink: 0,
+              fontSize: 13, fontWeight: 900, color: isLoggedIn ? "#fff" : "var(--violet-light)", flexShrink: 0,
             }}>
               {initial}
             </div>
             <div style={{ overflow: "hidden" }}>
               <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", whiteSpace: "nowrap", textOverflow: "ellipsis", overflow: "hidden" }}>
-                {isLoggedIn && user ? (user.name || user.email.split("@")[0]) : "Guest User"}
+                {isLoggedIn && user ? (user.name || user.email.split("@")[0]) : "Sign In"}
               </div>
-              <div style={{ fontSize: 11, color: isLoggedIn ? "#10b981" : "var(--text-dim)", fontWeight: 600 }}>
-                {isLoggedIn ? "● Active Credentials" : "○ Nil Mode"}
+              <div style={{ fontSize: 11, color: isLoggedIn ? "#10b981" : "var(--violet-light)", fontWeight: 600 }}>
+                {isLoggedIn ? "● Active Credentials" : "Save your history →"}
               </div>
             </div>
           </Link>
@@ -304,13 +309,14 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
       ) : (
         <div className="sidebar-bottom-card collapsed">
           <Link
-            to="/profile"
-            title={isLoggedIn && user ? (user.name || user.email) : "Profile"}
+            to={isLoggedIn ? "/profile" : "/login"}
+            title={isLoggedIn && user ? (user.name || user.email) : "Sign In to Save History"}
             style={{
               width: 34, height: 34, borderRadius: "50%",
-              background: "linear-gradient(135deg, var(--violet), var(--cyan))",
+              background: isLoggedIn ? "linear-gradient(135deg, var(--violet), var(--cyan))" : "rgba(124,58,237,0.15)",
+              border: isLoggedIn ? "none" : "1px solid rgba(124,58,237,0.3)",
               display: "flex", alignItems: "center", justifyContent: "center",
-              fontSize: 13, fontWeight: 900, color: "#fff",
+              fontSize: 13, fontWeight: 900, color: isLoggedIn ? "#fff" : "var(--violet-light)",
               textDecoration: "none", margin: "0 auto",
             }}
           >

@@ -1,3 +1,4 @@
+import { AppIcon } from "../components/common/AppIcon";
 import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
@@ -23,10 +24,10 @@ function wpmFromText(text) {
 }
 
 function commLabel(score) {
-  if (score >= 85) return ["Excellent Communicator 🏆", "#10b981"];
-  if (score >= 70) return ["Strong Communicator 👍",    "#7c3aed"];
-  if (score >= 55) return ["Average Communicator 📈",   "#f59e0b"];
-  return                  ["Needs Improvement 💪",       "#ef4444"];
+  if (score >= 85) return ["Excellent Communicator", "#10b981"];
+  if (score >= 70) return ["Strong Communicator",    "#7c3aed"];
+  if (score >= 55) return ["Average Communicator",   "#f59e0b"];
+  return                  ["Needs Improvement",       "#ef4444"];
 }
 
 // ── Animated ring ─────────────────────────────────────────────────────────────
@@ -125,8 +126,8 @@ function QuestionCard({ item, qIdx, userAnswers, questions }) {
                 background:`${verdictColor}12`, color:verdictColor,
                 border:`1px solid ${verdictColor}25`,
               }}>{verdict}</span>
-              <span style={{ fontSize:11, color:"var(--text-muted)" }}>⚡ {wpm} wpm</span>
-              {fillers > 0 && <span style={{ fontSize:11, color:"#f59e0b" }}>💬 {fillers} filler{fillers !== 1 ? "s":""}</span>}
+              <span style={{ fontSize:11, color:"var(--text-muted)" }}>{wpm} wpm</span>
+              {fillers > 0 && <span style={{ fontSize:11, color:"#f59e0b" }}>{fillers} filler{fillers !== 1 ? "s":""}</span>}
             </div>
           </div>
         </div>
@@ -143,12 +144,12 @@ function QuestionCard({ item, qIdx, userAnswers, questions }) {
           )}
           {item?.why_weak && (
             <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(245,158,11,0.06)", border:"1px solid rgba(245,158,11,0.15)", fontSize:13, color:"var(--text-muted)", lineHeight:1.7 }}>
-              <strong style={{ color:"#f59e0b" }}>⚠ Weakness:</strong> {item.why_weak}
+              <strong style={{ color:"#f59e0b" }}>Weakness:</strong> {item.why_weak}
             </div>
           )}
           {item?.ideal_answer && (
             <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(16,185,129,0.05)", border:"1px solid rgba(16,185,129,0.15)", fontSize:13, color:"var(--text-muted)", lineHeight:1.7 }}>
-              <strong style={{ color:"#10b981" }}>✅ Ideal:</strong> {item.ideal_answer}
+              <strong style={{ color:"#10b981" }}>Ideal:</strong> {item.ideal_answer}
             </div>
           )}
           {item?.missed_keywords?.length > 0 && (
@@ -204,7 +205,7 @@ export default function VoiceResults() {
           pacing: `${avgWpm} WPM`,
           fillers: `${totalFillers} detected`,
         },
-        icon: "🎙️",
+        icon: "mic",
         color: "#06b6d4",
         badge: score >= 75 ? "Strong" : "Completed",
       });
@@ -213,7 +214,7 @@ export default function VoiceResults() {
 
   if (!result) return (
     <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, background:"var(--bg)", padding:32, textAlign:"center" }}>
-      <div style={{ fontSize:48 }}>🎙</div>
+      <div style={{ display: "flex", justifyContent: "center", marginBottom: 12 }}><AppIcon name="mic" size={48} color="#06b6d4" /></div>
       <h2 style={{ fontSize:22, fontWeight:800, fontFamily:"'Sora', sans-serif" }}>No Voice Results Yet</h2>
       <p style={{ color:"var(--text-muted)", maxWidth:400 }}>Complete a voice interview session to see your results here.</p>
       <Link to="/voice" className="btn btn-primary">Start Voice Interview →</Link>
@@ -236,13 +237,14 @@ export default function VoiceResults() {
         {/* Header */}
         <div style={{ textAlign:"center", marginBottom:48, animation:"vrFadeUp 0.5s ease both" }}>
           <div style={{
-            display:"inline-flex", alignItems:"center", gap:8,
-            background:"rgba(16,185,129,0.1)", border:"1px solid rgba(16,185,129,0.25)",
-            borderRadius:99, padding:"5px 16px", marginBottom:20,
-            fontSize:11, fontWeight:700, color:"#10b981",
-            letterSpacing:"0.08em", textTransform:"uppercase",
+            display: "inline-flex", alignItems: "center", gap: 10,
+            marginBottom: 16,
+            fontSize: 12.5, fontWeight: 800, color: "#10b981",
+            letterSpacing: "0.16em", textTransform: "uppercase",
           }}>
-            🎙 Voice Interview Complete
+            <span style={{ width: 22, height: 1.5, background: "linear-gradient(90deg, transparent, #10b981)", display: "inline-block" }} />
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="mic" size={13} color="#10b981" /> Voice Interview Complete</span>
+            <span style={{ width: 22, height: 1.5, background: "linear-gradient(90deg, #10b981, transparent)", display: "inline-block" }} />
           </div>
           <h1 style={{
             fontSize:"clamp(26px, 4vw, 42px)", fontWeight:900,
@@ -278,11 +280,11 @@ export default function VoiceResults() {
         {/* Dimensions grid */}
         <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:24 }}>
           {[
-            { label:"Clarity",      icon:"💡", value:clarityScore,   color:"#06b6d4",  desc:"Answer coverage" },
-            { label:"Confidence",   icon:"💪", value:confidenceScore,color:"#7c3aed",  desc:"Low filler = high confidence" },
-            { label:"Pacing",       icon:"⚡", value:pacingScore,    color:"#f59e0b",  desc:"110–160 wpm ideal" },
-            { label:"Filler Control",icon:"🗣",value:fillerScore,    color:"#10b981",  desc:"Lower = better" },
-            { label:"Coverage",     icon:"🎯", value:coverageScore,  color:"#ec4899",  desc:"Excellent + Good answers" },
+            { label:"Clarity",      icon:"sparkles", value:clarityScore,   color:"#10b981",  desc:"Answer coverage" },
+            { label:"Confidence",   icon:"award",    value:confidenceScore, color:"#10b981",  desc:"Low filler = high confidence" },
+            { label:"Pacing",       icon:"clock",    value:pacingScore,     color:"#10b981",  desc:"110–160 wpm ideal" },
+            { label:"Filler Control",icon:"mic",     value:fillerScore,     color:"#10b981",  desc:"Lower = better" },
+            { label:"Coverage",     icon:"target",   value:coverageScore,   color:"#10b981",  desc:"Excellent + Good answers" },
           ].map((m, idx) => (
             <div key={m.label} className="glass" style={{
               padding:"20px 24px", borderRadius:16,
@@ -307,7 +309,7 @@ export default function VoiceResults() {
               borderRadius:"20px 0 0 20px",
             }} />
             <div style={{ fontSize:12, fontWeight:700, color:"#10b981", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>
-              🤖 AI Feedback
+              <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="bot" size={14} color="var(--cyan)" /> AI Feedback</span>
             </div>
             <p style={{ color:"var(--text-dim)", fontSize:14, lineHeight:1.8 }}>{result.feedback}</p>
           </div>
@@ -318,7 +320,7 @@ export default function VoiceResults() {
           <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:24 }}>
             {result.strengths?.length > 0 && (
               <div className="glass" style={{ padding:"20px 24px", borderRadius:16, borderColor:"rgba(16,185,129,0.15)", animation:"vrFadeUp 0.5s ease 0.6s both" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#10b981", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>✅ Strengths</div>
+                <div style={{ fontSize:12, fontWeight:700, color:"#10b981", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="check-circle" size={13} color="#10b981" /> Strengths</span></div>
                 <ul style={{ paddingLeft:0, listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
                   {result.strengths.map((s, i) => (
                     <li key={i} style={{ fontSize:13, color:"var(--text-dim)", display:"flex", alignItems:"flex-start", gap:8, lineHeight:1.6 }}>
@@ -330,7 +332,7 @@ export default function VoiceResults() {
             )}
             {result.improvements?.length > 0 && (
               <div className="glass" style={{ padding:"20px 24px", borderRadius:16, borderColor:"rgba(245,158,11,0.15)", animation:"vrFadeUp 0.5s ease 0.65s both" }}>
-                <div style={{ fontSize:12, fontWeight:700, color:"#f59e0b", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}>📈 To Improve</div>
+                <div style={{ fontSize:12, fontWeight:700, color:"#f59e0b", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:12 }}><span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="alert-triangle" size={13} color="#f59e0b" /> To Improve</span></div>
                 <ul style={{ paddingLeft:0, listStyle:"none", display:"flex", flexDirection:"column", gap:8 }}>
                   {result.improvements.map((s, i) => (
                     <li key={i} style={{ fontSize:13, color:"var(--text-dim)", display:"flex", alignItems:"flex-start", gap:8, lineHeight:1.6 }}>
@@ -376,7 +378,7 @@ export default function VoiceResults() {
               color:"#fff", border:"none",
               boxShadow:"0 4px 20px rgba(16,185,129,0.35)",
               padding:"11px 24px", fontSize:14,
-            }}>🔁 Try Again</Link>
+            display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="rotate-ccw" size={14} /> Try Again</Link>
             <Link to="/setup" className="btn btn-outline" style={{ padding:"11px 22px", fontSize:14 }}>
               Text Interview →
             </Link>

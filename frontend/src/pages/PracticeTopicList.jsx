@@ -2,6 +2,7 @@ import { useState, useMemo } from "react";
 import { useParams, Link, useNavigate } from "react-router-dom";
 import Navbar from "../components/Navbar";
 import { getCategory, getTopics } from "../data/practiceData";
+import AppIcon, { IconX } from "../components/common/AppIcon";
 
 function PracticeTopicList() {
   const { categoryId } = useParams();
@@ -79,7 +80,9 @@ function PracticeTopicList() {
                   onChange={e => setFilter(e.target.value)}
                 />
                 {filter && (
-                  <button onClick={() => setFilter("")} className="practice-filter-clear" aria-label="Clear">✕</button>
+                  <button onClick={() => setFilter("")} className="practice-filter-clear" aria-label="Clear" style={{ display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <IconX size={12} />
+                  </button>
                 )}
               </div>
 
@@ -125,11 +128,11 @@ function PracticeTopicList() {
                 <div className="practice-sidebar-section-title">Other Categories</div>
                 <div style={{ display: "flex", flexDirection: "column", gap: 4 }}>
                   {[
-                    { id: "quantitative",        name: "Quantitative Aptitude",  icon: "📐" },
-                    { id: "verbal",              name: "Verbal Ability",          icon: "📝" },
-                    { id: "logical",             name: "Logical Reasoning",       icon: "🧠" },
-                    { id: "verbal-reasoning",    name: "Verbal Reasoning",        icon: "💬" },
-                    { id: "nonverbal-reasoning", name: "Nonverbal Reasoning",   icon: "🔷" },
+                    { id: "quantitative",        name: "Quantitative Aptitude",  icon: "chart" },
+                    { id: "verbal",              name: "Verbal Ability",          icon: "book" },
+                    { id: "logical",             name: "Logical Reasoning",       icon: "brain" },
+                    { id: "verbal-reasoning",    name: "Verbal Reasoning",        icon: "message" },
+                    { id: "nonverbal-reasoning", name: "Nonverbal Reasoning",     icon: "grid" },
                   ].map(cat => (
                     <Link
                       key={cat.id}
@@ -138,9 +141,13 @@ function PracticeTopicList() {
                       style={{
                         fontWeight: cat.id === categoryId ? 700 : 500,
                         color: cat.id === categoryId ? "#7c3aed" : undefined,
+                        display: "flex",
+                        alignItems: "center",
+                        gap: 8,
                       }}
                     >
-                      {cat.icon} {cat.name}
+                      <AppIcon name={cat.icon} size={15} />
+                      <span>{cat.name}</span>
                     </Link>
                   ))}
                 </div>
