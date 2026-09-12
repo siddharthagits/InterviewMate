@@ -153,7 +153,7 @@ export default function InterviewSetup() {
               flex: 1, height: 3, borderRadius: 99,
               background: i <= step
                 ? "linear-gradient(90deg, #7c3aed, #06b6d4)"
-                : "rgba(255,255,255,0.06)",
+                : "var(--border)",
               transition: "background 0.4s",
             }} />
           ))}
@@ -216,7 +216,7 @@ export default function InterviewSetup() {
                     { label: "Duration", val: form.duration },
                   ].filter(Boolean).map(({ label, val }) => (
                     <div key={label} style={{
-                      background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
+                      background: "var(--bg2)", border: "1px solid var(--border)",
                       borderRadius: 10, padding: "6px 14px", fontSize: 13,
                     }}>
                       <span style={{ color: "var(--text-muted)", fontSize: 11 }}>{label}: </span>
@@ -228,8 +228,8 @@ export default function InterviewSetup() {
 
               {/* Pressure Mode Toggle */}
               <div style={{
-                background: form.pressureMode ? "rgba(239,68,68,0.06)" : "rgba(255,255,255,0.02)",
-                border: `1px solid ${form.pressureMode ? "rgba(239,68,68,0.3)" : "rgba(255,255,255,0.07)"}`,
+                background: form.pressureMode ? "rgba(239,68,68,0.08)" : "var(--bg2)",
+                border: `1px solid ${form.pressureMode ? "rgba(239,68,68,0.4)" : "var(--border)"}`,
                 borderRadius: 14, padding: "16px 20px",
                 transition: "all 0.3s",
               }}>
@@ -253,24 +253,28 @@ export default function InterviewSetup() {
                   {/* Toggle switch */}
                   <button
                     type="button"
+                    role="switch"
+                    aria-checked={form.pressureMode}
                     onClick={() => setForm(p => ({ ...p, pressureMode: !p.pressureMode }))}
                     style={{
                       width: 52, height: 28, borderRadius: 99,
                       background: form.pressureMode
                         ? "linear-gradient(135deg, #ef4444, #dc2626)"
-                        : "rgba(255,255,255,0.1)",
-                      border: "none", cursor: "pointer",
-                      position: "relative", transition: "all 0.3s",
+                        : "var(--toggle-track-off, #334155)",
+                      border: `2px solid ${form.pressureMode ? "#ef4444" : "var(--toggle-border-off, #64748b)"}`,
+                      cursor: "pointer",
+                      position: "relative", transition: "all 0.25s ease",
                       flexShrink: 0,
-                      boxShadow: form.pressureMode ? "0 0 16px rgba(239,68,68,0.4)" : "none",
+                      boxShadow: form.pressureMode ? "0 0 16px rgba(239,68,68,0.45)" : "0 1px 4px rgba(0,0,0,0.25)",
                     }}
                   >
                     <div style={{
-                      width: 20, height: 20, borderRadius: "50%", background: "#fff",
-                      position: "absolute", top: 4,
-                      left: form.pressureMode ? 28 : 4,
+                      width: 20, height: 20, borderRadius: "50%",
+                      background: "#ffffff",
+                      position: "absolute", top: 2,
+                      left: form.pressureMode ? 26 : 2,
                       transition: "left 0.25s cubic-bezier(0.4,0,0.2,1)",
-                      boxShadow: "0 1px 4px rgba(0,0,0,0.3)",
+                      boxShadow: "0 2px 5px rgba(0,0,0,0.35)",
                     }} />
                   </button>
                 </div>
@@ -308,7 +312,7 @@ export default function InterviewSetup() {
           {STEPS.map((_, i) => (
             <div key={i} style={{
               width: i === step ? 20 : 6, height: 6, borderRadius: 99,
-              background: i <= step ? "var(--violet)" : "rgba(255,255,255,0.1)",
+              background: i <= step ? "var(--violet)" : "var(--border)",
               transition: "all 0.3s",
             }} />
           ))}

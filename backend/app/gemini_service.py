@@ -241,68 +241,160 @@ missed_keywords: up to 4 important terms/concepts the answer missed.
 
 
 # ── Hiring Readiness Score ────────────────────────────────────────────────────
-def _fallback_readiness(score, interview_data):
-    """Compute readiness without AI based on numeric score."""
-    base = score
+def _compute_ground_truth_dimensions(answers, score, mcq_pct, code_pct, text_score):
+    """
+    Compute precise, honest dimension scores based on actual questions attempted.
+    If a candidate did NOT attempt any communication/text questions, communication is 0%.
+    If they did NOT attempt any code/problem solving questions, problem solving is 0%.
+    Accuracy is calculated strictly on questions they actually attempted.
+    """
+    if not answers:
+        return {
+            "technical": max(0, min(100, score)),
+            "communication": 0,
+            "problem_solving": 0,
+            "speed": 0,
+            "accuracy": 0,
+        }, 0, 0, 0
+
+    if isinstance(answers[0], str):
+        text_answers_obj = answers
+        text_attempted = [a for a in answers if (a or "").strip()]
+        mcq_attempted, code_attempted = [], []
+        mcq_correct, code_correct = 0, 0
+        total_mcq, total_code, total_text = 0, 0, len(answers)
+    else:
+        mcq_answers  = [a for a in answers if getattr(a, "question_type", None) == "mcq"]
+        code_answers = [a for a in answers if getattr(a, "question_type", None) == "code"]
+        text_answers_obj = [a for a in answers if getattr(a, "question_type", None) == "text"]
+
+        total_mcq = len(mcq_answers)
+        total_code = len(code_answers)
+        total_text = len(text_answers_obj)
+
+        mcq_attempted  = [a for a in mcq_answers if getattr(a, "selected", None) is not None]
+        code_attempted = [a for a in code_answers if getattr(a, "selected", None) is not None]
+        text_attempted = [a for a in text_answers_obj if (getattr(a, "text", None) or "").strip()]
+
+        mcq_correct  = sum(1 for a in mcq_attempted if getattr(a, "correct", None) is not None and a.selected == a.correct)
+        code_correct = sum(1 for a in code_attempted if getattr(a, "correct", None) is not None and a.selected == a.correct)
+
+    total_attempted = len(mcq_attempted) + len(code_attempted) + len(text_attempted)
+    total_questions = len(answers)
+
+    # 1. Technical: Based on MCQ questions (0% if 0 attempted)
+    if total_mcq > 0:
+        tech_score = round((mcq_correct / total_mcq) * 100) if len(mcq_attempted) > 0 else 0
+    else:
+        tech_score = round(code_pct) if total_code > 0 and len(code_attempted) > 0 else 0
+
+    # 2. Communication: 0% if candidate did NOT attempt any communication/text question
+    if total_text > 0:
+        comm_score = round(text_score) if len(text_attempted) > 0 else 0
+    else:
+        comm_score = 0
+
+    # 3. Problem Solving: 0% if candidate did NOT attempt any code question
+    if total_code > 0:
+        problem_score = round((code_correct / total_code) * 100) if len(code_attempted) > 0 else 0
+    else:
+        problem_score = round(tech_score) if len(mcq_attempted) > 0 else 0
+
+    # 4. Accuracy: Percentage of attempted questions answered correctly
+    if total_attempted == 0:
+        acc_score = 0
+    else:
+        text_correct = 1 if (text_score >= 50 and len(text_attempted) > 0) else 0
+        correct_count = mcq_correct + code_correct + text_correct
+        acc_score = round((correct_count / total_attempted) * 100)
+
+    # 5. Speed: Pacing and completion rate
+    if total_questions == 0 or total_attempted == 0:
+        speed_score = 0
+    else:
+        completion_ratio = total_attempted / total_questions
+        speed_score = round(min(100, max(5, completion_ratio * 100)))
+
     return {
-        "readiness": base,
-        "dimensions": {
-            "technical":       min(100, base + 5),
-            "communication":   min(100, max(20, base - 10)),
-            "problem_solving": min(100, base),
-            "speed":           min(100, max(20, base - 5)),
-            "accuracy":        min(100, base + 3),
-        },
-        "roadmap": [
-            {"area": "Technical Depth", "action": "Practice 2 LeetCode problems daily (Easy→Medium)."},
-            {"area": "Communication",   "action": "Use STAR format: Situation, Task, Action, Result."},
-            {"area": "Problem Solving", "action": "Study system design fundamentals on roadmap.sh."},
-        ],
-        "summary": f"You scored {base}/100. Keep practicing to improve consistency.",
+        "technical": max(0, min(100, tech_score)),
+        "communication": max(0, min(100, comm_score)),
+        "problem_solving": max(0, min(100, problem_score)),
+        "speed": max(0, min(100, speed_score)),
+        "accuracy": max(0, min(100, acc_score)),
+    }, total_attempted, total_questions, len(text_attempted)
+
+
+def calculate_readiness(
+    score: int,
+    interview_data: dict,
+    strengths: list,
+    improvements: list,
+    answers: list = None,
+    mcq_pct: float = 0,
+    code_pct: float = 0,
+    text_score: float = 0,
+):
+    """Calculate hiring readiness strictly anchored to actual candidate performance."""
+    ground_dims, total_attempted, total_questions, text_attempted_count = _compute_ground_truth_dimensions(
+        answers, score, mcq_pct, code_pct, text_score
+    )
+
+    if total_attempted == 0:
+        overall_readiness = 0
+    else:
+        overall_readiness = round(
+            ground_dims["technical"] * 0.35 +
+            ground_dims["problem_solving"] * 0.25 +
+            ground_dims["communication"] * 0.20 +
+            ground_dims["accuracy"] * 0.15 +
+            ground_dims["speed"] * 0.05
+        )
+
+    # Generate tailored, accurate roadmap
+    roadmap = []
+    if text_attempted_count == 0:
+        roadmap.append({
+            "area": "Communication (0% Attempted)",
+            "action": "You did not attempt any descriptive/communication questions. Practice formulating clear text explanations."
+        })
+    else:
+        roadmap.append({
+            "area": "Communication",
+            "action": "Use the STAR method (Situation, Task, Action, Result) for behavioral and descriptive questions."
+        })
+
+    if ground_dims["problem_solving"] == 0:
+        roadmap.append({
+            "area": "Problem Solving (0% Attempted)",
+            "action": "Attempt coding and algorithmic questions to demonstrate code correctness and logic."
+        })
+    else:
+        roadmap.append({
+            "area": "Problem Solving",
+            "action": "Practice LeetCode medium problems on data structures and system design fundamentals."
+        })
+
+    if total_attempted < total_questions:
+        roadmap.append({
+            "area": "Pacing & Completion",
+            "action": f"You attempted {total_attempted} of {total_questions} questions. Work on pacing to complete the full assessment."
+        })
+    else:
+        roadmap.append({
+            "area": "Technical Depth",
+            "action": f"Revise core {interview_data.get('language', 'programming')} concepts to improve technical consistency."
+        })
+
+    summary = f"You attempted {total_attempted} of {total_questions} questions with an overall hiring readiness of {overall_readiness}%."
+    if total_attempted <= 1:
+        summary += " Complete more questions across all sections (Technical, Code, and Text) for a comprehensive evaluation."
+
+    return {
+        "readiness": overall_readiness,
+        "dimensions": ground_dims,
+        "roadmap": roadmap,
+        "summary": summary,
     }
-
-
-def calculate_readiness(score: int, interview_data: dict, strengths: list, improvements: list):
-    """Calculate hiring readiness across 5 dimensions."""
-    role = interview_data.get("role", "Software Engineer")
-    exp  = interview_data.get("experience", "Fresher")
-
-    if not client:
-        return _fallback_readiness(score, interview_data)
-
-    prompt = f"""You are a career coach evaluating interview readiness.
-
-Candidate profile: Role={role}, Experience={exp}
-Overall interview score: {score}/100
-Strengths identified: {strengths}
-Areas to improve: {improvements}
-
-Return ONLY valid JSON (no markdown):
-{{
-  "readiness": 72,
-  "dimensions": {{
-    "technical": 75,
-    "communication": 60,
-    "problem_solving": 70,
-    "speed": 65,
-    "accuracy": 80
-  }},
-  "roadmap": [
-    {{"area": "Communication", "action": "Practice STAR method for behavioral questions daily."}},
-    {{"area": "Technical", "action": "Revise core {interview_data.get('language','')} concepts weekly."}},
-    {{"area": "Problem Solving", "action": "Solve 3 problems per week on LeetCode."}}
-  ],
-  "summary": "Strong technical foundation but communication needs work..."
-}}
-
-All dimension values: 0-100. readiness: overall 0-100.
-roadmap: 3 actionable steps with specific area and concrete action.
-"""
-    raw, _ = _call_gemini(prompt)
-    parsed = _parse_json(raw) if raw else None
-    if parsed and "readiness" in parsed and "dimensions" in parsed:
-        return parsed
-    return _fallback_readiness(score, interview_data)
 
 
 # ── Main evaluate_answers (existing + enhanced) ────────────────────────────────
@@ -362,8 +454,17 @@ def evaluate_answers(interview_data, answers, questions_map: dict = None):
     else:
         per_q = []
 
-    # ── Hiring readiness
-    readiness = calculate_readiness(final, interview_data, strengths, improvements)
+    # ── Hiring readiness strictly grounded on actual user answers
+    readiness = calculate_readiness(
+        final,
+        interview_data,
+        strengths,
+        improvements,
+        answers=answers,
+        mcq_pct=mcq_pct,
+        code_pct=code_pct,
+        text_score=text_score,
+    )
 
     return {
         "score":        final,

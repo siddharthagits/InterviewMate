@@ -3,6 +3,7 @@ import { useState, useEffect } from "react";
 import { Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
 import { useAuth } from "../context/AuthContext";
+import { useTheme } from "../context/ThemeContext";
 import ThemeToggle from "../components/ThemeToggle";
 import { logUserActivity } from "../utils/activityTracker";
 import { saveInterviewSession } from "../api/api";
@@ -28,7 +29,7 @@ function ScoreRing({ score }) {
     <div style={{ textAlign: "center", padding: "28px 0" }}>
       <div style={{ position: "relative", width: 160, height: 160, margin: "0 auto 20px" }}>
         <svg width="160" height="160" style={{ transform: "rotate(-90deg)" }}>
-          <circle cx="80" cy="80" r={radius} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="10" />
+          <circle cx="80" cy="80" r={radius} fill="none" stroke="var(--border)" strokeWidth="10" />
           <circle cx="80" cy="80" r={radius} fill="none" stroke={color} strokeWidth="10"
             strokeLinecap="round"
             strokeDasharray={circ}
@@ -314,9 +315,11 @@ function PerQuestionTab({ result, questions, userAnswers }) {
 }
 
 // ── Tab 3: Hiring Readiness Radar ─────────────────────────────────────────────
-function ReadinessTab({ result, interviewData }) {
+function ReadinessTab({ result, interviewData, userAnswers = [], questions = [] }) {
   const readiness = result?.readiness;
   const [animated, setAnimated] = useState(false);
+  const { theme } = useTheme();
+  const isLight = theme === "light";
 
   useEffect(() => { const t = setTimeout(() => setAnimated(true), 200); return () => clearTimeout(t); }, []);
 
@@ -328,35 +331,82 @@ function ReadinessTab({ result, interviewData }) {
     );
   }
 
-  const dims = readiness.dimensions || {};
+  // Enforce ground truth: If user didn't attempt communication or code, they are strictly 0%
+  const dims = { ...(readiness.dimensions || {}) };
+  if (userAnswers && userAnswers.length > 0) {
+    const textAttempted = userAnswers.filter(a => a.question_type === "text" && (a.text || "").trim());
+    const codeAttempted = userAnswers.filter(a => a.question_type === "code" && a.selected !== null && a.selected !== undefined);
+    const mcqAttempted = userAnswers.filter(a => a.question_type === "mcq" && a.selected !== null && a.selected !== undefined);
+    const totalAttempted = textAttempted.length + codeAttempted.length + mcqAttempted.length;
+
+    // 0% if no communication/text questions were answered
+    if (textAttempted.length === 0) {
+      dims.communication = 0;
+    }
+    // 0% if no code/problem-solving questions were answered
+    if (codeAttempted.length === 0) {
+      dims.problem_solving = 0;
+    }
+    // 0% if no MCQ questions were answered
+    if (mcqAttempted.length === 0) {
+      dims.technical = 0;
+    }
+
+    if (totalAttempted === 0) {
+      dims.accuracy = 0;
+      dims.speed = 0;
+    } else {
+      const mcqCorrect = mcqAttempted.filter(a => a.correct !== null && a.selected === a.correct).length;
+      const codeCorrect = codeAttempted.filter(a => a.correct !== null && a.selected === a.correct).length;
+      const textCorrect = textAttempted.filter(a => (result?.text_score || 0) >= 50).length;
+      dims.accuracy = Math.round(((mcqCorrect + codeCorrect + textCorrect) / totalAttempted) * 100);
+      const totalQs = questions.length || userAnswers.length || 1;
+      dims.speed = Math.round(Math.min(100, Math.max(5, (totalAttempted / totalQs) * 100)));
+    }
+  }
+
+  const computedOverall = Math.round(
+    dims.technical * 0.35 +
+    dims.problem_solving * 0.25 +
+    dims.communication * 0.20 +
+    dims.accuracy * 0.15 +
+    dims.speed * 0.05
+  );
+  const displayOverall = (userAnswers && userAnswers.length > 0) ? computedOverall : (readiness.readiness ?? 0);
+
+  const brandColor = isLight ? "#6d28d9" : "#a78bfa";
+  const brandBg = "rgba(124, 58, 237, 0.10)";
+  const brandBorder = "rgba(124, 58, 237, 0.22)";
+
   const dimList = [
-    { key: "technical",       label: "Technical",       color: "#7c3aed" },
-    { key: "communication",   label: "Communication",   color: "#06b6d4" },
-    { key: "problem_solving", label: "Problem Solving", color: "#10b981" },
-    { key: "speed",           label: "Speed",           color: "#f59e0b" },
-    { key: "accuracy",        label: "Accuracy",        color: "#ec4899" },
+    { key: "technical",       label: "Technical",       color: brandColor },
+    { key: "communication",   label: "Communication",   color: brandColor },
+    { key: "problem_solving", label: "Problem Solving", color: brandColor },
+    { key: "speed",           label: "Speed",           color: brandColor },
+    { key: "accuracy",        label: "Accuracy",        color: brandColor },
   ];
 
-  // SVG Radar chart
-  const cx = 130, cy = 130, r = 100;
+  // SVG Radar chart geometry
+  const cx = 150, cy = 145, r = 88;
   const n = dimList.length;
   const points = dimList.map((d, i) => {
     const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-    const pct   = (dims[d.key] || 0) / 100;
+    const rawPct = (dims[d.key] || 0) / 100;
+    const pct = rawPct; // True 0% sits cleanly at the center
     return {
       x: cx + (animated ? r * pct : 0) * Math.cos(angle),
       y: cy + (animated ? r * pct : 0) * Math.sin(angle),
-      lx: cx + (r + 24) * Math.cos(angle),
-      ly: cy + (r + 24) * Math.sin(angle),
+      lx: cx + (r + 26) * Math.cos(angle),
+      ly: cy + (r + 26) * Math.sin(angle),
     };
   });
 
-  const rings = [0.25, 0.5, 0.75, 1].map(scale => {
+  const rings = [0.25, 0.5, 0.75, 1.0].map(scale => {
     const ps = dimList.map((_, i) => {
       const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
       return `${cx + r * scale * Math.cos(angle)},${cy + r * scale * Math.sin(angle)}`;
     });
-    return ps.join(" ");
+    return { pts: ps.join(" "), scale };
   });
 
   const dataPolygon = points.map(p => `${p.x},${p.y}`).join(" ");
@@ -378,61 +428,338 @@ function ReadinessTab({ result, interviewData }) {
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
           letterSpacing: "-2px", lineHeight: 1,
         }}>
-          {readiness.readiness}%
+          {displayOverall}%
         </div>
         <div style={{ color: "var(--text-muted)", fontSize: 14, marginTop: 8 }}>
           ready for <strong style={{ color: "var(--text)" }}>{interviewData?.role || "this role"}</strong>
         </div>
         {readiness.summary && (
-          <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 12, lineHeight: 1.7, maxWidth: 420, margin: "12px auto 0" }}>
+          <p style={{ color: "var(--text-muted)", fontSize: 13, marginTop: 12, lineHeight: 1.7, maxWidth: 520, margin: "12px auto 0" }}>
             {readiness.summary}
           </p>
         )}
       </div>
 
-      {/* Radar chart */}
-      <div style={{ textAlign: "center", marginBottom: 24 }}>
-        <svg width="260" height="260" style={{ overflow: "visible" }}>
-          {/* Grid rings */}
-          {rings.map((pts, ri) => (
-            <polygon key={ri} points={pts} fill="none" stroke="rgba(255,255,255,0.05)" strokeWidth="1" />
-          ))}
-          {/* Spokes */}
-          {dimList.map((_, i) => {
-            const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
-            return (
-              <line key={i}
-                x1={cx} y1={cy}
-                x2={cx + r * Math.cos(angle)}
-                y2={cy + r * Math.sin(angle)}
-                stroke="rgba(255,255,255,0.06)" strokeWidth="1"
-              />
-            );
-          })}
-          {/* Data polygon */}
-          <polygon
-            points={dataPolygon}
-            fill="rgba(124,58,237,0.15)"
-            stroke="#7c3aed"
-            strokeWidth="2"
-            style={{ transition: "all 1.2s cubic-bezier(0.4,0,0.2,1)", filter: "drop-shadow(0 0 8px rgba(124,58,237,0.4))" }}
-          />
-          {/* Data points */}
-          {points.map((p, i) => (
-            <circle key={i} cx={p.x} cy={p.y} r="5" fill={dimList[i].color}
-              style={{ transition: "all 1.2s cubic-bezier(0.4,0,0.2,1)", filter: `drop-shadow(0 0 6px ${dimList[i].color})` }}
-            />
-          ))}
-          {/* Labels */}
-          {points.map((p, i) => (
-            <text key={i} x={p.lx} y={p.ly + 4}
-              textAnchor="middle" fontSize="10" fontWeight="600"
-              fill={dimList[i].color} fontFamily="Inter, sans-serif"
+      {/* 2-Column Section: Competency Radar (Left) + Practice & Other Tools (Right) */}
+      <div style={{
+        display: "grid",
+        gridTemplateColumns: "repeat(auto-fit, minmax(330px, 1fr))",
+        gap: 20,
+        marginBottom: 24,
+        alignItems: "stretch",
+      }}>
+        {/* Left: Radar Chart Card */}
+        <div className="glass" style={{
+          padding: "24px 20px",
+          borderRadius: 18,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          border: "1px solid var(--border)",
+          background: "var(--card)",
+        }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12, flexWrap: "wrap", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 9,
+                  background: brandBg,
+                  border: `1px solid ${brandBorder}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <AppIcon name="target" size={16} color="var(--violet-light)" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Competency Radar
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                    Multi-dimensional performance analysis
+                  </div>
+                </div>
+              </div>
+              <span style={{
+                fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99,
+                background: brandBg, color: "var(--violet-light)",
+                border: `1px solid ${brandBorder}`,
+              }}>
+                {displayOverall}% Overall
+              </span>
+            </div>
+
+            {/* Radar chart SVG */}
+            <div style={{ display: "flex", justifyContent: "center", alignItems: "center", padding: "10px 0" }}>
+              <svg viewBox="0 0 300 290" width="100%" height="270" style={{ overflow: "visible", display: "block", maxWidth: 320, margin: "0 auto" }}>
+                {/* Concentric grid rings */}
+                {rings.map((ring, ri) => (
+                  <polygon
+                    key={ri}
+                    points={ring.pts}
+                    fill={ri % 2 === 0 ? "var(--radar-ring-bg)" : "transparent"}
+                    stroke="var(--radar-ring)"
+                    strokeWidth={ri === rings.length - 1 ? "1.8" : "1.2"}
+                    strokeDasharray={ri === rings.length - 1 ? "none" : "3,3"}
+                  />
+                ))}
+
+                {/* Scale markings on vertical axis */}
+                {rings.map((ring, ri) => (
+                  <text
+                    key={`scale-${ri}`}
+                    x={cx + 4}
+                    y={cy - r * ring.scale + 3}
+                    fontSize="9"
+                    fontWeight="700"
+                    fill={isLight ? "#64748b" : "#94a3b8"}
+                    fontFamily="Inter, sans-serif"
+                  >
+                    {Math.round(ring.scale * 100)}%
+                  </text>
+                ))}
+
+                {/* Radial Spokes */}
+                {dimList.map((_, i) => {
+                  const angle = (i / n) * 2 * Math.PI - Math.PI / 2;
+                  return (
+                    <line
+                      key={i}
+                      x1={cx}
+                      y1={cy}
+                      x2={cx + r * Math.cos(angle)}
+                      y2={cy + r * Math.sin(angle)}
+                      stroke="var(--radar-spoke)"
+                      strokeWidth="1.2"
+                    />
+                  );
+                })}
+
+                {/* Center dot */}
+                <circle cx={cx} cy={cy} r="3" fill={brandColor} opacity="0.8" />
+
+                {/* Data polygon */}
+                <polygon
+                  points={dataPolygon}
+                  fill="var(--radar-poly-fill)"
+                  stroke="var(--radar-poly-stroke)"
+                  strokeWidth="2.5"
+                  style={{
+                    transition: "all 1.2s cubic-bezier(0.4,0,0.2,1)",
+                    filter: isLight ? "drop-shadow(0 2px 8px rgba(124,58,237,0.35))" : "drop-shadow(0 0 10px rgba(168,85,247,0.6))",
+                  }}
+                />
+
+                {/* Data vertex circles */}
+                {points.map((p, i) => (
+                  <circle
+                    key={i}
+                    cx={p.x}
+                    cy={p.y}
+                    r="5.5"
+                    fill={brandColor}
+                    stroke={isLight ? "#ffffff" : "#06030c"}
+                    strokeWidth="2"
+                    style={{
+                      transition: "all 1.2s cubic-bezier(0.4,0,0.2,1)",
+                      filter: `drop-shadow(0 0 6px ${brandColor})`,
+                    }}
+                  />
+                ))}
+
+                {/* Dimension labels with percentage value */}
+                {points.map((p, i) => (
+                  <g key={i} transform={`translate(${p.lx}, ${p.ly})`}>
+                    <text
+                      textAnchor="middle"
+                      y="-2"
+                      fontSize="11"
+                      fontWeight="700"
+                      fill="var(--text)"
+                      fontFamily="Inter, sans-serif"
+                    >
+                      {dimList[i].label}
+                    </text>
+                    <text
+                      textAnchor="middle"
+                      y="11"
+                      fontSize="10.5"
+                      fontWeight="800"
+                      fill={brandColor}
+                      fontFamily="'Sora', sans-serif"
+                    >
+                      {Math.round(dims[dimList[i].key] || 0)}%
+                    </text>
+                  </g>
+                ))}
+              </svg>
+            </div>
+          </div>
+
+          {/* Footer note inside card */}
+          <div style={{
+            marginTop: 12,
+            padding: "10px 14px",
+            borderRadius: 10,
+            background: "var(--bg2)",
+            border: "1px solid var(--border)",
+            fontSize: 12,
+            color: "var(--text-muted)",
+            display: "flex",
+            alignItems: "center",
+            gap: 8,
+          }}>
+            <AppIcon name="sparkles" size={14} color="var(--violet-light)" />
+            <span>Polygon shape highlights relative mastery across core technical & soft skills.</span>
+          </div>
+        </div>
+
+        {/* Right: Practice & Explore Other Tools Card */}
+        <div className="glass" style={{
+          padding: "24px 20px",
+          borderRadius: 18,
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+          border: "1px solid var(--border)",
+          background: "var(--card)",
+        }}>
+          <div>
+            <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 6, flexWrap: "wrap", gap: 8 }}>
+              <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+                <div style={{
+                  width: 32, height: 32, borderRadius: 9,
+                  background: brandBg,
+                  border: `1px solid ${brandBorder}`,
+                  display: "flex", alignItems: "center", justifyContent: "center",
+                }}>
+                  <AppIcon name="zap" size={16} color="var(--violet-light)" />
+                </div>
+                <div>
+                  <div style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", textTransform: "uppercase", letterSpacing: "0.06em" }}>
+                    Practice Other Tools
+                  </div>
+                  <div style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                    Target weaknesses with specialized practice modules
+                  </div>
+                </div>
+              </div>
+              <span style={{
+                fontSize: 10.5, fontWeight: 700, padding: "3px 9px", borderRadius: 99,
+                background: brandBg, color: "var(--violet-light)",
+                border: `1px solid ${brandBorder}`,
+              }}>
+                Level Up
+              </span>
+            </div>
+
+            {/* List of tools (Single cohesive brand color) */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 9, marginTop: 12 }}>
+              {[
+                {
+                  title: "Voice AI Interview",
+                  desc: "Interactive verbal mock interviews with real-time feedback",
+                  to: "/voice",
+                  badge: "Voice AI",
+                  icon: "mic",
+                },
+                {
+                  title: "Practice Corner",
+                  desc: "Targeted problem sets for DSA, System Design, SQL & Web",
+                  to: "/practice",
+                  badge: "Topic Drills",
+                  icon: "target",
+                },
+                {
+                  title: "Company Assessments",
+                  desc: "FAANG-calibrated hiring exams (Google, Meta, Amazon)",
+                  to: "/company-assessment",
+                  badge: "Exams",
+                  icon: "building",
+                },
+                {
+                  title: "Code Typing Test",
+                  desc: "Accelerate your code typing speed (WPM) and accuracy",
+                  to: "/typing-test",
+                  badge: "Speed",
+                  icon: "keyboard",
+                },
+                {
+                  title: "Curated Question Bank",
+                  desc: "Explore 1000+ top interview questions with solutions",
+                  to: "/question-bank",
+                  badge: "Library",
+                  icon: "book",
+                },
+                {
+                  title: "HR & Behavioral Prep",
+                  desc: "Master STAR method and culture-fit behavioral questions",
+                  to: "/hr-interview",
+                  badge: "Behavioral",
+                  icon: "user",
+                },
+              ].map((tool, idx) => (
+                <Link
+                  key={idx}
+                  to={tool.to}
+                  className="tool-practice-card"
+                  style={{
+                    display: "flex",
+                    alignItems: "center",
+                    gap: 12,
+                    padding: "9px 12px",
+                    borderRadius: 12,
+                    background: "var(--bg2)",
+                    border: "1px solid var(--border)",
+                    color: "var(--text)",
+                  }}
+                >
+                  <div style={{
+                    width: 32, height: 32, borderRadius: 8,
+                    background: brandBg,
+                    border: `1px solid ${brandBorder}`,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    flexShrink: 0,
+                  }}>
+                    <AppIcon name={tool.icon} size={15} color={brandColor} />
+                  </div>
+                  <div style={{ flex: 1, minWidth: 0 }}>
+                    <div style={{ display: "flex", alignItems: "center", gap: 7, flexWrap: "wrap" }}>
+                      <span style={{ fontSize: 12.5, fontWeight: 700, color: "var(--text)" }}>{tool.title}</span>
+                      <span style={{
+                        fontSize: 9.5, fontWeight: 700, padding: "1px 6px", borderRadius: 4,
+                        background: brandBg, color: brandColor, border: `1px solid ${brandBorder}`,
+                      }}>{tool.badge}</span>
+                    </div>
+                    <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 1, whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>
+                      {tool.desc}
+                    </div>
+                  </div>
+                  <span style={{ color: brandColor, fontWeight: 800, fontSize: 13, paddingLeft: 4, flexShrink: 0 }}>
+                    →
+                  </span>
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          {/* Retake Interview Link at bottom */}
+          <div style={{ marginTop: 14, textAlign: "center" }}>
+            <Link
+              to="/setup"
+              style={{
+                fontSize: 12,
+                fontWeight: 700,
+                color: "var(--violet-light)",
+                textDecoration: "none",
+                display: "inline-flex",
+                alignItems: "center",
+                gap: 6,
+              }}
             >
-              {dimList[i].label}
-            </text>
-          ))}
-        </svg>
+              <AppIcon name="refresh" size={13} color="var(--violet-light)" />
+              Configure New Technical Interview →
+            </Link>
+          </div>
+        </div>
       </div>
 
       {/* Dimension bars */}
@@ -454,7 +781,7 @@ function ReadinessTab({ result, interviewData }) {
           <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
             {readiness.roadmap.map((item, i) => (
               <div key={i} style={{
-                background: "rgba(255,255,255,0.02)", border: "1px solid rgba(255,255,255,0.06)",
+                background: "var(--bg2)", border: "1px solid var(--border)",
                 borderRadius: 12, padding: "14px 18px",
                 display: "flex", gap: 14, alignItems: "flex-start",
               }}>
@@ -543,7 +870,7 @@ function ResultsPage() {
         <ThemeToggle />
       </div>
 
-      <div style={{ maxWidth: 780, margin: "0 auto" }}>
+      <div style={{ maxWidth: 1040, margin: "0 auto" }}>
 
         {/* Header card */}
         <div style={{
@@ -652,7 +979,7 @@ function ResultsPage() {
           <div style={{ padding: "0 32px 36px" }}>
             {tab === "results"     && <><ResultsTab result={result} interviewData={interviewData} />{actionBtns}</>}
             {tab === "perquestion" && <div style={{ marginTop: 20 }}><PerQuestionTab result={result} questions={questions} userAnswers={userAnswers} />{actionBtns}</div>}
-            {tab === "readiness"   && <div style={{ marginTop: 20 }}><ReadinessTab  result={result} interviewData={interviewData} />{actionBtns}</div>}
+            {tab === "readiness"   && <div style={{ marginTop: 20 }}><ReadinessTab  result={result} interviewData={interviewData} userAnswers={userAnswers} questions={questions} />{actionBtns}</div>}
           </div>
         </div>
 
