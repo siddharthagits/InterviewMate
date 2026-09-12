@@ -22,7 +22,7 @@
 
 **InterviewMate** is an intelligent, full-stack interview readiness ecosystem engineered to transform technical, behavioral, and company-specific interview preparation. Powered by **Google Gemini AI**, it delivers realistic voice simulation, adaptive mock testing, automated code and speech evaluation, and personalized career roadmaps.
 
-[🚀 Explore Live Demo](https://aiinterviewmate.vercel.app/) • [✨ Key Features](#-key-features) • [🏗️ Architecture](#-system-architecture) • [⚡ Quick Start](#-quick-start-guide) • [🔌 API Docs](#-api-endpoints)
+[🚀 Explore Live Demo](https://aiinterviewmate.onrender.com/) • [✨ Key Features](#-key-features) • [🏗️ Architecture](#-system-architecture) • [⚡ Quick Start](#-quick-start-guide) • [🔌 API Docs](#-api-endpoints)
 
 </div>
 
