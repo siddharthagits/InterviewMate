@@ -56,6 +56,14 @@ body[data-theme="dark"],
   --hero-gradient: linear-gradient(135deg, #e9d5ff 0%, #c084fc 40%, #06b6d4 75%, #fcd34d 100%);
   --hero-stat-gradient: linear-gradient(135deg, #c4b5fd, #06b6d4);
   --hero-divider: rgba(139, 92, 246, 0.18);
+
+  /* Question / Option Review Feedback Colors */
+  --color-correct-text:   #34d399;
+  --color-correct-bg:     rgba(16, 185, 129, 0.14);
+  --color-correct-border: rgba(16, 185, 129, 0.38);
+  --color-wrong-text:     #f87171;
+  --color-wrong-bg:       rgba(239, 68, 68, 0.14);
+  --color-wrong-border:   rgba(239, 68, 68, 0.38);
 }
 
 :root[data-theme="light"],
@@ -81,6 +89,14 @@ body[data-theme="light"],
   --border-hover:  rgba(124, 58, 237, 0.45);
   --violet-light:  #6d28d9;
   --gold-light:    #b45309;
+
+  /* Question / Option Review Feedback Colors (High contrast for light mode) */
+  --color-correct-text:   #065f46;
+  --color-correct-bg:     rgba(16, 185, 129, 0.14);
+  --color-correct-border: rgba(5, 150, 105, 0.45);
+  --color-wrong-text:     #991b1b;
+  --color-wrong-bg:       rgba(239, 68, 68, 0.12);
+  --color-wrong-border:   rgba(220, 38, 38, 0.45);
 }
 
 /* ── Base ───────────────────────────────────────────────────────────────────── */

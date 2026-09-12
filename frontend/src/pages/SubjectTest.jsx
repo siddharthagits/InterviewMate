@@ -136,25 +136,52 @@ function BrowseMode({ subject }) {
   );
 }
 
-// ── MarkdownBlock — renders raw AI markdown as proper readable JSX ─────────────
+// ── Helper to format raw AI explanations into structured sections ─────────────
+function formatExplanationText(raw) {
+  if (!raw) return "";
+  let text = raw.trim();
+
+  // If already structured with markdown headings or lists, return directly
+  if (/^#{1,3}\s/m.test(text) || /^\s*[-*•]\s/m.test(text) || /^\s*\d+\.\s/m.test(text)) {
+    return text;
+  }
+
+  // Pre-process unstructured walls of text into structured markdown
+  text = text.replace(/([.!?])\s+(To see how it works|Imagine|For example|Consider|Suppose)/gi, "$1\n\n### 🏢 Real-World Analogy\n$2");
+  text = text.replace(/([.!?])\s+(Now,\s*when|In practice|Here is how|Specifically|When you)/gi, "$1\n\n### ⚙️ How It Works\n- $2");
+  text = text.replace(/([.!?])\s+(Foreign keys also|They also|It also|Importantly|Keep in mind|Remember|Note that)/gi, "$1\n- $2");
+  text = text.replace(/([.!?])\s+(If you accidentally|If someone|If an invalid)/gi, "$1\n- $2");
+  text = text.replace(/([.!?])\s+(This keeps|In summary|Overall|The takeaway|In conclusion)/gi, "$1\n\n### 🎯 Key Takeaway\n$2");
+
+  // If no heading was matched yet, add an overview header at the top
+  if (!text.startsWith("#")) {
+    text = "### 💡 Concept Overview\n" + text;
+  }
+
+  return text;
+}
+
+// ── MarkdownBlock — renders raw AI markdown as proper structured readable JSX ──
 function MarkdownBlock({ text }) {
   if (!text) return null;
+
+  const formatted = formatExplanationText(text);
 
   // Inline formatting: **bold**, *italic*, `code`
   function parseInline(str) {
     const parts = [];
-    // Split on **bold**, *italic*, `code`
     const re = /(\*\*(.+?)\*\*|\*(.+?)\*|`([^`]+)`)/g;
     let last = 0, m;
     while ((m = re.exec(str)) !== null) {
       if (m.index > last) parts.push(str.slice(last, m.index));
-      if (m[2] !== undefined) parts.push(<strong key={m.index}>{m[2]}</strong>);
+      if (m[2] !== undefined) parts.push(<strong key={m.index} style={{ color: "var(--text)", fontWeight: 700 }}>{m[2]}</strong>);
       else if (m[3] !== undefined) parts.push(<em key={m.index}>{m[3]}</em>);
       else if (m[4] !== undefined) parts.push(
         <code key={m.index} style={{
-          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.9em",
-          background: "rgba(124,58,237,0.12)", color: "#c4b5fd",
-          padding: "1px 6px", borderRadius: 4,
+          fontFamily: "'JetBrains Mono', monospace", fontSize: "0.88em",
+          background: "rgba(124,58,237,0.12)", color: "var(--violet-dark)",
+          border: "1px solid rgba(124,58,237,0.25)",
+          padding: "2px 6px", borderRadius: 4, fontWeight: 600,
         }}>{m[4]}</code>
       );
       last = m.index + m[0].length;
@@ -163,7 +190,7 @@ function MarkdownBlock({ text }) {
     return parts;
   }
 
-  const lines = text.split("\n");
+  const lines = formatted.split("\n");
   const elements = [];
   let i = 0;
 
@@ -179,14 +206,14 @@ function MarkdownBlock({ text }) {
       while (i < lines.length && /^\d+\.\s/.test(lines[i].trimEnd())) {
         const content = lines[i].replace(/^\d+\.\s/, "").trimEnd();
         listItems.push(
-          <li key={i} style={{ marginBottom: 5, lineHeight: 1.65 }}>
+          <li key={i} style={{ marginBottom: 6, lineHeight: 1.65, color: "var(--text)" }}>
             {parseInline(content)}
           </li>
         );
         i++;
       }
       elements.push(
-        <ol key={`ol-${i}`} style={{ paddingLeft: 22, margin: "8px 0 10px" }}>
+        <ol key={`ol-${i}`} style={{ paddingLeft: 22, margin: "8px 0 14px", color: "var(--text)" }}>
           {listItems}
         </ol>
       );
@@ -199,14 +226,14 @@ function MarkdownBlock({ text }) {
       while (i < lines.length && /^[-*•]\s/.test(lines[i].trimEnd())) {
         const content = lines[i].replace(/^[-*•]\s/, "").trimEnd();
         listItems.push(
-          <li key={i} style={{ marginBottom: 5, lineHeight: 1.65 }}>
+          <li key={i} style={{ marginBottom: 6, lineHeight: 1.65, color: "var(--text)" }}>
             {parseInline(content)}
           </li>
         );
         i++;
       }
       elements.push(
-        <ul key={`ul-${i}`} style={{ paddingLeft: 22, margin: "8px 0 10px", listStyleType: "disc" }}>
+        <ul key={`ul-${i}`} style={{ paddingLeft: 22, margin: "8px 0 14px", listStyleType: "disc", color: "var(--text)" }}>
           {listItems}
         </ul>
       );
@@ -216,14 +243,14 @@ function MarkdownBlock({ text }) {
     // Heading: starts with ### or ## or #
     const headingMatch = line.match(/^(#{1,3})\s+(.*)/);
     if (headingMatch) {
-      const level = headingMatch[1].length;
       const content = headingMatch[2];
-      const fontSize = level === 1 ? 17 : level === 2 ? 15.5 : 14.5;
       elements.push(
         <div key={i} style={{
-          fontSize, fontWeight: 800, color: "var(--text)",
-          fontFamily: "'Sora', sans-serif",
-          marginTop: 14, marginBottom: 4, letterSpacing: "-0.2px",
+          display: "flex", alignItems: "center", gap: 8,
+          fontSize: 14, fontWeight: 800, color: "var(--text)",
+          marginTop: elements.length === 0 ? 4 : 16, marginBottom: 8,
+          paddingBottom: 5, borderBottom: "1px dashed var(--border)",
+          fontFamily: "'Sora', sans-serif", letterSpacing: "-0.2px",
         }}>
           {parseInline(content)}
         </div>
@@ -237,9 +264,11 @@ function MarkdownBlock({ text }) {
       const content = line.replace(/\*\*/g, "").replace(/:$/, "");
       elements.push(
         <div key={i} style={{
-          fontSize: 14.5, fontWeight: 800, color: "var(--text)",
-          marginTop: 14, marginBottom: 3,
+          fontSize: 13.5, fontWeight: 800, color: "var(--text)",
+          marginTop: elements.length === 0 ? 4 : 14, marginBottom: 6,
+          display: "flex", alignItems: "center", gap: 6,
         }}>
+          <span style={{ width: 6, height: 6, borderRadius: "50%", background: "var(--violet)" }} />
           {content}
         </div>
       );
@@ -249,7 +278,7 @@ function MarkdownBlock({ text }) {
 
     // Regular paragraph
     elements.push(
-      <p key={i} style={{ margin: "0 0 8px", lineHeight: 1.72, fontSize: 13.5 }}>
+      <p key={i} style={{ margin: "0 0 10px", lineHeight: 1.72, fontSize: 13.5, color: "var(--text)" }}>
         {parseInline(line)}
       </p>
     );
@@ -274,7 +303,16 @@ function TopicRow({ topic, subject, index }) {
       });
       setAiExplanation(res.data.explanation);
     } catch (e) {
-      setAiExplanation("Failed to get AI explanation.");
+      console.error("[Explain Topic]", e);
+      let errMsg = "Failed to get AI explanation.";
+      if (typeof window !== "undefined" && window.location.protocol === "https:" && (!import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL.startsWith("http:"))) {
+        errMsg = "Backend connection error: VITE_API_URL is not configured for HTTPS on Render. Please add VITE_API_URL in Render Dashboard with your backend URL (e.g. https://your-backend.onrender.com).";
+      } else if (e.response?.data?.detail) {
+        errMsg = `Error: ${e.response.data.detail}`;
+      } else if (e.message) {
+        errMsg = `Could not reach backend (${e.message}). Check Render backend logs or CORS settings.`;
+      }
+      setAiExplanation(errMsg);
     } finally {
       setLoadingAi(false);
     }
@@ -593,7 +631,16 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
       });
       setAiExplanations(prev => ({ ...prev, [q.id]: res.data.explanation }));
     } catch (e) {
-      setAiExplanations(prev => ({ ...prev, [q.id]: "Failed to get AI explanation. Please check your connection." }));
+      console.error("[Explain Question]", e);
+      let errMsg = "Failed to get AI explanation. Please check your connection.";
+      if (typeof window !== "undefined" && window.location.protocol === "https:" && (!import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL.startsWith("http:"))) {
+        errMsg = "Backend connection error: VITE_API_URL is not configured for HTTPS on Render. Please add VITE_API_URL in Render Dashboard with your backend URL (e.g. https://your-backend.onrender.com).";
+      } else if (e.response?.data?.detail) {
+        errMsg = `Error: ${e.response.data.detail}`;
+      } else if (e.message) {
+        errMsg = `Could not reach backend (${e.message}). Check Render backend logs or CORS settings.`;
+      }
+      setAiExplanations(prev => ({ ...prev, [q.id]: errMsg }));
     } finally {
       setLoadingAi(prev => ({ ...prev, [q.id]: false }));
     }
@@ -642,43 +689,45 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
             const userAns = answers[i];
             const isCorrect = userAns === q.correct;
             const unanswered = userAns === undefined;
-            const borderColor = unanswered ? "rgba(245,158,11,0.3)" : isCorrect ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.3)";
-            const bgColor    = unanswered ? "rgba(245,158,11,0.04)" : isCorrect ? "rgba(16,185,129,0.05)" : "rgba(239,68,68,0.05)";
+            const borderColor = unanswered ? "rgba(245,158,11,0.35)" : isCorrect ? "var(--color-correct-border)" : "var(--color-wrong-border)";
+            const bgColor    = unanswered ? "rgba(245,158,11,0.06)" : isCorrect ? "var(--color-correct-bg)" : "var(--color-wrong-bg)";
 
             return (
               <div key={q.id} style={{
                 background: bgColor, border: `1px solid ${borderColor}`,
                 borderRadius: 14, padding: "16px 18px",
               }}>
-                <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 10 }}>
+                <div style={{ display: "flex", gap: 10, alignItems: "flex-start", marginBottom: 12 }}>
                   <span style={{
-                    width: 22, height: 22, borderRadius: "50%", flexShrink: 0,
-                    background: unanswered ? "rgba(245,158,11,0.15)" : isCorrect ? "rgba(16,185,129,0.15)" : "rgba(239,68,68,0.15)",
-                    color: unanswered ? "#f59e0b" : isCorrect ? "#10b981" : "#ef4444",
+                    width: 24, height: 24, borderRadius: "50%", flexShrink: 0,
+                    background: unanswered ? "rgba(245,158,11,0.18)" : isCorrect ? "var(--color-correct-bg)" : "var(--color-wrong-bg)",
+                    border: `1px solid ${unanswered ? "#f59e0b" : isCorrect ? "var(--color-correct-border)" : "var(--color-wrong-border)"}`,
+                    color: unanswered ? "#d97706" : isCorrect ? "var(--color-correct-text)" : "var(--color-wrong-text)",
                     display: "flex", alignItems: "center", justifyContent: "center",
-                    fontSize: 12, fontWeight: 800, marginTop: 1,
+                    fontSize: 11, fontWeight: 800, marginTop: 1,
                   }}>
-                    {unanswered ? "?" : isCorrect ? "OK" : "X"}
+                    {unanswered ? "?" : isCorrect ? "OK" : "✕"}
                   </span>
-                  <p style={{ fontSize: 13, fontWeight: 600, color: "var(--text)", lineHeight: 1.5, margin: 0 }}>{q.q}</p>
+                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", lineHeight: 1.5, margin: 0 }}>{q.q}</p>
                 </div>
 
-                <div style={{ paddingLeft: 32, display: "flex", flexDirection: "column", gap: 5, marginBottom: 10 }}>
+                <div style={{ paddingLeft: 34, display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
                   {q.options.map((opt, oi) => {
                     const isUser = userAns === oi;
                     const isCorr = q.correct === oi;
                     if (!isUser && !isCorr) return null;
                     return (
                       <div key={oi} style={{
-                        fontSize: 12, padding: "6px 12px", borderRadius: 7,
-                        background: isCorr ? "rgba(16,185,129,0.1)" : "rgba(239,68,68,0.08)",
-                        border: `1px solid ${isCorr ? "rgba(16,185,129,0.3)" : "rgba(239,68,68,0.25)"}`,
-                        color: isCorr ? "#6ee7b7" : "#fca5a5",
-                        display: "flex", gap: 8, alignItems: "center",
+                        fontSize: 13, padding: "8px 14px", borderRadius: 8,
+                        background: isCorr ? "var(--color-correct-bg)" : "var(--color-wrong-bg)",
+                        border: `1.5px solid ${isCorr ? "var(--color-correct-border)" : "var(--color-wrong-border)"}`,
+                        color: isCorr ? "var(--color-correct-text)" : "var(--color-wrong-text)",
+                        display: "flex", gap: 10, alignItems: "center",
+                        fontWeight: 600,
                       }}>
-                        <span style={{ fontWeight: 700, flexShrink: 0 }}>{["A","B","C","D"][oi]}.</span>
-                        <span style={{ flex: 1 }}>{opt}</span>
-                        <span style={{ flexShrink: 0, fontSize: 11 }}>
+                        <span style={{ fontWeight: 800, flexShrink: 0 }}>{["A","B","C","D"][oi]}.</span>
+                        <span style={{ flex: 1, lineHeight: 1.4 }}>{opt}</span>
+                        <span style={{ flexShrink: 0, fontSize: 12, fontWeight: 700 }}>
                           {isCorr && isUser ? "Correct (Your answer)" : isCorr ? "Correct" : "Your answer"}
                         </span>
                       </div>
@@ -686,37 +735,81 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                   })}
                   {unanswered && (
                     <div style={{
-                      fontSize: 12, padding: "6px 12px", borderRadius: 7,
-                      background: "rgba(16,185,129,0.08)", border: "1px solid rgba(16,185,129,0.25)",
-                      color: "#6ee7b7",
+                      fontSize: 13, padding: "8px 14px", borderRadius: 8,
+                      background: "var(--color-correct-bg)", border: "1.5px solid var(--color-correct-border)",
+                      color: "var(--color-correct-text)", fontWeight: 600,
                     }}>
                       Correct: {q.options[q.correct]}
                     </div>
                   )}
                 </div>
 
-                <div style={{ paddingLeft: 32, marginTop: 4 }}>
+                <div style={{ paddingLeft: 34, marginTop: 4 }}>
                   {q.explanation && (
                     <div style={{
-                      fontSize: 12, color: "var(--text-muted)",
-                      borderLeft: `2px solid ${subject.color}30`, paddingLeft: 10, lineHeight: 1.6,
-                      marginBottom: 10,
+                      fontSize: 13, color: "var(--text)",
+                      borderLeft: `3px solid ${subject.color || "var(--violet)"}`, paddingLeft: 12, lineHeight: 1.6,
+                      marginBottom: 12,
                     }}>
-                      <strong style={{ color: subject.color }}>Short Explanation:</strong> {q.explanation}
+                      <strong style={{ color: "var(--text-dim)", fontWeight: 800 }}>Short Explanation:</strong> {q.explanation}
                     </div>
                   )}
 
                   {/* AI Explanation Area */}
                   {aiExplanations[q.id] ? (
                     <div style={{
-                      fontSize: 13, color: "var(--text)", background: "rgba(16,185,129,0.05)",
-                      border: "1px solid rgba(16,185,129,0.2)", borderRadius: 8, padding: "12px 16px",
-                      lineHeight: 1.6, marginTop: 10, display: "flex", gap: 12,
+                      marginTop: 14,
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 12,
+                      padding: "16px 18px",
+                      boxShadow: "0 2px 10px rgba(0,0,0,0.03)",
                     }}>
-                      <AppIcon name="bot" size={18} color="#10b981" />
-                      <div>
-                        <strong style={{ color: "#10b981", display: "block", marginBottom: 6 }}>AI Explanation:</strong>
-                        {aiExplanations[q.id]}
+                      <div style={{
+                        display: "flex", alignItems: "center", justifyContent: "space-between",
+                        marginBottom: 12, paddingBottom: 10, borderBottom: "1px solid var(--border)",
+                      }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                          <span style={{
+                            width: 28, height: 28, borderRadius: 8,
+                            background: "rgba(16,185,129,0.12)",
+                            border: "1px solid rgba(16,185,129,0.3)",
+                            display: "flex", alignItems: "center", justifyContent: "center",
+                            color: "var(--color-correct-text)",
+                          }}>
+                            <AppIcon name="bot" size={16} color="currentColor" />
+                          </span>
+                          <div>
+                            <span style={{ fontSize: 13, fontWeight: 800, color: "var(--text)", display: "block" }}>
+                              AI Explanation
+                            </span>
+                            <span style={{ fontSize: 11, color: "var(--text-muted)" }}>
+                              Step-by-step breakdown & key concepts
+                            </span>
+                          </div>
+                        </div>
+
+                        <div style={{ display: "flex", gap: 8, alignItems: "center" }}>
+                          <button
+                            onClick={() => {
+                              navigator.clipboard?.writeText(aiExplanations[q.id]);
+                            }}
+                            style={{
+                              background: "var(--bg2)", border: "1px solid var(--border)",
+                              color: "var(--text-muted)", fontSize: 11, fontWeight: 600,
+                              padding: "4px 10px", borderRadius: 6, cursor: "pointer",
+                              transition: "all 0.15s",
+                            }}
+                            onMouseEnter={e => e.currentTarget.style.color = "var(--text)"}
+                            onMouseLeave={e => e.currentTarget.style.color = "var(--text-muted)"}
+                          >
+                            Copy
+                          </button>
+                        </div>
+                      </div>
+
+                      <div style={{ fontSize: 13.5, lineHeight: 1.7, color: "var(--text)" }}>
+                        <MarkdownBlock text={aiExplanations[q.id]} />
                       </div>
                     </div>
                   ) : (
@@ -725,10 +818,11 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                         onClick={() => handleExplainAI(q)}
                         disabled={loadingAi[q.id]}
                         style={{
-                          background: "rgba(255,255,255,0.05)", border: "1px solid rgba(255,255,255,0.1)",
-                          color: "var(--text-muted)", fontSize: 11, fontWeight: 600, padding: "6px 12px",
-                          borderRadius: 6, cursor: loadingAi[q.id] ? "not-allowed" : "pointer",
+                          background: "var(--card)", border: "1px solid var(--border)",
+                          color: "var(--text)", fontSize: 12, fontWeight: 600, padding: "7px 14px",
+                          borderRadius: 8, cursor: loadingAi[q.id] ? "not-allowed" : "pointer",
                           display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s",
+                          boxShadow: "0 1px 3px rgba(0,0,0,0.05)",
                         }}
                       >
                         {loadingAi[q.id] ? "Generating..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={13} /> Explain with AI</span>}
@@ -736,17 +830,17 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                       <button 
                         onClick={() => {
                           const shortQ = q.q.length > 60 ? q.q.substring(0, 60) + "..." : q.q;
-                          const query = encodeURIComponent(`Question: ${shortQ}, Correct Answer: ${q.options[q.answer]}. Please explain in detail.`);
+                          const query = encodeURIComponent(`Question: ${shortQ}, Correct Answer: ${q.options[q.correct]}. Please explain in detail.`);
                           window.open(`https://chatgpt.com/?q=${query}`, "_blank", "noopener,noreferrer");
                         }}
                         style={{
-                          background: "rgba(16, 163, 127, 0.1)", border: "1px solid rgba(16, 163, 127, 0.3)",
-                          color: "#10a37f", fontSize: 11, fontWeight: 600, padding: "6px 12px",
-                          borderRadius: 6, cursor: "pointer",
+                          background: "rgba(16, 163, 127, 0.12)", border: "1px solid rgba(16, 163, 127, 0.4)",
+                          color: "#0d9488", fontSize: 12, fontWeight: 700, padding: "7px 14px",
+                          borderRadius: 8, cursor: "pointer",
                           display: "flex", alignItems: "center", gap: 6, transition: "all 0.2s",
                         }}
-                        onMouseEnter={e => e.currentTarget.style.background = "rgba(16, 163, 127, 0.2)"}
-                        onMouseLeave={e => e.currentTarget.style.background = "rgba(16, 163, 127, 0.1)"}
+                        onMouseEnter={e => e.currentTarget.style.background = "rgba(16, 163, 127, 0.22)"}
+                        onMouseLeave={e => e.currentTarget.style.background = "rgba(16, 163, 127, 0.12)"}
                       >
                         Ask ChatGPT ↗
                       </button>

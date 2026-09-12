@@ -45,11 +45,14 @@ origins = [
     "http://127.0.0.1:5173",
     "http://localhost:5174",
     "http://127.0.0.1:5174",
+    "http://localhost:3000",
+    "https://aiinterviewmate.onrender.com",
+    "https://interviewmate-frontend.onrender.com",
     "https://aiinterviewmate.vercel.app",
     "https://interviewmateai.netlify.app",
 ]
 
-# Extra origins from env (e.g. Render preview URLs)
+# Extra origins from env (e.g. ALLOWED_ORIGINS=https://mycustomdomain.com)
 extra = os.getenv("ALLOWED_ORIGINS", "")
 if extra:
     origins += [o.strip() for o in extra.split(",") if o.strip()]
@@ -57,7 +60,7 @@ if extra:
 app.add_middleware(
     CORSMiddleware,
     allow_origins=origins,
-    allow_origin_regex=r"https://.*(\\.vercel\.app|\\.netlify\.app)",
+    allow_origin_regex=r"https://.*(\.onrender\.com|\.vercel\.app|\.netlify\.app)",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

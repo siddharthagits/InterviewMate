@@ -226,16 +226,16 @@ function PerQuestionTab({ result, questions, userAnswers }) {
                 {q.options.map((opt, oi) => {
                   const isUser = ua.selected === oi;
                   const isCorr = q.correct === oi;
-                  const bg  = isCorr ? "rgba(16,185,129,0.1)"  : isUser ? "rgba(239,68,68,0.08)" : "rgba(255,255,255,0.02)";
-                  const bdr = isCorr ? "#10b981"                : isUser ? "#ef4444"               : "rgba(255,255,255,0.06)";
-                  const clr = isCorr ? "#6ee7b7"                : isUser ? "#fca5a5"               : "var(--text-muted)";
+                  const bg  = isCorr ? "var(--color-correct-bg)"     : isUser ? "var(--color-wrong-bg)"     : "var(--bg2)";
+                  const bdr = isCorr ? "var(--color-correct-border)" : isUser ? "var(--color-wrong-border)" : "var(--border)";
+                  const clr = isCorr ? "var(--color-correct-text)"   : isUser ? "var(--color-wrong-text)"   : "var(--text)";
                   return (
-                    <div key={oi} style={{ padding: "9px 14px", borderRadius: 9, border: `1px solid ${bdr}`, background: bg, color: clr, fontSize: 13, display: "flex", gap: 10 }}>
+                    <div key={oi} style={{ padding: "9px 14px", borderRadius: 9, border: `1.5px solid ${bdr}`, background: bg, color: clr, fontSize: 13, fontWeight: (isCorr || isUser) ? 600 : 400, display: "flex", gap: 10 }}>
                       <span style={{ fontWeight: 700, flexShrink: 0 }}>{["A","B","C","D"][oi]}.</span>
                       <span style={{ flex: 1 }}>{opt}</span>
-                      {isCorr && !isUser && <span style={{ fontSize: 11, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="check" size={12} color="#10b981" /> Correct</span>}
-                      {isUser && isCorr  && <span style={{ fontSize: 11, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="check" size={12} color="#10b981" /> Your answer</span>}
-                      {isUser && !isCorr && <span style={{ fontSize: 11 }}>← Your answer</span>}
+                      {isCorr && !isUser && <span style={{ fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="check" size={12} color="currentColor" /> Correct</span>}
+                      {isUser && isCorr  && <span style={{ fontSize: 11, fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 3 }}><AppIcon name="check" size={12} color="currentColor" /> Your answer</span>}
+                      {isUser && !isCorr && <span style={{ fontSize: 11, fontWeight: 700 }}>← Your answer</span>}
                     </div>
                   );
                 })}

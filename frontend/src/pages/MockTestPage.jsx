@@ -376,13 +376,23 @@ function MockTestPage() {
               const isCorrect = submitted && i === q.correct;
               const isWrong = submitted && isSelected && i !== q.correct;
 
-              let borderColor = "rgba(255,255,255,0.1)";
-              let bg = "rgba(255,255,255,0.02)";
+              let borderColor = "var(--border)";
+              let bg = "var(--bg2)";
               let textColor = "var(--text)";
 
-              if (isCorrect) { borderColor = "#10b981"; bg = "rgba(16,185,129,0.12)"; textColor = "#6ee7b7"; }
-              else if (isWrong) { borderColor = "#ef4444"; bg = "rgba(239,68,68,0.1)"; textColor = "#fca5a5"; }
-              else if (isSelected) { borderColor = "var(--violet-light)"; bg = "rgba(124,58,237,0.12)"; textColor = "var(--text)"; }
+              if (isCorrect) {
+                borderColor = "var(--color-correct-border)";
+                bg = "var(--color-correct-bg)";
+                textColor = "var(--color-correct-text)";
+              } else if (isWrong) {
+                borderColor = "var(--color-wrong-border)";
+                bg = "var(--color-wrong-bg)";
+                textColor = "var(--color-wrong-text)";
+              } else if (isSelected) {
+                borderColor = "var(--violet-light)";
+                bg = "rgba(124,58,237,0.12)";
+                textColor = "var(--text)";
+              }
 
               return (
                 <button

@@ -382,18 +382,46 @@ def evaluate_answers(interview_data, answers, questions_map: dict = None):
     }
 
 def explain_question(question: str, subject: str) -> str:
-    """Dynamically explain a question using Gemini in ~200 words."""
+    """Dynamically explain a question using Gemini in a clear, highly-structured format."""
     if not client:
-        return f"[OFFLINE DEMO MODE]\n\nImagine this is a highly detailed, 200-word explanation of the question: '{question}'.\n\nTo see real AI-generated explanations, please add your GEMINI_API_KEY to the backend/.env file and restart the server. For now, this placeholder demonstrates how the UI expands seamlessly to fit detailed, rich-text feedback retrieved from the backend."
+        return f"""### 💡 Concept Overview
+A clear, concise definition of the core concept behind this question.
+
+### 🏢 Real-World Analogy
+Imagine a practical, everyday scenario that makes this concept instantly click.
+
+### ⚙️ How It Works & Key Rules
+- **Rule 1**: The fundamental mechanism and how data or flow is handled.
+- **Rule 2**: Important constraints, relationships, or performance characteristics.
+- **Rule 3**: Common pitfalls and how the system protects against them.
+
+### 🎯 Interview Takeaway
+What top tech interviewers look for when asking this question.
+
+*(Offline Demo Mode: Add your GEMINI_API_KEY in backend/.env to generate live AI explanations)*"""
     
-    prompt = f"""You are a friendly and expert computer science tutor. 
-Please explain the answer to the following {subject} question in about 200 words. 
-Use easy-to-understand language, real-world analogies if possible, and avoid overly academic jargon.
+    prompt = f"""You are an expert computer science tutor and interview mentor.
+Please explain the answer to the following {subject} question in a clear, highly-structured, and easy-to-understand format.
+
+Structure your response using these EXACT markdown headings and bullet points:
+
+### 💡 Concept Overview
+Explain the core idea simply and directly in 1-2 sentences.
+
+### 🏢 Real-World Analogy
+Provide a vivid, relatable everyday analogy (like a library, traffic system, post office, or restaurant) that makes the concept instantly click.
+
+### ⚙️ How It Works & Key Rules
+- Provide 2-3 clear bullet points explaining the mechanics, syntax, or relationships.
+- Highlight key terms in **bold** and code identifiers in `code`.
+
+### 🎯 Key Takeaway for Interviews
+State in 1-2 sentences what an interviewer expects to hear and the main advantage or use-case.
 
 Question: {question}
 
 Explanation:"""
     raw, err = _call_gemini(prompt)
     if raw:
-        return raw
+        return raw.strip()
     return f"Failed to generate explanation. {err}"
