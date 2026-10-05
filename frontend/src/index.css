@@ -2422,7 +2422,7 @@ kbd.typing-kbd {
   justify-content: center;
   align-items: center;
   text-align: center;
-  padding: 120px 24px 80px;
+  padding: 120px 24px 44px;
   position: relative;
   width: 100%;
 }
@@ -2467,7 +2467,7 @@ kbd.typing-kbd {
 
 /* ── Features Component Styles ─────────────────────────────────────────────── */
 .features-section {
-  padding: 100px 32px 110px;
+  padding: 68px 32px 110px;
   position: relative;
   width: 100%;
 }

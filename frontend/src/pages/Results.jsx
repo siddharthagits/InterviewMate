@@ -170,10 +170,13 @@ function PerQuestionTab({ result, questions, userAnswers }) {
       {questions.map((q, i) => {
         const ua = aMap[q.id] || {};
         const fb = fMap[q.id] || {};
+        const isSkipped = (q.type === "mcq" || q.type === "code")
+          ? (ua.selected === null || ua.selected === undefined)
+          : !ua.text?.trim();
         const isCorrect = (q.type === "mcq" || q.type === "code") && ua.selected === q.correct;
         const borderColor = q.type === "text"
           ? "#7c3aed"
-          : isCorrect ? "#10b981" : "#ef4444";
+          : isCorrect ? "#10b981" : isSkipped ? "rgba(255,255,255,0.15)" : "#ef4444";
 
         return (
           <div key={q.id} className="glass" style={{ padding: "20px 24px", borderLeft: `3px solid ${borderColor}`, position: "relative" }}>
@@ -269,7 +272,10 @@ function PerQuestionTab({ result, questions, userAnswers }) {
 
                 {fb.why_weak && (
                   <p style={{ fontSize: 13, color: "var(--text-dim)", lineHeight: 1.65, margin: 0 }}>
-                    <strong style={{ color: "var(--text)" }}>Analysis: </strong>{fb.why_weak}
+                    <strong style={{ color: "var(--text)" }}>Analysis: </strong>
+                    {isSkipped && (fb.why_weak === "You selected an incorrect option." || fb.why_weak === "Incorrect option selected.")
+                      ? "You skipped this question without selecting an option."
+                      : fb.why_weak}
                   </p>
                 )}
 

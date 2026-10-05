@@ -128,12 +128,13 @@ def _fallback_per_question(answers, questions_map):
             selected = getattr(a, "selected", None)
             correct  = getattr(a, "correct", None)
             is_correct = (selected is not None and correct is not None and selected == correct)
+            is_skipped = (selected is None)
             result.append({
                 "question_id": qid,
                 "question_type": qtype,
                 "score": None,
-                "verdict": "Correct" if is_correct else ("Wrong" if selected is not None else "Skipped"),
-                "why_weak": None if is_correct else "Incorrect option selected.",
+                "verdict": "Correct" if is_correct else ("Skipped" if is_skipped else "Wrong"),
+                "why_weak": None if is_correct else ("You skipped this question without selecting an option." if is_skipped else "Incorrect option selected."),
                 "ideal_answer": questions_map.get(qid, {}).get("explanation", ""),
                 "missed_keywords": [],
             })
@@ -156,13 +157,14 @@ def evaluate_per_question(answers, interview_data: dict, questions_map: dict):
         selected = getattr(a, "selected", None)
         correct  = getattr(a, "correct", None)
         is_correct = (selected is not None and correct is not None and selected == correct)
+        is_skipped = (selected is None)
         qid = getattr(a, "question_id", 0)
         per_q.append({
             "question_id": qid,
             "question_type": getattr(a, "question_type", "mcq"),
             "score": None,
-            "verdict": "Correct" if is_correct else ("Wrong" if selected is not None else "Skipped"),
-            "why_weak": None if is_correct else "You selected an incorrect option.",
+            "verdict": "Correct" if is_correct else ("Skipped" if is_skipped else "Wrong"),
+            "why_weak": None if is_correct else ("You skipped this question without selecting an option." if is_skipped else "You selected an incorrect option."),
             "ideal_answer": questions_map.get(qid, {}).get("explanation", ""),
             "missed_keywords": [],
         })

@@ -234,33 +234,6 @@ function Hero() {
         ))}
       </div>
 
-      {/* Scroll indicator */}
-      <div
-        className="float"
-        style={{
-          position: "absolute",
-          bottom: 24,
-          left: "50%",
-          transform: "translateX(-50%)",
-          display: "flex",
-          flexDirection: "column",
-          alignItems: "center",
-          gap: 6,
-          opacity: 0.4,
-        }}
-      >
-        <div style={{ fontSize: 10, letterSpacing: "0.1em", textTransform: "uppercase", color: "var(--text-muted)" }}>
-          Scroll
-        </div>
-        <div
-          style={{
-            width: 1,
-            height: 32,
-            background: "linear-gradient(180deg, var(--violet), transparent)",
-            borderRadius: 2,
-          }}
-        />
-      </div>
     </section>
   );
 }
