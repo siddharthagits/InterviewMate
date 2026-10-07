@@ -6,24 +6,30 @@
 [data-theme="dark"],
 body[data-theme="dark"],
 .dark {
-  /* Brand Colors — Electric Violet + Gold */
+  /* Single brand accent; success and error remain semantic feedback colors. */
   --violet:        #7c3aed;
   --violet-dark:   #5b21b6;
   --violet-light:  #c4b5fd;
   --violet-glow:   rgba(124,58,237,0.4);
   --violet-subtle: rgba(124,58,237,0.08);
 
-  --gold:          #f59e0b;
-  --gold-dark:     #d97706;
-  --gold-light:    #fcd34d;
-  --gold-glow:     rgba(245,158,11,0.35);
-  --gold-subtle:   rgba(245,158,11,0.08);
+  --accent:        #c4b5fd;
+  --accent-strong: #7c3aed;
+  --accent-soft:   rgba(124,58,237,0.10);
+  --accent-border: rgba(167,139,250,0.35);
+  --accent-gradient: linear-gradient(135deg, #8b5cf6, #6d28d9);
 
-  --cyan:          #06b6d4;
-  --cyan-glow:     rgba(6,182,212,0.3);
+  --gold:          var(--violet);
+  --gold-dark:     var(--violet-dark);
+  --gold-light:    var(--accent);
+  --gold-glow:     var(--violet-glow);
+  --gold-subtle:   var(--violet-subtle);
+
+  --cyan:          var(--accent);
+  --cyan-glow:     var(--violet-glow);
   --green:         #10b981;
   --red:           #ef4444;
-  --pink:          #ec4899;
+  --pink:          var(--accent);
 
   /* Backgrounds (Zeabur Deep Cosmic Obsidian) */
   --bg-color:      #06030c;
@@ -53,8 +59,8 @@ body[data-theme="dark"],
   --amber:         var(--gold);
 
   /* Home page gradients */
-  --hero-gradient: linear-gradient(135deg, #e9d5ff 0%, #c084fc 40%, #06b6d4 75%, #fcd34d 100%);
-  --hero-stat-gradient: linear-gradient(135deg, #c4b5fd, #06b6d4);
+  --hero-gradient: linear-gradient(135deg, #ddd6fe 0%, #c4b5fd 55%, #a78bfa 100%);
+  --hero-stat-gradient: linear-gradient(135deg, #c4b5fd, #a78bfa);
   --hero-divider: rgba(139, 92, 246, 0.18);
 
   /* Question / Option Review Feedback Colors */
@@ -98,9 +104,14 @@ body[data-theme="light"],
   --glass:         rgba(255, 255, 255, 0.94);
   --hero-divider:  rgba(0, 0, 0, 0.08);
   --border:        rgba(0, 0, 0, 0.09);
-  --border-hover:  rgba(124, 58, 237, 0.45);
-  --violet-light:  #6d28d9;
-  --gold-light:    #b45309;
+  --border-hover:  rgba(109, 40, 217, 0.42);
+  --violet-light:  #5b21b6;
+  --accent:        #5b21b6;
+  --accent-strong: #6d28d9;
+  --accent-soft:   rgba(109,40,217,0.08);
+  --accent-border: rgba(109,40,217,0.28);
+  --accent-gradient: linear-gradient(135deg, #6d28d9, #5b21b6);
+  --gold-light:    var(--accent);
 
   /* Question / Option Review Feedback Colors (High contrast for light mode) */
   --color-correct-text:   #065f46;
@@ -204,7 +215,7 @@ body {
   max-width: 1400px;
   height: 80vh;
   border-radius: 50%;
-  background: radial-gradient(ellipse 70% 55% at 50% 32%, rgba(254, 215, 195, 0.78) 0%, rgba(255, 236, 226, 0.45) 45%, rgba(250, 248, 245, 0) 80%);
+  background: radial-gradient(ellipse 70% 55% at 50% 32%, rgba(196, 181, 253, 0.34) 0%, rgba(221, 214, 254, 0.18) 45%, rgba(250, 248, 245, 0) 80%);
   filter: blur(52px);
   animation: lago-peach-pulse 14s ease-in-out infinite alternate;
 }
@@ -217,7 +228,7 @@ body {
   max-width: 820px;
   height: 58vh;
   border-radius: 50%;
-  background: radial-gradient(ellipse 65% 55% at 60% 40%, rgba(255, 226, 212, 0.58) 0%, rgba(255, 238, 229, 0.25) 50%, transparent 75%);
+  background: radial-gradient(ellipse 65% 55% at 60% 40%, rgba(196, 181, 253, 0.22) 0%, rgba(221, 214, 254, 0.12) 50%, transparent 75%);
   filter: blur(62px);
 }
 
@@ -229,7 +240,7 @@ body {
   max-width: 640px;
   height: 52vh;
   border-radius: 50%;
-  background: radial-gradient(circle at 40% 50%, rgba(254, 240, 230, 0.48) 0%, transparent 70%);
+  background: radial-gradient(circle at 40% 50%, rgba(221, 214, 254, 0.18) 0%, transparent 70%);
   filter: blur(68px);
 }
 
@@ -240,7 +251,7 @@ body {
   width: 70vw;
   height: 45vh;
   border-radius: 50%;
-  background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(255, 245, 238, 0.6) 0%, transparent 70%);
+  background: radial-gradient(ellipse 60% 40% at 50% 50%, rgba(221, 214, 254, 0.16) 0%, transparent 70%);
   filter: blur(55px);
   pointer-events: none;
 }
@@ -423,14 +434,14 @@ code, pre, .mono { font-family: 'JetBrains Mono', monospace; }
 
 /* ── Gradient Text ──────────────────────────────────────────────────────────── */
 .grad-text {
-  background: linear-gradient(135deg, var(--violet-light) 0%, var(--cyan) 50%, var(--gold-light) 100%);
+  background: linear-gradient(135deg, var(--accent) 0%, var(--accent) 50%, var(--accent-strong) 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
 }
 
 .grad-text-gold {
-  background: linear-gradient(135deg, var(--gold) 0%, var(--gold-light) 100%);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -640,7 +651,7 @@ body[data-theme="light"] .navbar-floating-sidebar-btn:hover {
   font-size: 23px;
   font-weight: 900;
   text-decoration: none;
-  background: linear-gradient(135deg, #c4b5fd 0%, #06b6d4 60%, #fcd34d 100%);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -650,7 +661,7 @@ body[data-theme="light"] .navbar-floating-sidebar-btn:hover {
 
 /* Light theme: high-contrast deep gradient so the logo pops on ivory canvas */
 body[data-theme="light"] .navbar-logo {
-  background: linear-gradient(135deg, #5b21b6 0%, #0369a1 55%, #b45309 100%);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1384,7 +1395,7 @@ body[data-theme="light"] select option {
   font-size: 20px;
   font-weight: 900;
   padding: 0 2px;
-  background: linear-gradient(135deg, var(--violet-light), var(--cyan), var(--gold-light));
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -1412,7 +1423,7 @@ body[data-theme="light"] select option {
   width: 38px;
   height: 38px;
   border-radius: 11px;
-  background: linear-gradient(135deg, var(--violet), #06b6d4);
+  background: var(--accent-gradient);
   color: #ffffff !important;
   -webkit-text-fill-color: #ffffff !important;
   font-family: 'Sora', sans-serif;
@@ -1460,7 +1471,7 @@ body[data-theme="light"] select option {
 }
 
 .sidebar-link.active {
-  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.08));
+  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(124,58,237,0.08));
   color: var(--violet-light);
   border: 1px solid rgba(124,58,237,0.25);
   box-shadow: none;
@@ -1598,7 +1609,7 @@ body[data-theme="light"] select option {
 }
 .mcq-option.selected {
   border-color: var(--violet);
-  background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(6,182,212,0.06));
+  background: linear-gradient(135deg, rgba(124,58,237,0.18), rgba(124,58,237,0.06));
   box-shadow: 0 0 20px rgba(124,58,237,0.2);
   color: var(--text);
 }
@@ -1635,7 +1646,7 @@ body[data-theme="light"] select option {
   content: '';
   position: absolute;
   top: 0; left: 0; right: 0; height: 1px;
-  background: linear-gradient(90deg, var(--violet), var(--cyan), transparent);
+  background: linear-gradient(90deg, var(--accent-strong), transparent);
 }
 
 /* ── Progress Bar ───────────────────────────────────────────────────────────── */
@@ -1862,7 +1873,7 @@ body[data-theme="light"] .glow-pill-amber {
   gap: 8px;
   padding: 10px 18px;
   border-radius: 12px;
-  border: 1px solid var(--glass-border);
+  border: 1px solid var(--border-hover);
   background: rgba(255,255,255,0.02);
   color: var(--text-muted);
   font-size: 13px;
@@ -1872,15 +1883,15 @@ body[data-theme="light"] .glow-pill-amber {
   white-space: nowrap;
 }
 .option-pill:hover {
-  border-color: rgba(124,58,237,0.4);
+  border-color: var(--accent-strong);
   color: var(--violet-light);
-  background: rgba(124,58,237,0.06);
+  background: var(--accent-soft);
 }
 .option-pill.selected {
-  border-color: var(--violet);
-  background: linear-gradient(135deg, rgba(124,58,237,0.2), rgba(6,182,212,0.06));
+  border-color: var(--accent-strong);
+  background: var(--accent-soft);
   color: var(--violet-light);
-  box-shadow: 0 0 16px rgba(124,58,237,0.2);
+  box-shadow: 0 0 0 1px var(--accent-strong);
 }
 
 /* ── Chart bar ──────────────────────────────────────────────────────────────── */
@@ -1902,16 +1913,16 @@ body[data-theme="light"] .glow-pill-amber {
 
 /* ── Gold button ─────────────────────────────────────────────────────────────── */
 .btn-gold {
-  background: linear-gradient(135deg, #f59e0b, #d97706);
-  color: #000;
+  background: var(--accent-gradient);
+  color: #fff;
   border: none;
   font-weight: 800;
-  box-shadow: 0 4px 24px rgba(245,158,11,0.35);
+  box-shadow: 0 4px 24px var(--violet-glow);
   transition: all 0.25s;
 }
 .btn-gold:hover:not(:disabled) {
-  background: linear-gradient(135deg, #fcd34d, #f59e0b);
-  box-shadow: 0 6px 30px rgba(245,158,11,0.5);
+  background: var(--accent-gradient);
+  box-shadow: 0 6px 30px var(--violet-glow);
   transform: translateY(-1px);
 }
 
@@ -1966,8 +1977,8 @@ body[data-theme="light"],
   --gold-light:    #b45309;
   --violet-subtle: rgba(124, 58, 237, 0.08);
   --violet-glow:   rgba(124, 58, 237, 0.22);
-  --hero-gradient: linear-gradient(135deg, #6d28d9 0%, #0284c7 60%, #b45309 100%);
-  --hero-stat-gradient: linear-gradient(135deg, #6d28d9, #0284c7);
+  --hero-gradient: linear-gradient(135deg, #6d28d9 0%, #5b21b6 100%);
+  --hero-stat-gradient: linear-gradient(135deg, #6d28d9, #5b21b6);
   --hero-divider: rgba(0, 0, 0, 0.08);
 }
 
@@ -2022,7 +2033,7 @@ body[data-theme="light"] .sidebar-link:hover {
   color: #0f172a;
 }
 body[data-theme="light"] .sidebar-link.active {
-  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(6, 182, 212, 0.06));
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.12), rgba(124, 58, 237, 0.06));
   color: var(--violet);
 }
 
@@ -2059,12 +2070,13 @@ body[data-theme="light"] .mcq-option.selected {
 
 body[data-theme="light"] .option-pill {
   background: #ffffff;
-  border-color: rgba(0, 0, 0, 0.12);
+  border-color: rgba(71, 85, 105, 0.38);
   color: #334155;
 }
 body[data-theme="light"] .option-pill.selected {
-  color: var(--violet);
-  border-color: var(--violet);
+  color: var(--accent);
+  border-color: var(--accent-strong);
+  background: var(--accent-soft);
 }
 
 body[data-theme="light"] .stat-card {
@@ -2485,7 +2497,7 @@ kbd.typing-kbd {
   justify-content: space-between;
   flex-wrap: wrap;
   gap: 24px;
-  background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(6,182,212,0.05));
+  background: linear-gradient(135deg, rgba(124,58,237,0.1), rgba(124,58,237,0.05));
   border: 1px solid rgba(124,58,237,0.2);
   border-radius: 24px;
   padding: 32px 40px;
@@ -2530,7 +2542,7 @@ kbd.typing-kbd {
 }
 
 .about-deployment-card {
-  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(6,182,212,0.05), rgba(0,112,243,0.04));
+  background: linear-gradient(135deg, rgba(124,58,237,0.08), rgba(124,58,237,0.05), rgba(124,58,237,0.04));
   border: 1px solid rgba(124,58,237,0.25);
   border-radius: 24px;
   padding: 36px 40px;
@@ -2559,7 +2571,7 @@ kbd.typing-kbd {
 }
 
 [data-theme="light"] .about-deployment-card {
-  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(6,182,212,0.04), rgba(0,112,243,0.03));
+  background: linear-gradient(135deg, rgba(124,58,237,0.06), rgba(124,58,237,0.04), rgba(124,58,237,0.03));
 }
 
 /* ── Footer Component Styles ───────────────────────────────────────────────── */
@@ -4194,7 +4206,7 @@ kbd.typing-kbd {
   overflow: hidden;
 }
 [data-theme="light"] .hr-hero-banner {
-  background: linear-gradient(160deg, #ede9fe 0%, #e0f2fe 50%, #f0f9ff 100%);
+  background: linear-gradient(160deg, #ede9fe 0%, #ddd6fe 50%, #f5f3ff 100%);
   border-bottom-color: rgba(124,58,237,0.2);
 }
 .hr-hero-banner::before {
@@ -4241,7 +4253,7 @@ kbd.typing-kbd {
 }
 [data-theme="light"] .hr-hero-title { color: #0f172a; }
 .hr-hero-title-accent {
-  background: linear-gradient(120deg, #7c3aed, #06b6d4);
+  background: var(--accent-gradient);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -5089,7 +5101,7 @@ body[data-theme="light"] .auth-card {
 
 .auth-card-glow-bar {
   height: 3px;
-  background: linear-gradient(90deg, var(--violet), var(--cyan) 60%, var(--gold));
+  background: var(--accent-gradient);
   width: 100%;
 }
 

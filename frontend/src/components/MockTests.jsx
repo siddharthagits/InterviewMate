@@ -50,7 +50,7 @@ function MockTests() {
             { v: "100%", l: "Free Access" },
           ].map(({ v, l }) => (
             <div key={l} style={{ textAlign: "center" }}>
-              <div style={{ fontSize: 22, fontWeight: 800, background: "linear-gradient(135deg,#a5b4fc,#67e8f9)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{v}</div>
+              <div style={{ fontSize: 22, fontWeight: 800, background: "var(--accent-gradient)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>{v}</div>
               <div style={{ fontSize: 12, color: "var(--text-muted)", marginTop: 3 }}>{l}</div>
             </div>
           ))}

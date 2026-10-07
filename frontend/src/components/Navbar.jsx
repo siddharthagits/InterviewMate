@@ -202,13 +202,13 @@ function Navbar() {
   const navGroups = [
     {
       label: "Prepare",
-      accent: "var(--violet-light)",
+      accent: "var(--accent)",
       items: [
         {
           to: "/mock-tests",
           label: "Mock Tests",
           desc: "Full-length interview simulations",
-          color: "var(--violet-light)",
+          color: "var(--accent)",
           isActive: location.pathname === "/mock-tests",
           icon: Icon.mockTests,
         },
@@ -216,7 +216,7 @@ function Navbar() {
           to: "/question-bank",
           label: "Question Bank",
           desc: "Browse thousands of curated Q&As",
-          color: "#6ee7b7",
+          color: "var(--accent)",
           isActive: location.pathname.startsWith("/question-bank"),
           icon: Icon.questionBank,
         },
@@ -224,13 +224,13 @@ function Navbar() {
     },
     {
       label: "AI Tools",
-      accent: "#10b981",
+      accent: "var(--accent)",
       items: [
         {
           to: "/voice",
           label: "Voice Interview",
           desc: "AI-powered spoken interview practice",
-          color: "#10b981",
+          color: "var(--accent)",
           isActive: location.pathname.startsWith("/voice"),
           badge: "AI",
           icon: Icon.voice,
@@ -239,7 +239,7 @@ function Navbar() {
           to: "/typing-test",
           label: "Typing Test",
           desc: "Measure and improve your WPM",
-          color: "var(--cyan)",
+          color: "var(--accent)",
           isActive: location.pathname === "/typing-test",
           icon: Icon.typing,
         },
@@ -247,7 +247,7 @@ function Navbar() {
           to: "/setup",
           label: "Interview Setup",
           desc: "Configure a new AI interview session",
-          color: "var(--gold-light)",
+          color: "var(--accent)",
           isActive: location.pathname === "/setup",
           icon: Icon.setup,
         },
@@ -255,13 +255,13 @@ function Navbar() {
     },
     {
       label: "Resources",
-      accent: "#38bdf8",
+      accent: "var(--accent)",
       items: [
         {
           to: "/company-assessment",
           label: "Companies",
           desc: "Company-specific interview tracks",
-          color: "var(--gold-light)",
+          color: "var(--accent)",
           isActive: location.pathname === "/company-assessment",
           icon: Icon.companies,
         },
@@ -269,7 +269,7 @@ function Navbar() {
           to: "/hr-interview",
           label: "HR Guide",
           desc: "Behavioral & soft-skills playbook",
-          color: "#10b981",
+          color: "var(--accent)",
           isActive: location.pathname === "/hr-interview",
           icon: Icon.hr,
         },
@@ -277,7 +277,7 @@ function Navbar() {
           to: "/#about",
           label: "About",
           desc: "Learn more about InterviewMate",
-          color: "#38bdf8",
+          color: "var(--accent)",
           isActive: false,
           isHash: true,
           icon: Icon.about,
@@ -286,13 +286,13 @@ function Navbar() {
     },
     {
       label: "My Progress",
-      accent: "var(--gold-light)",
+      accent: "var(--accent)",
       items: [
         {
           to: "/history",
           label: "History",
           desc: "Review past interview sessions",
-          color: "#f59e0b",
+          color: "var(--accent)",
           isActive: location.pathname === "/history",
           icon: Icon.history,
         },
@@ -300,7 +300,7 @@ function Navbar() {
           to: "/reports",
           label: "Reports",
           desc: "Detailed performance analytics",
-          color: "#06b6d4",
+          color: "var(--accent)",
           isActive: location.pathname === "/reports",
           icon: Icon.reports,
         },
@@ -347,7 +347,7 @@ function Navbar() {
       >
         {/* Logo */}
         <Link to="/" className="navbar-logo" onClick={() => setMobileMenuOpen(false)}>
-          Interview<span style={{ color: "#fcd34d" }}>Mate</span>
+          Interview<span style={{ color: "var(--accent)" }}>Mate</span>
         </Link>
 
         {/* Desktop: dropdown groups + standalone Practice & Dashboard */}
@@ -356,7 +356,7 @@ function Navbar() {
             to={practiceLink.to}
             className="nav-link"
             style={{
-              color: practiceLink.isActive ? "#f59e0b" : undefined,
+              color: practiceLink.isActive ? "var(--accent)" : undefined,
               fontWeight: practiceLink.isActive ? 700 : undefined,
               display: "inline-flex",
               alignItems: "center",
@@ -474,7 +474,7 @@ function Navbar() {
           <Link
             to="/practice"
             className={`navbar-mobile-link${practiceLink.isActive ? " active" : ""}`}
-            style={{ color: practiceLink.isActive ? "#f59e0b" : undefined }}
+            style={{ color: practiceLink.isActive ? "var(--accent)" : undefined }}
             onClick={() => setMobileMenuOpen(false)}
           >
             <span className="navbar-mobile-link-icon">{Icon.practice}</span>
@@ -613,4 +613,3 @@ function Navbar() {
 }
 
 export default Navbar;
-

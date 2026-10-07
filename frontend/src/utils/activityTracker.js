@@ -31,7 +31,7 @@ export function getStoredActivities() {
     const raw = localStorage.getItem(key);
     if (!raw) return [];
     const parsed = JSON.parse(raw);
-    return Array.isArray(parsed) ? parsed : [];
+    return Array.isArray(parsed) ? parsed.map((activity) => ({ ...activity, color: "var(--accent)" })) : [];
   } catch {
     return [];
   }
@@ -50,6 +50,7 @@ export function logUserActivity(activity) {
       timestamp: Date.now(),
       maxScore: 100,
       ...activity,
+      color: "var(--accent)",
     };
     const updated = [newEntry, ...current].slice(0, 100); // retain latest 100 real activities
     localStorage.setItem(key, JSON.stringify(updated));
@@ -79,12 +80,12 @@ export function calculateOverallStats(activities = []) {
       compositeScore: 0,
       totalActivities: 0,
       domains: {
-        technical: { score: 0, count: 0, label: "Technical Coding & MCQs", color: "#7c3aed" },
-        voice: { score: 0, count: 0, label: "Spoken AI Communication", color: "#06b6d4" },
-        company: { score: 0, count: 0, label: "Company Assessment Tracks", color: "#f59e0b" },
-        subject: { score: 0, count: 0, label: "CS Core Fundamentals", color: "#ec4899" },
-        typing: { score: 0, count: 0, label: "Typing Speed & Accuracy", color: "#10b981" },
-        practice: { score: 0, count: 0, label: "Aptitude & Problem Solving", color: "#6366f1" },
+        technical: { score: 0, count: 0, label: "Technical Coding & MCQs", color: "var(--accent)" },
+        voice: { score: 0, count: 0, label: "Spoken AI Communication", color: "var(--accent)" },
+        company: { score: 0, count: 0, label: "Company Assessment Tracks", color: "var(--accent)" },
+        subject: { score: 0, count: 0, label: "CS Core Fundamentals", color: "var(--accent)" },
+        typing: { score: 0, count: 0, label: "Typing Speed & Accuracy", color: "var(--accent)" },
+        practice: { score: 0, count: 0, label: "Aptitude & Problem Solving", color: "var(--accent)" },
       },
       peakTypingWpm: "—",
       voiceClarity: "—",
@@ -160,12 +161,12 @@ export function calculateOverallStats(activities = []) {
     compositeScore,
     totalActivities: activities.length,
     domains: {
-      technical: { score: techAvg, count: technical.length, label: "Technical Coding & MCQs", color: "#7c3aed" },
-      voice: { score: voiceAvg, count: voice.length, label: "Spoken AI Communication", color: "#06b6d4" },
-      company: { score: companyAvg, count: company.length, label: "Company Assessment Tracks", color: "#f59e0b" },
-      subject: { score: subjectAvg, count: subject.length, label: "CS Core Fundamentals", color: "#ec4899" },
-      typing: { score: typingAvg, count: typing.length, label: "Typing Speed & Accuracy", color: "#10b981" },
-      practice: { score: practiceAvg, count: practice.length, label: "Aptitude & Problem Solving", color: "#6366f1" },
+      technical: { score: techAvg, count: technical.length, label: "Technical Coding & MCQs", color: "var(--accent)" },
+      voice: { score: voiceAvg, count: voice.length, label: "Spoken AI Communication", color: "var(--accent)" },
+      company: { score: companyAvg, count: company.length, label: "Company Assessment Tracks", color: "var(--accent)" },
+      subject: { score: subjectAvg, count: subject.length, label: "CS Core Fundamentals", color: "var(--accent)" },
+      typing: { score: typingAvg, count: typing.length, label: "Typing Speed & Accuracy", color: "var(--accent)" },
+      practice: { score: practiceAvg, count: practice.length, label: "Aptitude & Problem Solving", color: "var(--accent)" },
     },
     peakTypingWpm: peakWpm,
     voiceClarity,
@@ -198,7 +199,7 @@ export function dbSessionToActivity(dbSession) {
     score,
     badge: score >= 75 ? "Passed" : "Completed",
     icon: "code",
-    color: "#7c3aed",
+    color: "var(--accent)",
     // Convert ISO string from backend to ms timestamp for formatTimeAgo()
     timestamp: dbSession.created_at ? new Date(dbSession.created_at).getTime() : Date.now(),
     metrics: {
@@ -209,4 +210,3 @@ export function dbSessionToActivity(dbSession) {
     },
   };
 }
-

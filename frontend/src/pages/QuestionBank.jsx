@@ -125,7 +125,7 @@ function StatsStrip() {
         }}>
           <div style={{
             fontSize: 22, fontWeight: 900, fontFamily: "'Sora', sans-serif",
-            background: "linear-gradient(135deg, #c4b5fd, #06b6d4)",
+            background: "var(--accent-gradient)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             letterSpacing: "-0.5px",
           }}>{val}</div>
@@ -166,7 +166,7 @@ export default function QuestionBank() {
         <div style={{
           position: "absolute", top: 0, left: "50%", transform: "translateX(-50%)",
           width: 700, height: 2,
-          background: "linear-gradient(90deg, transparent, rgba(124,58,237,0.5), rgba(6,182,212,0.3), transparent)",
+          background: "linear-gradient(90deg, transparent, var(--accent-border), transparent)",
         }} />
 
         <div style={{ maxWidth: 1200, margin: "0 auto" }}>
@@ -196,7 +196,7 @@ export default function QuestionBank() {
               }}>
                 Master Every{" "}
                 <span style={{
-                  background: "linear-gradient(135deg, #c4b5fd, #06b6d4, #fcd34d)",
+                  background: "var(--accent-gradient)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>
                   CS Topic
@@ -255,9 +255,9 @@ export default function QuestionBank() {
               {difficulties.map(d => (
                 <button key={d} onClick={() => setFilter(d)} style={{
                   padding: "7px 14px", borderRadius: 99, fontSize: 12, fontWeight: 600, cursor: "pointer",
-                  border: `1px solid ${filter === d ? "#7c3aed" : "rgba(255,255,255,0.08)"}`,
-                  background: filter === d ? "rgba(124,58,237,0.15)" : "transparent",
-                  color: filter === d ? "#c4b5fd" : "var(--text-muted)",
+                  border: `1px solid ${filter === d ? "var(--accent-strong)" : "var(--border)"}`,
+                  background: filter === d ? "var(--accent-soft)" : "transparent",
+                  color: filter === d ? "var(--accent)" : "var(--text-muted)",
                   transition: "all 0.2s",
                 }}>
                   {d === "all" ? "All Levels" : d}

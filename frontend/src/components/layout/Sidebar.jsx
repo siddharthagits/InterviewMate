@@ -94,7 +94,7 @@ const navGroups = [
   {
     label: "Prepare",
     links: [
-      { to: "/practice",      icon: Ic.practice,  label: "Practice Corner", accent: "#f59e0b", matchPrefix: true },
+      { to: "/practice",      icon: Ic.practice,  label: "Practice Corner", accent: "var(--accent)", matchPrefix: true },
       { to: "/mock-tests",    icon: Ic.mockTest,  label: "Mock Tests",      accent: "#c4b5fd" },
       { to: "/question-bank", icon: Ic.book,      label: "Question Bank",   accent: "#6ee7b7", matchPrefix: true },
     ],
@@ -102,8 +102,8 @@ const navGroups = [
   {
     label: "AI Tools",
     links: [
-      { to: "/voice",        icon: Ic.mic,      label: "Voice Interview",  accent: "#10b981", matchPrefix: true, badge: "AI" },
-      { to: "/typing-test",  icon: Ic.keyboard, label: "Typing Test",      accent: "#06b6d4" },
+      { to: "/voice",        icon: Ic.mic,      label: "Voice Interview",  accent: "var(--accent)", matchPrefix: true, badge: "AI" },
+      { to: "/typing-test",  icon: Ic.keyboard, label: "Typing Test",      accent: "var(--accent)" },
       { to: "/setup",        icon: Ic.setup,    label: "Interview Setup",  accent: "#fcd34d" },
     ],
   },
@@ -111,14 +111,14 @@ const navGroups = [
     label: "Resources",
     links: [
       { to: "/company-assessment", icon: Ic.building, label: "Companies", accent: "#fcd34d", matchPrefix: true },
-      { to: "/hr-interview",       icon: Ic.hr,       label: "HR Guide",  accent: "#10b981" },
+      { to: "/hr-interview",       icon: Ic.hr,       label: "HR Guide",  accent: "var(--accent)" },
     ],
   },
   {
     label: "My Progress",
     links: [
-      { to: "/history", icon: Ic.clock, label: "History", accent: "#f59e0b" },
-      { to: "/reports", icon: Ic.chart, label: "Reports", accent: "#06b6d4" },
+      { to: "/history", icon: Ic.clock, label: "History", accent: "var(--accent)" },
+      { to: "/reports", icon: Ic.chart, label: "Reports", accent: "var(--accent)" },
     ],
   },
 ];
@@ -167,7 +167,7 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
       <div className="sidebar-brand-area">
         <Link to="/" className="sidebar-brand" style={{ textDecoration: "none" }} onClick={onClose} title="InterviewMate">
           {isOpen || isMobile ? (
-            <>Interview<span style={{ color: "#fcd34d" }}>Mate</span></>
+            <>Interview<span style={{ color: "var(--accent)" }}>Mate</span></>
           ) : (
             <span className="sidebar-brand-initial">I</span>
           )}
@@ -329,4 +329,3 @@ function Sidebar({ isOpen, onToggle, onClose, isMobile }) {
 }
 
 export default Sidebar;
-

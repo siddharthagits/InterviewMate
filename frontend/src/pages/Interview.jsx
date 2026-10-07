@@ -299,7 +299,7 @@ export default function Interview() {
           <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
             <span style={{
               fontFamily: "'Sora', sans-serif", fontSize: 20, fontWeight: 900,
-              background: "linear-gradient(135deg, #c4b5fd, #06b6d4, #fcd34d)",
+              background: "var(--hero-gradient)",
               WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
             }}>InterviewMate</span>
             {interviewData.company && <CompanyBadge company={interviewData.company} />}
@@ -396,7 +396,7 @@ export default function Interview() {
                         ? "linear-gradient(90deg, #ef4444, #dc2626)"
                         : qSecs <= (PRESSURE_LIMITS[currentQ.type] || 60) * 0.3
                           ? "linear-gradient(90deg, #f59e0b, #d97706)"
-                          : "linear-gradient(90deg, #7c3aed, #06b6d4)",
+                          : "var(--accent-gradient)",
                       transition: "width 1s linear, background 0.3s",
                       borderRadius: "0 2px 2px 0",
                     }} />

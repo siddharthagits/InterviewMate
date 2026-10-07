@@ -30,6 +30,21 @@ function perfLabel(pct) {
   return "Needs Practice";
 }
 
+function accentTint(amount) {
+  return `color-mix(in srgb, var(--accent-strong) ${amount}%, transparent)`;
+}
+
+function explanationErrorMessage(error) {
+  if (typeof window !== "undefined" && window.location.protocol === "https:" && (!import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL.startsWith("http:"))) {
+    return "Backend connection error: configure VITE_API_URL with your HTTPS backend URL.";
+  }
+  if (error.response?.status === 503 || /503|UNAVAILABLE|429|RESOURCE_EXHAUSTED/i.test(error.response?.data?.detail || "")) {
+    return "The AI service is temporarily busy. Please try again in a moment.";
+  }
+  if (error.response?.data?.detail) return `Error: ${error.response.data.detail}`;
+  return `Could not reach backend (${error.message || "unknown error"}). Check the backend connection.`;
+}
+
 // ── Animated score ring ───────────────────────────────────────────────────────
 function ScoreRing({ score, total }) {
   const [anim, setAnim] = useState(0);
@@ -107,7 +122,7 @@ function BrowseMode({ subject }) {
               padding: "5px 13px", borderRadius: 99, fontSize: 11,
               fontWeight: 600, cursor: "pointer", transition: "all 0.15s",
               border: `1px solid ${activeTag === tag ? subject.color : "rgba(255,255,255,0.08)"}`,
-              background: activeTag === tag ? `${subject.color}15` : "transparent",
+              background: activeTag === tag ? accentTint(10) : "transparent",
               color: activeTag === tag ? subject.color : "var(--text-muted)",
             }}>{tag}</button>
           ))}
@@ -291,11 +306,13 @@ function MarkdownBlock({ text }) {
 // ── Topic Row — fully visible, no dropdown ────────────────────────────────────
 function TopicRow({ topic, subject, index }) {
   const [aiExplanation, setAiExplanation] = useState("");
+  const [aiError, setAiError] = useState("");
   const [loadingAi, setLoadingAi] = useState(false);
 
   const handleDiveIn = async () => {
     if (aiExplanation || loadingAi) return;
     setLoadingAi(true);
+    setAiError("");
     try {
       const res = await api.post("/explain-question", {
         question: `Explain in depth the topic "${topic.title}". Context: ${topic.summary}`,
@@ -304,15 +321,7 @@ function TopicRow({ topic, subject, index }) {
       setAiExplanation(res.data.explanation);
     } catch (e) {
       console.error("[Explain Topic]", e);
-      let errMsg = "Failed to get AI explanation.";
-      if (typeof window !== "undefined" && window.location.protocol === "https:" && (!import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL.startsWith("http:"))) {
-        errMsg = "Backend connection error: VITE_API_URL is not configured for HTTPS on Render. Please add VITE_API_URL in Render Dashboard with your backend URL (e.g. https://your-backend.onrender.com).";
-      } else if (e.response?.data?.detail) {
-        errMsg = `Error: ${e.response.data.detail}`;
-      } else if (e.message) {
-        errMsg = `Could not reach backend (${e.message}). Check Render backend logs or CORS settings.`;
-      }
-      setAiExplanation(errMsg);
+      setAiError(explanationErrorMessage(e));
     } finally {
       setLoadingAi(false);
     }
@@ -361,9 +370,9 @@ function TopicRow({ topic, subject, index }) {
           <span style={{
             fontSize: 9, fontWeight: 700, padding: "3px 9px",
             borderRadius: 99, flexShrink: 0,
-            background: `${subject.color}15`,
+            background: accentTint(10),
             color: subject.color,
-            border: `1px solid ${subject.color}30`,
+            border: `1px solid ${accentTint(24)}`,
             textTransform: "uppercase", letterSpacing: "0.07em",
           }}>
             {topic.tag}
@@ -423,6 +432,11 @@ function TopicRow({ topic, subject, index }) {
             </>
           ) : (
             <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+              {aiError && (
+                <div role="alert" style={{ flexBasis: "100%", color: "#b45309", fontSize: 12 }}>
+                  {aiError}
+                </div>
+              )}
               <button 
                 onClick={handleDiveIn}
                 disabled={loadingAi}
@@ -433,7 +447,7 @@ function TopicRow({ topic, subject, index }) {
                   display: "inline-flex", alignItems: "center", gap: 6, transition: "all 0.2s",
                 }}
               >
-                {loadingAi ? "Generating..." : <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={13} /> AI Dive In</span>}
+                {loadingAi ? "Generating..." : aiError ? "Try again" : <span style={{ display: "inline-flex", alignItems: "center", gap: 5 }}><AppIcon name="sparkles" size={13} /> AI Dive In</span>}
               </button>
               <button 
                 onClick={handleChatGPTOpen}
@@ -536,7 +550,7 @@ function TestRunner({ questions, subject, onFinish }) {
                 background: isCurr
                   ? subject.color
                   : answered
-                    ? `${subject.color}60`
+                    ? accentTint(38)
                     : "rgba(255,255,255,0.1)",
                 transition: "all 0.2s",
               }} />
@@ -556,12 +570,12 @@ function TestRunner({ questions, subject, onFinish }) {
               <button key={oi} onClick={() => select(oi)} style={{
                 padding: "13px 18px", borderRadius: 12, textAlign: "left",
                 border: `1px solid ${selected ? subject.color : "rgba(255,255,255,0.07)"}`,
-                background: selected ? `${subject.color}15` : "rgba(255,255,255,0.02)",
+                background: selected ? accentTint(10) : "rgba(255,255,255,0.02)",
                 color: selected ? "var(--text)" : "var(--text-dim)",
                 cursor: "pointer", fontSize: 14, fontWeight: selected ? 600 : 400,
                 display: "flex", gap: 12, alignItems: "center",
                 transition: "all 0.18s",
-                boxShadow: selected ? `0 0 18px ${subject.color}20` : "none",
+                boxShadow: selected ? `0 0 18px ${accentTint(13)}` : "none",
                 transform: selected ? "translateX(2px)" : "none",
               }}>
                 <span style={{
@@ -582,9 +596,13 @@ function TestRunner({ questions, subject, onFinish }) {
       </div>
 
       {/* Nav buttons */}
-      <div style={{ display: "flex", gap: 10 }}>
+      <div style={{ display: "flex", gap: 10, width: "100%" }}>
         <button className="btn btn-outline" onClick={() => setIdx(p => p - 1)} disabled={idx === 0}
-          style={{ fontSize: 13, padding: "11px 20px" }}>← Back</button>
+          style={{
+            fontSize: 13, padding: "11px 20px",
+            color: "var(--text-muted)", opacity: 1,
+            borderColor: "var(--border)",
+          }}>← Back</button>
         <button
           className="btn btn-outline"
           onClick={() => setIdx(p => p + 1)}
@@ -593,11 +611,18 @@ function TestRunner({ questions, subject, onFinish }) {
         >Skip →</button>
         <button
           className="btn btn-primary"
-          onClick={() => { if (isLast) setConfirmOpen(true); else setIdx(p => p + 1); }}
-          disabled={answers[idx] === undefined && !isLast}
+          onClick={() => setIdx(p => p + 1)}
+          disabled={answers[idx] === undefined || isLast}
           style={{ flex: 1, fontSize: 14 }}
         >
-          {isLast ? "Submit Test" : "Next →"}
+          Next →
+        </button>
+        <button
+          className="btn"
+          onClick={() => setConfirmOpen(true)}
+          style={{ fontSize: 14, padding: "11px 24px", background: subject.gradient, border: "none", fontWeight: 700 }}
+        >
+          Submit Test
         </button>
       </div>
 
@@ -618,12 +643,16 @@ function TestRunner({ questions, subject, onFinish }) {
 // ── Test Results Screen ───────────────────────────────────────────────────────
 function TestResults({ result, subject, onRetake, onBrowse }) {
   const { score, total, answers, questions } = result;  const [aiExplanations, setAiExplanations] = useState({});
+  const [aiErrors, setAiErrors] = useState({});
   const [loadingAi, setLoadingAi] = useState({});
+  const skipped = questions.filter((_, i) => answers[i] === undefined).length;
+  const wrong = total - score - skipped;
 
   const handleExplainAI = async (q) => {
     if (aiExplanations[q.id] || loadingAi[q.id]) return;
     
     setLoadingAi(prev => ({ ...prev, [q.id]: true }));
+    setAiErrors(prev => ({ ...prev, [q.id]: "" }));
     try {
       const res = await api.post("/explain-question", {
         question: q.q,
@@ -632,15 +661,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
       setAiExplanations(prev => ({ ...prev, [q.id]: res.data.explanation }));
     } catch (e) {
       console.error("[Explain Question]", e);
-      let errMsg = "Failed to get AI explanation. Please check your connection.";
-      if (typeof window !== "undefined" && window.location.protocol === "https:" && (!import.meta.env.VITE_API_URL || import.meta.env.VITE_API_URL.startsWith("http:"))) {
-        errMsg = "Backend connection error: VITE_API_URL is not configured for HTTPS on Render. Please add VITE_API_URL in Render Dashboard with your backend URL (e.g. https://your-backend.onrender.com).";
-      } else if (e.response?.data?.detail) {
-        errMsg = `Error: ${e.response.data.detail}`;
-      } else if (e.message) {
-        errMsg = `Could not reach backend (${e.message}). Check Render backend logs or CORS settings.`;
-      }
-      setAiExplanations(prev => ({ ...prev, [q.id]: errMsg }));
+      setAiErrors(prev => ({ ...prev, [q.id]: explanationErrorMessage(e) }));
     } finally {
       setLoadingAi(prev => ({ ...prev, [q.id]: false }));
     }
@@ -652,15 +673,16 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
     <div>
       {/* Score hero */}
       <div style={{
-        background: `linear-gradient(135deg, ${subject.color}15, rgba(6,182,212,0.05))`,
-        border: `1px solid ${subject.color}25`,
+        background: `linear-gradient(135deg, ${accentTint(10)}, transparent)`,
+        border: `1px solid ${accentTint(18)}`,
         borderRadius: 20, padding: "28px", marginBottom: 24, textAlign: "center",
       }}>
         <ScoreRing score={score} total={total} />
         <div style={{ marginTop: 20, display: "flex", justifyContent: "center", gap: 20, flexWrap: "wrap" }}>
           {[
             ["Correct", score, "#10b981"],
-            ["Wrong", total - score, "#ef4444"],
+            ["Wrong", wrong, "#ef4444"],
+            ["Skipped", skipped, "#d97706"],
             ["Total", total, "var(--text)"],
           ].map(([label, val, color]) => (
             <div key={label} style={{
@@ -706,9 +728,16 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                     display: "flex", alignItems: "center", justifyContent: "center",
                     fontSize: 11, fontWeight: 800, marginTop: 1,
                   }}>
-                    {unanswered ? "?" : isCorrect ? "OK" : "✕"}
+                    {unanswered ? "—" : isCorrect ? "OK" : "✕"}
                   </span>
-                  <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", lineHeight: 1.5, margin: 0 }}>{q.q}</p>
+                  <div>
+                    <p style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", lineHeight: 1.5, margin: 0 }}>{q.q}</p>
+                    {unanswered && (
+                      <span style={{ display: "inline-block", marginTop: 5, fontSize: 11, fontWeight: 700, color: "#b45309" }}>
+                        Skipped
+                      </span>
+                    )}
+                  </div>
                 </div>
 
                 <div style={{ paddingLeft: 34, display: "flex", flexDirection: "column", gap: 8, marginBottom: 12 }}>
@@ -728,7 +757,7 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                         <span style={{ fontWeight: 800, flexShrink: 0 }}>{["A","B","C","D"][oi]}.</span>
                         <span style={{ flex: 1, lineHeight: 1.4 }}>{opt}</span>
                         <span style={{ flexShrink: 0, fontSize: 12, fontWeight: 700 }}>
-                          {isCorr && isUser ? "Correct (Your answer)" : isCorr ? "Correct" : "Your answer"}
+                          {isCorr && isUser ? "Correct (Your answer)" : isCorr ? (unanswered ? "Correct answer" : "Correct") : "Your answer"}
                         </span>
                       </div>
                     );
@@ -736,10 +765,10 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                   {unanswered && (
                     <div style={{
                       fontSize: 13, padding: "8px 14px", borderRadius: 8,
-                      background: "var(--color-correct-bg)", border: "1.5px solid var(--color-correct-border)",
-                      color: "var(--color-correct-text)", fontWeight: 600,
+                      background: "rgba(245,158,11,0.08)", border: "1.5px solid rgba(245,158,11,0.3)",
+                      color: "#b45309", fontWeight: 600,
                     }}>
-                      Correct: {q.options[q.correct]}
+                      Not answered — the correct answer is shown above.
                     </div>
                   )}
                 </div>
@@ -812,6 +841,18 @@ function TestResults({ result, subject, onRetake, onBrowse }) {
                         <MarkdownBlock text={aiExplanations[q.id]} />
                       </div>
                     </div>
+                  ) : aiErrors[q.id] ? (
+                    <div role="alert" style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
+                      <span style={{ color: "#b45309", fontSize: 12 }}>{aiErrors[q.id]}</span>
+                      <button
+                        onClick={() => handleExplainAI(q)}
+                        disabled={loadingAi[q.id]}
+                        className="btn btn-outline"
+                        style={{ fontSize: 12, padding: "7px 14px" }}
+                      >
+                        {loadingAi[q.id] ? "Generating..." : "Try again"}
+                      </button>
+                    </div>
                   ) : (
                     <div style={{ display: "flex", gap: 10, alignItems: "center", flexWrap: "wrap" }}>
                       <button 
@@ -862,7 +903,10 @@ function TestConfig({ subject, allQuestions, onStart }) {
   const [mode, setMode] = useState("random"); // random | sequential
 
   const maxQ = allQuestions.length;
-  const counts = [10, 15, 20, 25, maxQ].filter(c => c <= maxQ);
+  const counts = [10, 15, 20, 25].filter(c => c < maxQ);
+  if (maxQ > 0 && counts[counts.length - 1] !== maxQ) {
+    counts.push(maxQ);
+  }
 
   return (
     <div>
@@ -875,10 +919,10 @@ function TestConfig({ subject, allQuestions, onStart }) {
             <button key={c} onClick={() => setCount(c)} style={{
               padding: "10px 22px", borderRadius: 12, fontSize: 14, fontWeight: 700, cursor: "pointer",
               border: `1px solid ${count === c ? subject.color : "rgba(255,255,255,0.08)"}`,
-              background: count === c ? `${subject.color}18` : "rgba(255,255,255,0.02)",
+              background: count === c ? accentTint(12) : "rgba(255,255,255,0.02)",
               color: count === c ? subject.color : "var(--text-muted)",
               transition: "all 0.2s",
-              boxShadow: count === c ? `0 0 16px ${subject.color}20` : "none",
+              boxShadow: count === c ? `0 0 16px ${accentTint(13)}` : "none",
             }}>
               {c === maxQ ? `All (${c})` : c}
             </button>
@@ -895,7 +939,7 @@ function TestConfig({ subject, allQuestions, onStart }) {
             <button key={val} onClick={() => setMode(val)} style={{
               padding: "10px 22px", borderRadius: 12, fontSize: 14, fontWeight: 600, cursor: "pointer",
               border: `1px solid ${mode === val ? subject.color : "rgba(255,255,255,0.08)"}`,
-              background: mode === val ? `${subject.color}18` : "rgba(255,255,255,0.02)",
+              background: mode === val ? accentTint(12) : "rgba(255,255,255,0.02)",
               color: mode === val ? subject.color : "var(--text-muted)",
               transition: "all 0.2s",
             }}>
@@ -907,7 +951,7 @@ function TestConfig({ subject, allQuestions, onStart }) {
 
       {/* Estimated time */}
       <div style={{
-        background: `${subject.color}08`, border: `1px solid ${subject.color}20`,
+        background: accentTint(5), border: `1px solid ${accentTint(13)}`,
         borderRadius: 12, padding: "14px 18px", marginBottom: 24,
         display: "flex", gap: 24, fontSize: 13, color: "var(--text-muted)",
       }}>
@@ -922,7 +966,7 @@ function TestConfig({ subject, allQuestions, onStart }) {
         style={{
           width: "100%", fontSize: 15, padding: "14px",
           background: subject.gradient, border: "none", fontWeight: 800,
-          boxShadow: `0 4px 24px ${subject.color}35`,
+          boxShadow: `0 4px 24px ${accentTint(22)}`,
         }}
       >
         Start Test
@@ -968,7 +1012,7 @@ export default function SubjectTest() {
           subject: subject.shortName || subject.name,
         },
         icon: subject.icon || "book",
-        color: subject.color || "#ec4899",
+        color: "var(--accent)",
         badge: pct >= 70 ? "Mastered" : "Completed",
       });
     }
@@ -994,7 +1038,7 @@ export default function SubjectTest() {
 
       {/* ── Hero Header ── */}
       <div className="subject-test-header" style={{
-        background: `linear-gradient(135deg, ${subject.color}12, rgba(6,182,212,0.04))`,
+        background: `linear-gradient(135deg, ${accentTint(8)}, transparent)`,
         borderBottom: "1px solid rgba(255,255,255,0.05)",
         position: "relative", overflow: "hidden",
       }}>
@@ -1020,7 +1064,7 @@ export default function SubjectTest() {
           <div style={{ display: "flex", alignItems: "center", gap: 18, marginBottom: 16, flexWrap: "wrap" }}>
             <div style={{
               width: 56, height: 56, borderRadius: 16,
-              background: `${subject.color}20`, border: `1px solid ${subject.color}35`,
+              background: accentTint(13), border: `1px solid ${accentTint(22)}`,
               display: "flex", alignItems: "center", justifyContent: "center", fontSize: 28, flexShrink: 0,
             }}>
               <AppIcon name={subject.icon} size={28} color={subject.color} />
@@ -1042,7 +1086,7 @@ export default function SubjectTest() {
             {subject.topics.map(t => (
               <span key={t} style={{
                 fontSize: 10, fontWeight: 600, padding: "3px 10px", borderRadius: 99,
-                background: `${subject.color}12`, color: subject.color, border: `1px solid ${subject.color}30`,
+                background: accentTint(8), color: subject.color, border: `1px solid ${accentTint(20)}`,
               }}>{t}</span>
             ))}
           </div>
@@ -1068,7 +1112,7 @@ export default function SubjectTest() {
               background: tab === t.id ? subject.gradient : "transparent",
               color: tab === t.id ? "#fff" : "var(--text-muted)",
               transition: "all 0.2s",
-              boxShadow: tab === t.id ? `0 4px 16px ${subject.color}30` : "none",
+              boxShadow: tab === t.id ? `0 4px 16px ${accentTint(20)}` : "none",
             }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name={t.icon} size={14} /> {t.label}</span>
             </button>
@@ -1083,7 +1127,7 @@ export default function SubjectTest() {
                 Study Topics
                 <span style={{
                   marginLeft: 10, fontSize: 12, fontWeight: 600, padding: "2px 10px", borderRadius: 99,
-                  background: `${subject.color}15`, color: subject.color, border: `1px solid ${subject.color}30`,
+                  background: accentTint(10), color: subject.color, border: `1px solid ${accentTint(20)}`,
                 }}>{getSubjectTopics(subject.id).length} concepts</span>
               </h2>
             </div>

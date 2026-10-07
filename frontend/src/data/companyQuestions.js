@@ -12,7 +12,7 @@
 // ─────────────────────────────────────────────────────────────────────────────
 
 const TCS_META = {
-  color:"#3b82f6", gradient:"linear-gradient(135deg,#3b82f6,#1d4ed8)",
+  color:"var(--accent)", gradient:"var(--accent-gradient)",
   name:"TCS", cutoffPercent:65, durationMinutes:90,
   sections:["Numerical Ability","Verbal Ability","Reasoning Ability","Programming Logic"],
 };
@@ -1255,12 +1255,11 @@ const TCS_2021 = [
 
 // ── Exports ───────────────────────────────────────────────────────────────────
 export const TCS_NQT_YEARS = [
-  { id: 2023, year: 2023, label: "TCS NQT 2023", questions: TCS_2023, meta: TCS_META, gradient: "linear-gradient(135deg,#3b82f6,#1d4ed8)" },
-  { id: 2022, year: 2022, label: "TCS NQT 2022", questions: TCS_2022, meta: TCS_META, gradient: "linear-gradient(135deg,#6366f1,#4338ca)" },
-  { id: 2021, year: 2021, label: "TCS NQT 2021", questions: TCS_2021, meta: TCS_META, gradient: "linear-gradient(135deg,#8b5cf6,#6d28d9)" },
+  { id: 2023, year: 2023, label: "TCS NQT 2023", questions: TCS_2023, meta: TCS_META, gradient: "var(--accent-gradient)" },
+  { id: 2022, year: 2022, label: "TCS NQT 2022", questions: TCS_2022, meta: TCS_META, gradient: "var(--accent-gradient)" },
+  { id: 2021, year: 2021, label: "TCS NQT 2021", questions: TCS_2021, meta: TCS_META, gradient: "var(--accent-gradient)" },
 ];
 
 export function getTCSYear(year) {
   return TCS_NQT_YEARS.find(p => p.year === Number(year)) || TCS_NQT_YEARS[0];
 }
-

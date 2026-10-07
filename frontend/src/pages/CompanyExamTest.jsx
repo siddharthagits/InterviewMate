@@ -9,14 +9,18 @@ import { logUserActivity } from "../utils/activityTracker";
 
 // ── Section colour map ────────────────────────────────────────────────────────
 const SECTION_COLORS = {
-  "Numerical Ability":  { color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  icon: "bar-chart" },
-  "Verbal Ability":     { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "book" },
-  "Reasoning Ability":  { color: "#6366f1", bg: "rgba(99,102,241,0.1)",  icon: "brain" },
-  "Programming Logic":  { color: "#ec4899", bg: "rgba(236,72,153,0.1)",  icon: "code" },
+  "Numerical Ability":  { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "bar-chart" },
+  "Verbal Ability":     { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "book" },
+  "Reasoning Ability":  { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "brain" },
+  "Programming Logic":  { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "code" },
 };
 
 function sectionStyle(sec) {
-  return SECTION_COLORS[sec] || { color: "#7c3aed", bg: "rgba(124,58,237,0.1)", icon: "help-circle" };
+  return SECTION_COLORS[sec] || { color: "var(--accent)", bg: "var(--accent-soft)", icon: "help-circle" };
+}
+
+function accentTint(amount) {
+  return `color-mix(in srgb, var(--accent-strong) ${amount}%, transparent)`;
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -54,7 +58,7 @@ function BrowseCard({ item, index, paper }) {
   return (
     <div style={{
       background: "rgba(10,16,30,0.9)",
-      border: `1px solid ${s.color}22`,
+      border: `1px solid ${accentTint(14)}`,
       borderRadius: 20,
       marginBottom: 22,
       overflow: "hidden",
@@ -65,7 +69,7 @@ function BrowseCard({ item, index, paper }) {
       {/* ── Coloured header strip ── */}
       <div style={{
         background: s.bg,
-        borderBottom: `1px solid ${s.color}30`,
+        borderBottom: `1px solid ${accentTint(20)}`,
         padding: "14px 24px",
         display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 10,
       }}>
@@ -74,7 +78,7 @@ function BrowseCard({ item, index, paper }) {
           <span style={{
             fontFamily: "'JetBrains Mono', monospace",
             fontSize: 14, fontWeight: 900, color: s.color,
-            background: `${s.color}20`, border: `1px solid ${s.color}40`,
+            background: accentTint(13), border: `1px solid ${accentTint(26)}`,
             borderRadius: 8, padding: "3px 10px",
           }}>
             Q{String(index + 1).padStart(2, "0")}
@@ -82,7 +86,7 @@ function BrowseCard({ item, index, paper }) {
           {/* Section badge */}
           <span style={{
             fontSize: 11, fontWeight: 700, padding: "3px 10px", borderRadius: 99,
-            background: `${s.color}15`, color: s.color, border: `1px solid ${s.color}35`,
+            background: accentTint(10), color: s.color, border: `1px solid ${accentTint(23)}`,
             textTransform: "uppercase", letterSpacing: "0.06em",
             display: "flex", alignItems: "center", gap: 5,
           }}>
@@ -91,10 +95,10 @@ function BrowseCard({ item, index, paper }) {
           {/* Year badge */}
           <span style={{
             fontSize: 10, fontWeight: 700, padding: "3px 10px", borderRadius: 99,
-            background: "rgba(59,130,246,0.12)", color: "#60a5fa",
-            border: "1px solid rgba(59,130,246,0.3)",
+            background: "var(--accent-soft)", color: "var(--accent)",
+            border: "1px solid var(--accent-border)",
           }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="calendar" size={11} color="#60a5fa" /> TCS NQT {item.year}</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="calendar" size={11} color="var(--accent)" /> TCS NQT {item.year}</span>
           </span>
         </div>
 
@@ -196,12 +200,12 @@ function BrowseCard({ item, index, paper }) {
           margin: "0 24px 24px",
           borderRadius: 14,
           overflow: "hidden",
-          border: `1px solid ${s.color}30`,
+          border: `1px solid ${accentTint(20)}`,
         }}>
           {/* Solution header */}
           <div style={{
-            background: `${s.color}18`,
-            borderBottom: `1px solid ${s.color}25`,
+            background: accentTint(12),
+            borderBottom: `1px solid ${accentTint(16)}`,
             padding: "12px 18px",
             display: "flex", alignItems: "center", gap: 8,
           }}>
@@ -227,14 +231,14 @@ function BrowseCard({ item, index, paper }) {
           {/* Exam tip */}
           {item.tip && (
             <div style={{
-              background: "rgba(245,158,11,0.07)",
-              borderTop: "1px solid rgba(245,158,11,0.2)",
+              background: "var(--accent-soft)",
+              borderTop: "1px solid var(--accent-border)",
               padding: "12px 18px",
               display: "flex", alignItems: "flex-start", gap: 10,
             }}>
-              <AppIcon name="target" size={15} color="#f59e0b" />
-              <p style={{ fontSize: 13, color: "#fbbf24", lineHeight: 1.65, margin: 0 }}>
-                <strong style={{ color: "#f59e0b" }}>TCS Exam Tip: </strong>{item.tip}
+              <AppIcon name="target" size={15} color="var(--accent)" />
+              <p style={{ fontSize: 13, color: "var(--text)", lineHeight: 1.65, margin: 0 }}>
+                <strong style={{ color: "var(--accent)" }}>TCS Exam Tip: </strong>{item.tip}
               </p>
             </div>
           )}
@@ -356,7 +360,7 @@ function MockTestRunner({ paper, onFinish }) {
       }}>
         <div style={{ display: "flex", alignItems: "center", gap: 14 }}>
           <div style={{
-            background: "linear-gradient(135deg, #3b82f6, #1d4ed8)",
+            background: "var(--accent-gradient)",
             borderRadius: 12, width: 38, height: 38,
             display: "flex", alignItems: "center", justifyContent: "center",
             fontSize: 16, fontWeight: 900, color: "#fff", fontFamily: "'Sora', sans-serif",
@@ -403,7 +407,7 @@ function MockTestRunner({ paper, onFinish }) {
       {/* Progress bar */}
       <div style={{ height: 3, background: "rgba(255,255,255,0.04)" }}>
         <div style={{
-          height: "100%", background: "linear-gradient(90deg,#3b82f6,#06b6d4)",
+          height: "100%", background: "var(--accent-gradient)",
           width: `${((currIdx + 1) / paper.questions.length) * 100}%`,
           transition: "width 0.4s ease",
         }} />
@@ -421,7 +425,7 @@ function MockTestRunner({ paper, onFinish }) {
           <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 22 }}>
             <span style={{
               fontSize: 11, fontWeight: 700, padding: "4px 12px", borderRadius: 99,
-              background: s.bg, color: s.color, border: `1px solid ${s.color}30`,
+              background: s.bg, color: s.color, border: `1px solid ${accentTint(20)}`,
               display: "flex", alignItems: "center", gap: 5,
             }}>
               <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name={s.icon} size={11} color={s.color} /> {q.section}</span>
@@ -429,13 +433,13 @@ function MockTestRunner({ paper, onFinish }) {
             <button
               onClick={() => setFlagged(f => ({ ...f, [currIdx]: !f[currIdx] }))}
               style={{
-                background: flagged[currIdx] ? "rgba(245,158,11,0.12)" : "transparent",
-                border: `1px solid ${flagged[currIdx] ? "#f59e0b" : "rgba(255,255,255,0.1)"}`,
-                color: flagged[currIdx] ? "#f59e0b" : "var(--text-muted)",
+                background: flagged[currIdx] ? "var(--accent-soft)" : "transparent",
+                border: `1px solid ${flagged[currIdx] ? "var(--accent-border)" : "rgba(255,255,255,0.1)"}`,
+                color: flagged[currIdx] ? "var(--accent)" : "var(--text-muted)",
                 padding: "5px 14px", borderRadius: 8, fontSize: 12, fontWeight: 600, cursor: "pointer",
               }}
             >
-              {flagged[currIdx] ? <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="flag" size={13} color="#f59e0b" /> Flagged</span> : <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="flag" size={13} color="var(--text-muted)" /> Flag</span>}
+              {flagged[currIdx] ? <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="flag" size={13} color="var(--accent)" /> Flagged</span> : <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="flag" size={13} color="var(--text-muted)" /> Flag</span>}
             </button>
           </div>
 
@@ -453,7 +457,7 @@ function MockTestRunner({ paper, onFinish }) {
                   key={oi}
                   onClick={() => setAnswers(a => ({ ...a, [currIdx]: oi }))}
                   style={{
-                    background: sel ? `${s.color}18` : "rgba(255,255,255,0.02)",
+                    background: sel ? accentTint(12) : "rgba(255,255,255,0.02)",
                     border: `1px solid ${sel ? s.color : "rgba(255,255,255,0.08)"}`,
                     borderRadius: 14, padding: "15px 20px",
                     display: "flex", alignItems: "center", gap: 14,
@@ -461,7 +465,7 @@ function MockTestRunner({ paper, onFinish }) {
                     fontSize: 14, fontWeight: sel ? 700 : 500,
                     cursor: "pointer", textAlign: "left",
                     transition: "all 0.15s",
-                    boxShadow: sel ? `0 0 20px ${s.color}20` : "none",
+                    boxShadow: sel ? `0 0 20px ${accentTint(13)}` : "none",
                   }}
                 >
                   <span style={{
@@ -517,7 +521,7 @@ function MockTestRunner({ paper, onFinish }) {
               let color  = "var(--text-muted)";
               if (isAns)  { bg = "rgba(16,185,129,0.15)"; border = "1px solid rgba(16,185,129,0.5)"; color = "#34d399"; }
               if (isFlag) { bg = "rgba(245,158,11,0.15)"; border = "1px solid rgba(245,158,11,0.5)"; color = "#fbbf24"; }
-              if (isCurr) { border = `2px solid #3b82f6`; }
+              if (isCurr) { border = "2px solid var(--accent)"; }
               return (
                 <button key={i} onClick={() => setCurrIdx(i)} style={{
                   aspectRatio: "1", borderRadius: 8, background: bg, border, color,
@@ -619,7 +623,7 @@ function ResultScreen({ result, paper, onRetake, onStudy, onBack }) {
               const pct = Math.round((data.correct / data.total) * 100);
               return (
                 <div key={sec} style={{
-                  background: s.bg, border: `1px solid ${s.color}25`,
+                  background: s.bg, border: `1px solid ${accentTint(16)}`,
                   borderRadius: 14, padding: "14px 16px", textAlign: "center",
                 }}>
                   <div style={{ display: "flex", justifyContent: "center", marginBottom: 6 }}>
@@ -757,12 +761,12 @@ export default function CompanyExamTest() {
             <div>
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 8, marginBottom: 12,
-                background: "rgba(59,130,246,0.1)", border: "1px solid rgba(59,130,246,0.3)",
+                background: "var(--accent-soft)", border: "1px solid var(--accent-border)",
                 borderRadius: 99, padding: "5px 16px",
-                fontSize: 11, fontWeight: 700, color: "#3b82f6",
+                fontSize: 11, fontWeight: 700, color: "var(--accent)",
                 textTransform: "uppercase", letterSpacing: "0.07em",
               }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="clipboard" size={12} color="#3b82f6" /> TCS NQT PYQ — {paper.year}</span>
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="clipboard" size={12} color="var(--accent)" /> TCS NQT PYQ — {paper.year}</span>
               </div>
               <h1 style={{ fontSize: "clamp(22px,3vw,36px)", fontWeight: 900, fontFamily: "'Sora', sans-serif", letterSpacing: "-0.8px", marginBottom: 8 }}>
                 TCS NQT {paper.year} — Full Paper
@@ -772,16 +776,16 @@ export default function CompanyExamTest() {
               </p>
               <div style={{
                 padding: "10px 16px", borderRadius: 10,
-                background: "rgba(245,158,11,0.06)", border: "1px solid rgba(245,158,11,0.2)",
-                fontSize: 12, color: "#fbbf24", maxWidth: 620,
+                background: "var(--accent-soft)", border: "1px solid var(--accent-border)",
+                fontSize: 12, color: "var(--text)", maxWidth: 620,
               }}>
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="sparkles" size={13} color="#fbbf24" /> <strong>Pattern Insight:</strong></span> {paper.patternNote}
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="sparkles" size={13} color="var(--accent)" /> <strong style={{ color: "var(--accent)" }}>Pattern Insight:</strong></span> {paper.patternNote}
               </div>
             </div>
 
             {/* Action card */}
             <div style={{
-              background: "var(--card)", border: "1px solid rgba(59,130,246,0.3)",
+              background: "var(--card)", border: "1px solid var(--accent-border)",
               borderRadius: 18, padding: "20px 24px", display: "flex", flexDirection: "column", gap: 12, minWidth: 240,
             }}>
               <div style={{ fontSize: 12, color: "var(--text-muted)", lineHeight: 1.8 }}>
@@ -800,7 +804,7 @@ export default function CompanyExamTest() {
       <div style={{ background: "rgba(255,255,255,0.01)", borderBottom: "1px solid rgba(255,255,255,0.04)", padding: "14px 40px" }}>
         <div style={{ maxWidth: 1100, margin: "0 auto", display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap" }}>
           {sections.map(sec => {
-            const s = sec === "All" ? { color: "#3b82f6", icon: "clipboard" } : sectionStyle(sec);
+            const s = sec === "All" ? { color: "var(--accent)", icon: "clipboard" } : sectionStyle(sec);
             return (
               <button
                 key={sec}

@@ -6,10 +6,10 @@ import { TCS_NQT_YEARS } from "../data/companyQuestions";
 
 // ── Section colour map ────────────────────────────────────────────────────────
 const SECTION_COLORS = {
-  "Numerical Ability":  { color: "#f59e0b", bg: "rgba(245,158,11,0.1)",  icon: "bar-chart" },
-  "Verbal Ability":     { color: "#10b981", bg: "rgba(16,185,129,0.1)",  icon: "book" },
-  "Reasoning Ability":  { color: "#6366f1", bg: "rgba(99,102,241,0.1)",  icon: "brain" },
-  "Programming Logic":  { color: "#ec4899", bg: "rgba(236,72,153,0.1)",  icon: "code" },
+  "Numerical Ability":  { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "bar-chart" },
+  "Verbal Ability":     { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "book" },
+  "Reasoning Ability":  { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "brain" },
+  "Programming Logic":  { color: "var(--accent)", bg: "var(--accent-soft)",  icon: "code" },
 };
 
 // ── Year Card ─────────────────────────────────────────────────────────────────
@@ -173,10 +173,10 @@ function StatsStrip() {
           background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)",
           borderRadius: 14, padding: "14px 20px", textAlign: "center", flex: "1 1 90px",
         }}>
-          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center" }}><AppIcon name={icon} size={20} color="#3b82f6" /></div>
+          <div style={{ marginBottom: 4, display: "flex", justifyContent: "center" }}><AppIcon name={icon} size={20} color="var(--accent)" /></div>
           <div style={{
             fontSize: 20, fontWeight: 900, fontFamily: "'Sora', sans-serif",
-            background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
+            background: "var(--accent-gradient)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
           }}>{val}</div>
           <div style={{ fontSize: 11, color: "var(--text-muted)", marginTop: 2, fontWeight: 600 }}>{label}</div>
@@ -285,11 +285,11 @@ export default function CompanyAssessment() {
               <div style={{
                 display: "inline-flex", alignItems: "center", gap: 8,
                 marginBottom: 14,
-                fontSize: 12, fontWeight: 800, color: "#3b82f6",
+                fontSize: 12, fontWeight: 800, color: "var(--accent)",
                 textTransform: "uppercase", letterSpacing: "0.14em",
               }}>
-                <span style={{ width: 18, height: 1.5, background: "#3b82f6", display: "inline-block", borderRadius: 2 }} />
-                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="award" size={14} color="#3b82f6" /> TCS NQT Previous Year Questions</span>
+                <span style={{ width: 18, height: 1.5, background: "var(--accent)", display: "inline-block", borderRadius: 2 }} />
+                <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="award" size={14} color="var(--accent)" /> TCS NQT Previous Year Questions</span>
               </div>
 
               <h1 style={{
@@ -299,14 +299,14 @@ export default function CompanyAssessment() {
               }}>
                 TCS NQT{" "}
                 <span style={{
-                  background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
+                  background: "var(--accent-gradient)",
                   WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 }}>PYQ Papers</span>
                 <br />2020 – 2024
               </h1>
 
               <p style={{ color: "var(--text)", fontSize: 15, lineHeight: 1.75, marginBottom: 28 }}>
-                Complete collection of TCS National Qualifier Test previous year questions with <strong style={{ color: "#3b82f6" }}>detailed solutions</strong>, section-wise breakdown, and exam tips. Covers all 4 sections — Numerical, Verbal, Reasoning, and Programming Logic.
+                Complete collection of TCS National Qualifier Test previous year questions with <strong style={{ color: "var(--accent)" }}>detailed solutions</strong>, section-wise breakdown, and exam tips. Covers all 4 sections — Numerical, Verbal, Reasoning, and Programming Logic.
               </p>
 
               <StatsStrip />
@@ -320,10 +320,10 @@ export default function CompanyAssessment() {
               <div style={{
                 fontSize: 56, marginBottom: 10,
                 filter: "drop-shadow(0 0 20px rgba(59,130,246,0.4))",
-              }}><AppIcon name="building" size={48} color="#3b82f6" /></div>
+              }}><AppIcon name="building" size={48} color="var(--accent)" /></div>
               <div style={{
                 fontSize: 32, fontWeight: 900, fontFamily: "'Sora', sans-serif",
-                background: "linear-gradient(135deg, #3b82f6, #06b6d4)",
+                background: "var(--accent-gradient)",
                 WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
                 letterSpacing: "-0.5px",
               }}>TCS</div>
@@ -353,9 +353,9 @@ export default function CompanyAssessment() {
               onClick={() => setFilter(sec)}
               style={{
                 padding: "6px 14px", borderRadius: 99, fontSize: 11, fontWeight: 700, cursor: "pointer",
-                background: filter === sec ? "#3b82f6" : "rgba(255,255,255,0.04)",
+                background: filter === sec ? "var(--accent-strong)" : "rgba(255,255,255,0.04)",
                 color: filter === sec ? "#fff" : "var(--text-muted)",
-                border: `1px solid ${filter === sec ? "#3b82f6" : "rgba(255,255,255,0.08)"}`,
+                border: `1px solid ${filter === sec ? "var(--accent)" : "rgba(255,255,255,0.08)"}`,
                 transition: "all 0.15s",
               }}
             >
@@ -376,7 +376,7 @@ export default function CompanyAssessment() {
         {/* Year cards grid */}
         <div style={{ marginBottom: 16, display: "flex", alignItems: "center", justifyContent: "space-between" }}>
           <h2 style={{ fontSize: 18, fontWeight: 800, fontFamily: "'Sora', sans-serif", color: "var(--text)" }}>
-            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="calendar" size={18} color="#3b82f6" /> Year-wise Papers</span>
+            <span style={{ display: "inline-flex", alignItems: "center", gap: 6 }}><AppIcon name="calendar" size={18} color="var(--accent)" /> Year-wise Papers</span>
           </h2>
           <span style={{ fontSize: 12, color: "var(--text-muted)" }}>
             {TCS_NQT_YEARS.length} papers • Latest first
@@ -405,13 +405,13 @@ export default function CompanyAssessment() {
           background: "rgba(59,130,246,0.05)", border: "1px solid rgba(59,130,246,0.12)",
           display: "flex", gap: 16, alignItems: "flex-start",
         }}>
-          <div style={{ width: 36, height: 36, borderRadius: 10, background: "rgba(59,130,246,0.1)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><AppIcon name="info" size={18} color="#3b82f6" /></div>
+          <div style={{ width: 36, height: 36, borderRadius: 10, background: "var(--accent-soft)", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}><AppIcon name="info" size={18} color="var(--accent)" /></div>
           <div>
             <div style={{ fontSize: 14, fontWeight: 700, color: "var(--text)", marginBottom: 6 }}>
               How to use these PYQs effectively
             </div>
             <p style={{ fontSize: 13, color: "var(--text-muted)", lineHeight: 1.7, margin: 0 }}>
-              Start with <strong style={{ color: "#f59e0b" }}>2020</strong> to understand the base pattern, then move forward year by year to track how difficulty evolved. Use <strong style={{ color: "#3b82f6" }}>Browse & Study</strong> mode to learn solutions deeply, then take the <strong style={{ color: "#f59e0b" }}>Mock Test</strong> to simulate real exam conditions. Focus on Programming Logic last as it has the highest weight for Ninja selection.
+              Start with <strong style={{ color: "var(--accent)" }}>2020</strong> to understand the base pattern, then move forward year by year to track how difficulty evolved. Use <strong style={{ color: "var(--accent)" }}>Browse & Study</strong> mode to learn solutions deeply, then take the <strong style={{ color: "var(--accent)" }}>Mock Test</strong> to simulate real exam conditions. Focus on Programming Logic last as it has the highest weight for Ninja selection.
             </p>
           </div>
         </div>

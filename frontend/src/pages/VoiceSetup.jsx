@@ -38,23 +38,23 @@ function MicRing({ active }) {
       {active && [1, 2, 3].map(i => (
         <div key={i} style={{
           position: "absolute", width: 100, height: 100, borderRadius: "50%",
-          border: "2px solid rgba(16,185,129,0.4)",
+          border: "2px solid var(--accent-border)",
           animation: `mcRipple 1.8s ease-out ${i * 0.4}s infinite`,
         }} />
       ))}
       <div style={{
         width: 72, height: 72, borderRadius: "50%",
         background: active
-          ? "linear-gradient(135deg, #10b981, #059669)"
-          : "linear-gradient(135deg, rgba(16,185,129,0.2), rgba(16,185,129,0.1))",
-        border: "2px solid rgba(16,185,129,0.4)",
+          ? "var(--accent-gradient)"
+          : "var(--accent-soft)",
+        border: "2px solid var(--accent-border)",
         display: "flex", alignItems: "center", justifyContent: "center",
         fontSize: 28,
-        boxShadow: active ? "0 0 30px rgba(16,185,129,0.5)" : "none",
+        boxShadow: active ? "0 0 30px var(--accent-border)" : "none",
         transition: "all 0.35s cubic-bezier(0.4,0,0.2,1)",
         position: "relative", zIndex: 1,
       }}>
-        <AppIcon name="mic" size={18} color="#fff" />
+        <AppIcon name="mic" size={24} color={active ? "#fff" : "var(--accent)"} />
       </div>
     </div>
   );
@@ -216,7 +216,7 @@ export default function VoiceSetup() {
           {/* ── Option step ── */}
           {!current.isMicCheck && (
             <div style={{ display: "flex", flexWrap: "wrap", gap: 12 }}>
-              {current.options.map(({ value, icon, color, desc }) => {
+              {current.options.map(({ value, icon, desc }) => {
                 const sel = form[current.name] === value;
                 return (
                   <button
@@ -227,16 +227,14 @@ export default function VoiceSetup() {
                       display: "flex", alignItems: "center", gap: 10,
                       padding: "12px 20px", borderRadius: 14,
                       border: sel
-                        ? `1px solid ${color || "#10b981"}`
-                        : "1px solid rgba(255,255,255,0.08)",
-                      background: sel
-                        ? `${color || "#10b981"}18`
-                        : "rgba(255,255,255,0.02)",
-                      color: sel ? (color || "#10b981") : "var(--text-muted)",
+                        ? "2px solid var(--accent-strong)"
+                        : "1px solid var(--accent-border)",
+                      background: sel ? "var(--accent-soft)" : "var(--card)",
+                      color: sel ? "var(--accent)" : "var(--text-muted)",
                       cursor: "pointer",
                       fontSize: 14, fontWeight: 600,
                       transition: "all 0.2s",
-                      boxShadow: sel ? `0 0 16px ${color || "#10b981"}25` : "none",
+                      boxShadow: sel ? "0 0 0 1px var(--accent-strong)" : "none",
                     }}
                   >
                     <AppIcon name={icon} size={16} />

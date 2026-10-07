@@ -32,13 +32,16 @@ function Dashboard() {
   const { result } = useInterview();
   const [activities, setActivities] = useState([]);
   const [activeTab, setActiveTab] = useState("all");
+  const [historyError, setHistoryError] = useState("");
 
   const loadAll = useCallback(async () => {
     if (!isLoggedIn || !user?.id) {
       setActivities([]);
+      setHistoryError("");
       return;
     }
     const local = getStoredActivities();
+    setHistoryError("");
     try {
       const dbSessions = await fetchInterviewSessions(user.id);
       const dbActivities = dbSessions.map(dbSessionToActivity);
@@ -53,8 +56,9 @@ function Dashboard() {
         (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
       );
       setActivities(merged);
-    } catch {
+    } catch (error) {
       setActivities(local);
+      setHistoryError(error.response?.data?.detail || "Could not sync saved interview history. Showing locally saved activities.");
     }
   }, [isLoggedIn, user?.id]);
 
@@ -154,6 +158,36 @@ function Dashboard() {
 
   return (
     <DashboardLayout>
+      {historyError && (
+        <div
+          role="alert"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            padding: "12px 16px",
+            marginBottom: 16,
+            borderRadius: 12,
+            color: "#b45309",
+            background: "rgba(245,158,11,0.08)",
+            border: "1px solid rgba(245,158,11,0.3)",
+            fontSize: 13,
+          }}
+        >
+          <span>{historyError}</span>
+          <button
+            type="button"
+            onClick={loadAll}
+            className="btn btn-outline"
+            style={{ padding: "7px 14px", fontSize: 12, color: "inherit" }}
+          >
+            Retry
+          </button>
+        </div>
+      )}
+
       {/* ── TOP HERO: INTERACTIVE PROGRESS & PERFORMANCE GRAPH ───────────── */}
       <PerformanceGraph activities={activities} overallScore={composite} />
 

@@ -60,6 +60,7 @@ function History() {
   const [activeFilter, setActiveFilter] = useState("all");
   const [loading, setLoading] = useState(true);
   const [deletingId, setDeletingId] = useState(null);
+  const [historyError, setHistoryError] = useState("");
 
   // Merge local activities + persistent sessions (deduplicated by id)
   const loadAll = useCallback(async () => {
@@ -72,6 +73,7 @@ function History() {
 
     // Fetch DB sessions and merge
     setLoading(true);
+    setHistoryError("");
     try {
       const dbSessions = await fetchInterviewSessions(user.id);
       const dbActivities = dbSessions.map(dbSessionToActivity);
@@ -89,8 +91,9 @@ function History() {
         (a, b) => (b.timestamp || 0) - (a.timestamp || 0)
       );
       setActivities(merged);
-    } catch {
+    } catch (error) {
       setActivities(local);
+      setHistoryError(error.response?.data?.detail || "Could not sync saved interview history. Showing locally saved activities.");
     } finally {
       setLoading(false);
     }
@@ -218,6 +221,37 @@ function History() {
           </button>
         ))}
       </div>
+
+      {historyError && (
+        <div
+          role="alert"
+          style={{
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            gap: 12,
+            flexWrap: "wrap",
+            padding: "12px 16px",
+            marginBottom: 16,
+            borderRadius: 12,
+            color: "#b45309",
+            background: "rgba(245,158,11,0.08)",
+            border: "1px solid rgba(245,158,11,0.3)",
+            fontSize: 13,
+          }}
+        >
+          <span>{historyError}</span>
+          <button
+            type="button"
+            onClick={loadAll}
+            disabled={loading}
+            className="btn btn-outline"
+            style={{ padding: "7px 14px", fontSize: 12, color: "inherit" }}
+          >
+            {loading ? "Retrying..." : "Retry"}
+          </button>
+        </div>
+      )}
 
       {/* History Items */}
       <div style={{ display: "flex", flexDirection: "column", gap: 12 }}>
@@ -384,5 +418,3 @@ function History() {
 }
 
 export default History;
-
-

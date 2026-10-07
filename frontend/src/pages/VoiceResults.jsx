@@ -4,6 +4,7 @@ import { Link } from "react-router-dom";
 import { useInterview } from "../context/InterviewContext";
 import ThemeToggle from "../components/ThemeToggle";
 import { logUserActivity } from "../utils/activityTracker";
+import api from "../api/api";
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const FILLERS = ["um","uh","like","you know","basically","literally","right","so","kind of","sort of","actually","anyway"];
@@ -17,10 +18,8 @@ function countFillers(text) {
   }, 0);
 }
 
-function wpmFromText(text) {
-  if (!text || !text.trim()) return 0;
-  const words = text.trim().split(/\s+/).length;
-  return Math.min(220, Math.max(60, Math.round(words * 4.5)));
+function wordCount(text) {
+  return text?.trim() ? text.trim().split(/\s+/).filter(Boolean).length : 0;
 }
 
 function commLabel(score) {
@@ -93,16 +92,16 @@ function MetricBar({ label, value, maxVal = 100, color, icon, desc }) {
 // ── Per-question card ─────────────────────────────────────────────────────────
 function QuestionCard({ item, qIdx, userAnswers, questions }) {
   const [open, setOpen] = useState(false);
-  const userText = userAnswers[qIdx]?.text || "";
-  const verdict  = item?.verdict || "Answered";
-  const score    = item?.score ?? 0;
+  const answerMetrics = userAnswers?.[qIdx] || {};
+  const userText = answerMetrics.text || "";
+  const verdict  = item?.verdict || "Not evaluated";
+  const score    = item?.score;
   const fillers  = countFillers(userText);
-  const wpm      = wpmFromText(userText);
 
   const verdictColor = verdict === "Excellent" ? "#10b981"
     : verdict === "Good" ? "#7c3aed"
     : verdict === "Partial" ? "#f59e0b"
-    : "#ef4444";
+    : verdict === "Skipped" ? "var(--text-muted)" : "#ef4444";
 
   return (
     <div className="glass" style={{
@@ -113,7 +112,13 @@ function QuestionCard({ item, qIdx, userAnswers, questions }) {
         <div style={{ display:"flex", alignItems:"center", gap:12, flex:1, minWidth:0 }}>
           {/* Score ring small */}
           <div style={{ flexShrink:0 }}>
-            <ScoreRing score={Math.round(score * 10)} color={verdictColor} size={52} strokeWidth={5} />
+            {typeof score === "number"
+              ? <ScoreRing score={Math.round(score * 10)} color={verdictColor} size={52} strokeWidth={5} />
+              : <div style={{
+                width:52, height:52, display:"grid", placeItems:"center",
+                border:`3px solid var(--border)`, borderRadius:"50%",
+                color:"var(--text-muted)", fontSize:11, fontWeight:700,
+              }}>N/A</div>}
           </div>
           <div style={{ minWidth:0 }}>
             <div style={{ fontWeight:700, fontSize:14, marginBottom:4, color:"var(--text)" }}>
@@ -126,12 +131,18 @@ function QuestionCard({ item, qIdx, userAnswers, questions }) {
                 background:`${verdictColor}12`, color:verdictColor,
                 border:`1px solid ${verdictColor}25`,
               }}>{verdict}</span>
-              <span style={{ fontSize:11, color:"var(--text-muted)" }}>{wpm} wpm</span>
-              {fillers > 0 && <span style={{ fontSize:11, color:"#f59e0b" }}>{fillers} filler{fillers !== 1 ? "s":""}</span>}
+              <span style={{ fontSize:11, color:"var(--text-muted)" }}>
+                {answerMetrics.wpm == null ? "Pace not measured" : `${answerMetrics.wpm} wpm`}
+              </span>
+              {userText && <span style={{ fontSize:11, color:fillers > 0 ? "#f59e0b" : "var(--text-muted)" }}>
+                {fillers} filler{fillers !== 1 ? "s" : ""}
+              </span>}
             </div>
           </div>
         </div>
-        <span style={{ color:"var(--text-muted)", fontSize:16, flexShrink:0 }}>{open ? "▲" : "▼"}</span>
+        <span style={{ color:"var(--accent)", fontSize:11, fontWeight:700, flexShrink:0 }}>
+          {open ? "Hide feedback" : "Review answer"}
+        </span>
       </div>
 
       {open && (
@@ -142,21 +153,27 @@ function QuestionCard({ item, qIdx, userAnswers, questions }) {
               <p style={{ fontSize:13, lineHeight:1.75, color:"var(--text-dim)" }}>{userText}</p>
             </div>
           )}
-          {item?.why_weak && (
+          {(item?.issue || item?.why_weak) && (
             <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(245,158,11,0.06)", border:"1px solid rgba(245,158,11,0.15)", fontSize:13, color:"var(--text-muted)", lineHeight:1.7 }}>
-              <strong style={{ color:"#f59e0b" }}>Weakness:</strong> {item.why_weak}
+              <strong style={{ color:"#f59e0b" }}>What needs work:</strong> {item.issue || item.why_weak}
             </div>
           )}
-          {item?.ideal_answer && (
+          {item?.what_worked && (
             <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(16,185,129,0.05)", border:"1px solid rgba(16,185,129,0.15)", fontSize:13, color:"var(--text-muted)", lineHeight:1.7 }}>
-              <strong style={{ color:"#10b981" }}>Ideal:</strong> {item.ideal_answer}
+              <strong style={{ color:"#10b981" }}>What worked:</strong> {item.what_worked}
             </div>
           )}
-          {item?.missed_keywords?.length > 0 && (
+          {(item?.suggested_answer || item?.ideal_answer) && (
+            <div style={{ padding:"10px 14px", borderRadius:10, background:"rgba(16,185,129,0.05)", border:"1px solid rgba(16,185,129,0.15)", fontSize:13, color:"var(--text-muted)", lineHeight:1.7 }}>
+              <strong style={{ color:"#10b981" }}>Example stronger answer (personalize it):</strong>{" "}
+              {item.suggested_answer || item.ideal_answer}
+            </div>
+          )}
+          {(item?.missed_points?.length > 0 || item?.missed_keywords?.length > 0) && (
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>Missed Keywords</div>
+              <div style={{ fontSize:11, fontWeight:700, color:"var(--text-muted)", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:6 }}>Points to include</div>
               <div style={{ display:"flex", gap:8, flexWrap:"wrap" }}>
-                {item.missed_keywords.map((kw, i) => (
+                {(item.missed_points || item.missed_keywords).map((kw, i) => (
                   <span key={i} style={{
                     fontSize:12, padding:"3px 10px", borderRadius:99,
                     background:"rgba(239,68,68,0.08)", color:"#ef4444",
@@ -174,35 +191,75 @@ function QuestionCard({ item, qIdx, userAnswers, questions }) {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function VoiceResults() {
-  const { result, questions, userAnswers, interviewData } = useInterview();
-  const score = result?.score ?? 0;
+  const { result, setResult, questions, userAnswers, interviewData } = useInterview();
+  const reportAnswers = userAnswers || [];
+  const score = result?.score;
   const perQ  = result?.per_question_feedback || [];
+  const dimensions = result?.dimensions;
+  const [retrying, setRetrying] = useState(false);
 
-  // Aggregate filler + wpm stats from all answers
-  const allAnswers = (userAnswers || []).map(a => a?.text || "");
+  // Speaking pace is based on recorded speech duration, not an estimate from transcript length.
+  const allAnswers = reportAnswers.map(a => a?.text || "");
   const totalFillers = allAnswers.reduce((sum, t) => sum + countFillers(t), 0);
-  const avgWpm = Math.round(allAnswers.reduce((sum, t) => sum + wpmFromText(t), 0) / Math.max(allAnswers.length, 1));
+  const totalSpokenWords = reportAnswers.reduce((sum, answer) => sum + wordCount(answer?.text || ""), 0);
+  const totalSpeechSeconds = reportAnswers.reduce((sum, answer) => sum + (answer?.durationSeconds || 0), 0);
+  const avgWpm = totalSpeechSeconds > 0
+    ? Math.round(totalSpokenWords / totalSpeechSeconds * 60)
+    : null;
   const answeredCount = allAnswers.filter(t => t && t.trim()).length;
 
-  // Compute dimension scores
-  const clarityScore  = Math.min(100, score + 5);
-  const confidenceScore = Math.max(0, Math.min(100, score - totalFillers * 3));
-  const pacingScore   = avgWpm >= 110 && avgWpm <= 160 ? 90 : avgWpm > 160 ? 55 : 65;
-  const fillerScore   = Math.max(0, 100 - totalFillers * 8);
-  const coverageScore = Math.round(perQ.filter(q => q.verdict === "Excellent" || q.verdict === "Good").length / Math.max(perQ.length, 1) * 100);
+  const [label, labelColor] = typeof score === "number"
+    ? commLabel(score)
+    : ["Not evaluated", "var(--text-muted)"];
 
-  const [label, labelColor] = commLabel(score);
+  const retryEvaluation = async () => {
+    setRetrying(true);
+    try {
+      const answers = (questions || []).map((question, index) => ({
+        question_id: index + 1,
+        question_type: "text",
+        selected: null,
+        text: reportAnswers[index]?.text || "",
+        correct: null,
+        question_text: question.question,
+      }));
+      const response = await api.post("/evaluate-voice", {
+        interview_data: {
+          role: interviewData.role,
+          experience: interviewData.experience,
+          language: "English",
+          difficulty: interviewData.difficulty,
+          company: null,
+        },
+        answers,
+      });
+      setResult({
+        ...response.data,
+        totalQuestions: questions.length,
+        answered: answeredCount,
+        isVoice: true,
+      });
+    } catch (error) {
+      setResult(previous => ({
+        ...previous,
+        evaluation_status: "unavailable",
+        evaluation_error: error.response?.data?.detail || error.message || "Could not reach the evaluation service.",
+      }));
+    } finally {
+      setRetrying(false);
+    }
+  };
 
   useEffect(() => {
-    if (result && result.score !== undefined) {
+    if (result?.evaluation_status === "evaluated" && typeof result.score === "number") {
       logUserActivity({
         type: "voice",
         title: `${interviewData?.role || "AI"} Voice Interview`,
         category: "Voice AI",
         score: score,
         metrics: {
-          clarity: `${clarityScore}%`,
-          pacing: `${avgWpm} WPM`,
+          clarity: `${dimensions?.clarity ?? "N/A"}%`,
+          pacing: avgWpm === null ? "Not measured" : `${avgWpm} WPM`,
           fillers: `${totalFillers} detected`,
         },
         icon: "mic",
@@ -210,7 +267,7 @@ export default function VoiceResults() {
         badge: score >= 75 ? "Strong" : "Completed",
       });
     }
-  }, [result]);
+  }, [result, score, dimensions, avgWpm, totalFillers, interviewData?.role]);
 
   if (!result) return (
     <div style={{ minHeight:"100vh", display:"flex", flexDirection:"column", alignItems:"center", justifyContent:"center", gap:20, background:"var(--bg)", padding:32, textAlign:"center" }}>
@@ -253,21 +310,51 @@ export default function VoiceResults() {
           <p style={{ color:"var(--text-muted)", fontSize:14 }}>
             {interviewData.role} · {answeredCount}/{questions?.length || perQ.length} answered
           </p>
+          <p style={{ color:"var(--text-muted)", fontSize:12, marginTop:8 }}>
+            Scores assess transcript clarity, relevance, and structure. Pace is calculated from recorded speaking time.
+          </p>
         </div>
 
+        {result.evaluation_status === "unavailable" && (
+          <div className="glass" role="alert" style={{
+            padding:"20px 24px", marginBottom:24, borderRadius:16,
+            borderColor:"rgba(239,68,68,0.35)",
+          }}>
+            <strong style={{ color:"#ef4444" }}>AI evaluation unavailable</strong>
+            <p style={{ color:"var(--text-muted)", margin:"8px 0 14px", lineHeight:1.6 }}>
+              {result.evaluation_error || "The answers were saved, but no evaluation was produced. Your report will not show guessed scores."}
+            </p>
+            <button className="btn btn-primary" onClick={retryEvaluation} disabled={retrying}>
+              {retrying ? "Retrying evaluation…" : "Retry evaluation"}
+            </button>
+          </div>
+        )}
+
+        {result.evaluation_status === "not_evaluated" && (
+          <div className="glass" role="status" style={{
+            padding:"20px 24px", marginBottom:24, borderRadius:16,
+            borderColor:"var(--border-hover)",
+          }}>
+            <strong>No answers to evaluate</strong>
+            <p style={{ color:"var(--text-muted)", margin:"8px 0 0", lineHeight:1.6 }}>
+              Record at least one answer to receive a communication score, specific feedback, and a stronger example response.
+            </p>
+          </div>
+        )}
+
         {/* Score ring + label */}
-        <div className="glass" style={{
+        {typeof score === "number" && <div className="glass" style={{
           padding:"40px 32px", borderRadius:24, textAlign:"center", marginBottom:24,
-          borderColor:"rgba(16,185,129,0.2)",
-          boxShadow:"0 0 60px rgba(16,185,129,0.06)",
+          borderColor:"var(--accent-border)",
+          boxShadow:"0 0 60px var(--accent-soft)",
           animation:"vrFadeUp 0.5s ease 0.1s both",
         }}>
           <ScoreRing score={score} color={labelColor} size={180} strokeWidth={12} label={label} />
           <div style={{ marginTop:24, display:"flex", gap:24, justifyContent:"center", flexWrap:"wrap" }}>
             {[
-              { label:"Questions", value:`${answeredCount} answered`, color:"#06b6d4" },
-              { label:"Filler Words", value:`${totalFillers} total`, color: totalFillers > 5 ? "#ef4444" : "#10b981" },
-              { label:"Avg. Pace", value:`${avgWpm} wpm`, color: avgWpm >= 110 && avgWpm <= 160 ? "#10b981" : "#f59e0b" },
+              { label:"Questions", value:`${answeredCount}/${questions?.length || perQ.length} answered`, color:"var(--accent)" },
+              { label:"Filler Words", value:answeredCount ? `${totalFillers} detected` : "Not measured", color: totalFillers > 5 ? "#ef4444" : "var(--accent)" },
+              { label:"Observed Pace", value:avgWpm === null ? "Not measured" : `${avgWpm} wpm`, color:"var(--accent)" },
             ].map(({ label, value, color }) => (
               <div key={label} style={{ textAlign:"center" }}>
                 <div style={{ fontWeight:800, fontSize:20, color, fontFamily:"'Sora', sans-serif" }}>{value}</div>
@@ -275,26 +362,24 @@ export default function VoiceResults() {
               </div>
             ))}
           </div>
-        </div>
+        </div>}
 
         {/* Dimensions grid */}
-        <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:24 }}>
+        {dimensions && <div style={{ display:"grid", gridTemplateColumns:"1fr 1fr", gap:16, marginBottom:24 }}>
           {[
-            { label:"Clarity",      icon:"sparkles", value:clarityScore,   color:"#10b981",  desc:"Answer coverage" },
-            { label:"Confidence",   icon:"award",    value:confidenceScore, color:"#10b981",  desc:"Low filler = high confidence" },
-            { label:"Pacing",       icon:"clock",    value:pacingScore,     color:"#10b981",  desc:"110–160 wpm ideal" },
-            { label:"Filler Control",icon:"mic",     value:fillerScore,     color:"#10b981",  desc:"Lower = better" },
-            { label:"Coverage",     icon:"target",   value:coverageScore,   color:"#10b981",  desc:"Excellent + Good answers" },
+            { label:"Clarity", icon:"sparkles", value:dimensions.clarity, color:"var(--accent)", desc:"How clearly ideas are explained" },
+            { label:"Relevance", icon:"target", value:dimensions.relevance, color:"var(--accent)", desc:"How directly answers address each question" },
+            { label:"Structure", icon:"layers", value:dimensions.structure, color:"var(--accent)", desc:"How logically answers are organized" },
           ].map((m, idx) => (
             <div key={m.label} className="glass" style={{
               padding:"20px 24px", borderRadius:16,
               animation:`vrFadeUp 0.5s ease ${0.15 + idx * 0.08}s both`,
-              gridColumn: idx === 4 ? "span 2" : "span 1",
+              gridColumn: idx === 2 ? "span 2" : "span 1",
             }}>
               <MetricBar {...m} />
             </div>
           ))}
-        </div>
+        </div>}
 
         {/* AI feedback */}
         {result.feedback && (
@@ -305,7 +390,7 @@ export default function VoiceResults() {
           }}>
             <div style={{
               position:"absolute", left:0, top:0, bottom:0, width:3,
-              background:"linear-gradient(180deg, #10b981, #06b6d4)",
+              background:"var(--accent-gradient)",
               borderRadius:"20px 0 0 20px",
             }} />
             <div style={{ fontSize:12, fontWeight:700, color:"#10b981", textTransform:"uppercase", letterSpacing:"0.08em", marginBottom:10 }}>

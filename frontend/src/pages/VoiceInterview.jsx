@@ -53,7 +53,7 @@ function AIEqualizer({ active, color = "#06b6d4" }) {
           width: 4, borderRadius: 3,
           background: active
             ? `linear-gradient(180deg, ${color}, ${color}44)`
-            : "rgba(255,255,255,0.08)",
+            : "var(--border-hover)",
           height: active ? `${14 + Math.sin(i * 0.9) * 12}px` : "6px",
           animation: active ? `aiEq ${0.45 + (i % 7) * 0.1}s ease-in-out ${i * 0.035}s infinite alternate` : "none",
           transition: "height 0.3s, background 0.3s",
@@ -100,7 +100,7 @@ function UserWave({ active }) {
       {Array.from({ length: 16 }).map((_, i) => (
         <div key={i} style={{
           width: 3, borderRadius: 3,
-          background: active ? "linear-gradient(180deg,#10b981,#059669)" : "rgba(255,255,255,0.08)",
+          background: active ? "linear-gradient(180deg,#10b981,#059669)"           : "var(--border-hover)",
           height: active ? `${10 + Math.sin(i * 1.1) * 10}px` : "4px",
           animation: active ? `userWave ${0.6 + (i % 5) * 0.08}s ease-in-out ${i * 0.06}s infinite alternate` : "none",
           transition: "height 0.2s",
@@ -148,6 +148,8 @@ export default function VoiceInterview() {
 
   const srRef      = useRef(null);
   const answersRef = useRef([]);
+  const speechDurationRef = useRef([]);
+  const speechStartedAtRef = useRef(null);
   const elapsedRef = useRef(0);
   const wordsRef   = useRef(0);
   const timerRef   = useRef(null);
@@ -180,6 +182,7 @@ export default function VoiceInterview() {
         setCtxQs(qs);
         setAnswers(new Array(qs.length).fill(""));
         answersRef.current = new Array(qs.length).fill("");
+        speechDurationRef.current = new Array(qs.length).fill(0);
       } catch {
         const fallback = [
           { id:"v1", type:"text", question:"Tell me about yourself and your background." },
@@ -194,6 +197,7 @@ export default function VoiceInterview() {
         setQuestions(fallback); setCtxQs(fallback);
         setAnswers(new Array(fallback.length).fill(""));
         answersRef.current = new Array(fallback.length).fill("");
+        speechDurationRef.current = new Array(fallback.length).fill(0);
       } finally { setLoading(false); }
     })();
   }, []);
@@ -243,12 +247,19 @@ export default function VoiceInterview() {
     sr.lang = "en-US"; sr.continuous = true; sr.interimResults = true;
 
     let finalText = answersRef.current[idx] || "";
-    sr.onstart  = () => setStatus("listening");
+    let heardSpeech = false;
+    sr.onstart  = () => {
+      speechStartedAtRef.current = performance.now();
+      setStatus("listening");
+    };
     sr.onresult = (e) => {
       let interim = "";
       for (let i = e.resultIndex; i < e.results.length; i++) {
         const t = e.results[i][0].transcript;
-        if (e.results[i].isFinal) finalText += (finalText ? " " : "") + t;
+        if (e.results[i].isFinal) {
+          finalText += (finalText ? " " : "") + t;
+          heardSpeech = true;
+        }
         else interim = t;
       }
       const full = finalText + (interim ? " " + interim : "");
@@ -258,10 +269,18 @@ export default function VoiceInterview() {
     };
     sr.onerror = (e) => { if (e.error !== "aborted") setStatus("idle"); };
     sr.onend = () => {
+      if (heardSpeech && speechStartedAtRef.current !== null) {
+        const durationSeconds = Math.max(0, (performance.now() - speechStartedAtRef.current) / 1000);
+        speechDurationRef.current[idx] = (speechDurationRef.current[idx] || 0) + durationSeconds;
+      }
+      speechStartedAtRef.current = null;
       if (finalText) {
         answersRef.current = answersRef.current.map((a, i) => i === idx ? finalText : a);
         setAnswers([...answersRef.current]);
         setTranscript(finalText);
+        const seconds = speechDurationRef.current[idx] || 0;
+        const wordCount = finalText.trim().split(/\s+/).filter(Boolean).length;
+        setWpm(seconds > 0 ? Math.round(wordCount / seconds * 60) : 0);
       }
       setStatus("idle");
     };
@@ -293,30 +312,56 @@ export default function VoiceInterview() {
 
   const submitAll = async () => {
     setSubmitting(true); setStatus("processing"); synth.cancel();
+    const reportAnswers = questions.map((q, i) => {
+      const text = answersRef.current[i] || "";
+      const durationSeconds = speechDurationRef.current[i] || 0;
+      const words = text.trim().split(/\s+/).filter(Boolean).length;
+      return {
+        question_id: i + 1,
+        question_type: "text",
+        selected: null,
+        text,
+        correct: null,
+        question_text: q.question,
+        durationSeconds,
+        wpm: durationSeconds > 0 ? Math.round(words / durationSeconds * 60) : null,
+      };
+    });
     const list = questions.map((q, i) => ({
-      question_id:   q.id,
-      question_type: "text",
-      selected:      null,
-      text:          answersRef.current[i] || "",
-      correct:       null,
-      question_text: q.question,
+      question_id: reportAnswers[i].question_id,
+      question_type: reportAnswers[i].question_type,
+      selected: reportAnswers[i].selected,
+      text: reportAnswers[i].text,
+      correct: reportAnswers[i].correct,
+      question_text: reportAnswers[i].question_text,
     }));
-    setCtxAnswers(list);
+    setCtxAnswers(reportAnswers);
     try {
-      const resp = await api.post("/evaluate", {
+      const resp = await api.post("/evaluate-voice", {
         interview_data: {
           role: interviewData.role, experience: interviewData.experience,
           language: "English", difficulty: interviewData.difficulty, company: null,
         },
         answers: list,
       });
-      setResult({ ...resp.data, totalQuestions: questions.length, answered: list.length, isVoice: true });
-    } catch {
       setResult({
-        score: 0, feedback: "Could not reach server.",
+        ...resp.data,
+        totalQuestions: questions.length,
+        answered: reportAnswers.filter(answer => answer.text.trim()).length,
+        isVoice: true,
+      });
+    } catch (error) {
+      setResult({
+        evaluation_status: "unavailable",
+        evaluation_error: error.response?.data?.detail || error.message || "Could not reach the evaluation service.",
+        score: null,
+        feedback: "",
         strengths: [], improvements: [],
         per_question_feedback: [], readiness: null,
-        totalQuestions: questions.length, answered: 0, isVoice: true,
+        dimensions: null,
+        totalQuestions: questions.length,
+        answered: reportAnswers.filter(answer => answer.text.trim()).length,
+        isVoice: true,
       });
     } finally {
       setSubmitting(false);
@@ -363,14 +408,14 @@ export default function VoiceInterview() {
       <div className="voice-interview-topbar" style={{
         position:"sticky", top:0, zIndex:100,
         display:"flex", alignItems:"center", justifyContent:"space-between",
-        background:"rgba(4,8,15,0.9)", backdropFilter:"blur(20px)",
-        borderBottom:"1px solid rgba(255,255,255,0.06)",
+        background:"color-mix(in srgb, var(--bg) 92%, transparent)", backdropFilter:"blur(20px)",
+        borderBottom:"1px solid var(--border)",
         gap:12, flexWrap:"wrap",
       }}>
         <div style={{ display:"flex", alignItems:"center", gap:10, flexWrap:"wrap" }}>
           <span style={{
             fontFamily:"'Sora', sans-serif", fontSize:18, fontWeight:900,
-            background:"linear-gradient(135deg, #c4b5fd, #06b6d4, #fcd34d)",
+            background:"var(--hero-gradient)",
             WebkitBackgroundClip:"text", WebkitTextFillColor:"transparent", backgroundClip:"text",
           }}>InterviewMate</span>
           <span style={{
@@ -389,7 +434,7 @@ export default function VoiceInterview() {
           <span style={{
             fontFamily:"'JetBrains Mono', monospace", fontSize:13, fontWeight:700,
             padding:"5px 10px", borderRadius:8,
-            background:"rgba(255,255,255,0.04)", color:"var(--text-muted)",
+            background:"var(--bg2)", color:"var(--text-muted)",
           }}>
             <span style={{ display: "inline-flex", alignItems: "center", gap: 4 }}><AppIcon name="clock" size={12} /> {fmtSecs(totalSecs)}</span>
           </span>
@@ -410,10 +455,10 @@ export default function VoiceInterview() {
       </div>
 
       {/* ── Progress bar ── */}
-      <div style={{ height:3, background:"rgba(255,255,255,0.04)" }}>
+      <div style={{ height:3, background:"var(--bg2)" }}>
         <div style={{
           height:"100%", borderRadius:"0 2px 2px 0",
-          background:"linear-gradient(90deg, #10b981, #06b6d4)",
+          background:"var(--accent-gradient)",
           width:`${progressPct}%`, transition:"width 0.6s ease",
         }} />
       </div>
@@ -435,7 +480,7 @@ export default function VoiceInterview() {
             {/* Top accent */}
             <div style={{
               position:"absolute", top:0, left:0, right:0, height:3,
-              background:"linear-gradient(90deg, #06b6d4, #7c3aed)",
+              background:"var(--accent-gradient)",
               borderRadius:"20px 20px 0 0",
             }} />
 
@@ -443,7 +488,7 @@ export default function VoiceInterview() {
               <div style={{ display:"flex", alignItems:"center", gap:10 }}>
                 <div style={{
                   width:36, height:36, borderRadius:"50%",
-                  background:"linear-gradient(135deg, #06b6d4, #7c3aed)",
+                  background:"var(--accent-gradient)",
                   display:"flex", alignItems:"center", justifyContent:"center", fontSize:16,
                   boxShadow:"0 4px 16px rgba(6,182,212,0.4)",
                 display: "flex", alignItems: "center", justifyContent: "center" }}><AppIcon name="bot" size={24} color="#06b6d4" /></div>
@@ -513,13 +558,14 @@ export default function VoiceInterview() {
               return (
                 <button key={i} onClick={() => { srRef.current?.stop(); setIdx(i); }} style={{
                   width:32, height:32, borderRadius:8, fontSize:11, fontWeight:700,
-                  cursor:"pointer", transition:"all 0.2s", border:"none",
+                  cursor:"pointer", transition:"all 0.2s",
                   background: current  ? "linear-gradient(135deg, #10b981, #059669)"
                              : answered ? "rgba(16,185,129,0.15)"
-                             : "rgba(255,255,255,0.04)",
+                             : "var(--bg2)",
                   color: current  ? "#fff"
                        : answered ? "#10b981"
-                       : "rgba(255,255,255,0.3)",
+                       : "var(--text-muted)",
+                  border: current || answered ? "none" : "1px solid var(--border)",
                   boxShadow: current ? "0 4px 12px rgba(16,185,129,0.35)" : "none",
                 }}>
                   {i+1}
@@ -544,7 +590,7 @@ export default function VoiceInterview() {
             {/* Top accent */}
             <div style={{
               position:"absolute", top:0, left:0, right:0, height:3,
-              background:"linear-gradient(90deg, #10b981, #06b6d4)",
+              background:"var(--accent-gradient)",
               borderRadius:"20px 20px 0 0",
             }} />
 
@@ -665,7 +711,7 @@ export default function VoiceInterview() {
               className="btn btn-outline"
               onClick={() => { srRef.current?.stop(); setIdx(p => p - 1); }}
               disabled={idx === 0 || submitting}
-              style={{ minWidth:100 }}
+              style={{ minWidth:100, opacity: idx === 0 && !submitting ? 0.72 : 1 }}
             >← Back</button>
             <button
               className="btn"

@@ -75,7 +75,7 @@ function Footer() {
                 fontSize: 24,
                 display: "block",
                 marginBottom: 14,
-                background: "linear-gradient(135deg, #c4b5fd 0%, #06b6d4 60%, #fcd34d 100%)",
+                background: "var(--accent-gradient)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
                 backgroundClip: "text",

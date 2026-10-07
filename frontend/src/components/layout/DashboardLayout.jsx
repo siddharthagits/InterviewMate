@@ -59,7 +59,7 @@ function DashboardLayout({ children }) {
         </button>
 
         <Link to="/" className="sidebar-brand" style={{ textDecoration: "none", fontSize: 18 }}>
-          Interview<span style={{ color: "#fcd34d" }}>Mate</span>
+          Interview<span style={{ color: "var(--accent)" }}>Mate</span>
         </Link>
 
         <div style={{ display: "flex", alignItems: "center", gap: 8 }}>

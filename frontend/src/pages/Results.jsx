@@ -105,7 +105,7 @@ function ResultsTab({ result, interviewData }) {
           fontSize: 14, color: "var(--text-dim)", lineHeight: 1.75,
           position: "relative", paddingLeft: 22,
         }}>
-          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: "linear-gradient(180deg, #7c3aed, #06b6d4)", borderRadius: "12px 0 0 12px" }} />
+          <div style={{ position: "absolute", left: 0, top: 0, bottom: 0, width: 3, background: "var(--accent-gradient)", borderRadius: "12px 0 0 12px" }} />
           {result.feedback}
         </div>
       )}
@@ -430,7 +430,7 @@ function ReadinessTab({ result, interviewData, userAnswers = [], questions = [] 
         </div>
         <div style={{
           fontSize: 64, fontWeight: 900, fontFamily: "'Sora', sans-serif",
-          background: "linear-gradient(135deg, #c4b5fd, #06b6d4)",
+          background: "var(--hero-gradient)",
           WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
           letterSpacing: "-2px", lineHeight: 1,
         }}>
@@ -793,7 +793,7 @@ function ReadinessTab({ result, interviewData, userAnswers = [], questions = [] 
               }}>
                 <div style={{
                   width: 28, height: 28, borderRadius: "50%", flexShrink: 0,
-                  background: "linear-gradient(135deg, #7c3aed, #06b6d4)",
+                  background: "var(--accent-gradient)",
                   display: "flex", alignItems: "center", justifyContent: "center",
                   fontSize: 12, fontWeight: 800, color: "#fff",
                 }}>{i + 1}</div>

@@ -152,7 +152,7 @@ export default function InterviewSetup() {
             <div key={i} style={{
               flex: 1, height: 3, borderRadius: 99,
               background: i <= step
-                ? "linear-gradient(90deg, #7c3aed, #06b6d4)"
+                ? "var(--accent-gradient)"
                 : "var(--border)",
               transition: "background 0.4s",
             }} />
@@ -171,9 +171,10 @@ export default function InterviewSetup() {
                   className={`option-pill ${selectedValue === value ? "selected" : ""}`}
                   style={{
                     fontSize: 14,
+                    border: `1px solid ${selectedValue === value ? "var(--accent-strong)" : "#64748b"}`,
                     borderColor: selectedValue === value && color ? color : undefined,
                     color: selectedValue === value && color ? color : undefined,
-                    background: selectedValue === value && color ? `${color}15` : undefined,
+                    background: selectedValue === value ? "var(--accent-soft)" : "var(--card)",
                     boxShadow: selectedValue === value && color ? `0 0 16px ${color}25` : undefined,
                   }}
                   onClick={() => select(value)}

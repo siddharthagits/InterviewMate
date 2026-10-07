@@ -3,15 +3,15 @@ import { Link } from "react-router-dom";
 import { useTheme } from "../../context/ThemeContext";
 import AppIcon, { IconBarChart } from "../common/AppIcon";
 
-/* ── Module color palette ── */
+/* ── Unified accent palette for every performance domain ── */
 const MOD = {
-  all:       { stroke: "#7c3aed", fill: "rgba(124,58,237,0.18)", light: "#a78bfa", label: "Overall" },
-  technical: { stroke: "#7c3aed", fill: "rgba(124,58,237,0.18)", light: "#c4b5fd", label: "Technical" },
-  voice:     { stroke: "#06b6d4", fill: "rgba(6,182,212,0.18)",  light: "#67e8f9", label: "Voice AI"  },
-  company:   { stroke: "#f59e0b", fill: "rgba(245,158,11,0.18)", light: "#fde68a", label: "Company"   },
-  typing:    { stroke: "#10b981", fill: "rgba(16,185,129,0.18)", light: "#6ee7b7", label: "Typing"    },
-  subject:   { stroke: "#ec4899", fill: "rgba(236,72,153,0.18)", light: "#f9a8d4", label: "CS Bank"   },
-  practice:  { stroke: "#6366f1", fill: "rgba(99,102,241,0.18)", light: "#a5b4fc", label: "Practice"  },
+  all:       { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "Overall" },
+  technical: { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "Technical" },
+  voice:     { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "Voice AI"  },
+  company:   { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "Company"   },
+  typing:    { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "Typing"    },
+  subject:   { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "CS Bank"   },
+  practice:  { stroke: "var(--accent)", fill: "var(--accent-soft)", light: "var(--accent)", label: "Practice"  },
 };
 
 const DOMAIN_KEYS = ["technical", "voice", "company", "typing", "subject", "practice"];
@@ -135,11 +135,11 @@ function BarChart({ data, isLight = false }) {
                 width: "100%", borderRadius: "5px 5px 0 0",
                 height: pct > 0 ? `${Math.max(pct * 0.82, 4)}px` : "4px",
                 background: d.value > 0
-                  ? `linear-gradient(180deg, ${d.color} 0%, ${d.color}99 100%)`
+                  ? "linear-gradient(180deg, var(--accent-strong) 0%, color-mix(in srgb, var(--accent-strong) 58%, transparent) 100%)"
                   : (isLight ? "rgba(100, 116, 139, 0.12)" : "rgba(255, 255, 255, 0.06)"),
                 transition: "height 0.5s ease, opacity 0.2s",
                 opacity: isHov ? 1 : 0.82,
-                boxShadow: isHov ? `0 0 12px ${d.color}60` : "none",
+                boxShadow: isHov ? "0 0 12px var(--violet-glow)" : "none",
               }} />
             </div>
           );

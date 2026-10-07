@@ -153,7 +153,7 @@ export default function VoiceLanding() {
         }}>
           Interview Like It's{" "}
           <span style={{
-            background: "linear-gradient(135deg, #10b981, #06b6d4)",
+            background: "var(--hero-gradient)",
             WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text",
           }}>
             Real

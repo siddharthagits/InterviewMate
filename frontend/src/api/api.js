@@ -138,7 +138,8 @@ export async function saveInterviewSession(sessionData) {
 
 /**
  * Fetch all sessions for an authenticated user_id.
- * Returns empty array immediately if userId is not provided.
+ * Returns empty array immediately if userId is not provided. Throws on request
+ * failure so callers can distinguish unavailable history from an empty history.
  * @param {string|null} userId
  * @returns {Promise<Array>}  Array of InterviewSessionResponse objects.
  */
@@ -146,14 +147,9 @@ export async function fetchInterviewSessions(userId = null) {
   if (!userId) {
     return [];
   }
-  try {
-    const params = { user_id: userId, limit: 50 };
-    const res = await api.get("/interview-sessions", { params });
-    return Array.isArray(res.data) ? res.data : [];
-  } catch (err) {
-    console.warn("[InterviewMate] Could not fetch sessions from DB:", err?.message);
-    return [];
-  }
+  const params = { user_id: userId, limit: 50 };
+  const res = await api.get("/interview-sessions", { params });
+  return Array.isArray(res.data) ? res.data : [];
 }
 
 /**

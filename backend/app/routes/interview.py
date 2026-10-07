@@ -12,7 +12,11 @@ from app.schemas.interview import (
     InterviewSessionResponse,
 )
 from app.services.question_service import generate_questions, get_questions_map
-from app.gemini_service import evaluate_answers
+from app.gemini_service import (
+    VoiceEvaluationUnavailable,
+    evaluate_answers,
+    evaluate_voice_answers,
+)
 
 router = APIRouter()
 
@@ -38,10 +42,24 @@ def evaluate(data: EvaluationRequest):
         questions_map=questions_map,
     )
 
+
+@router.post("/evaluate-voice")
+def evaluate_voice(data: EvaluationRequest):
+    try:
+        return evaluate_voice_answers(
+            interview_data=data.interview_data,
+            answers=data.answers,
+        )
+    except VoiceEvaluationUnavailable as exc:
+        raise HTTPException(status_code=503, detail=str(exc)) from exc
+
+
 @router.post("/explain-question")
 def explain(data: ExplainRequest):
     from app.gemini_service import explain_question
     explanation = explain_question(data.question, data.subject)
+    if explanation.startswith("Failed to generate explanation."):
+        raise HTTPException(status_code=503, detail=explanation)
     return {"explanation": explanation}
 
 

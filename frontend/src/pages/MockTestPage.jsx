@@ -224,7 +224,7 @@ function MockTestPage() {
               <span style={{ fontWeight: 700, color: "#10b981" }}>{attempted}/{total}</span>
             </div>
             <div style={{ height: 5, background: "rgba(255,255,255,0.06)", borderRadius: 99, overflow: "hidden" }}>
-              <div style={{ height: "100%", width: `${(attempted / total) * 100}%`, background: "linear-gradient(90deg,#10b981,#06b6d4)", borderRadius: 99, transition: "width 0.3s" }} />
+              <div style={{ height: "100%", width: `${(attempted / total) * 100}%`, background: "var(--accent-gradient)", borderRadius: 99, transition: "width 0.3s" }} />
             </div>
           </div>
 
